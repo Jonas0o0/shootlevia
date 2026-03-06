@@ -1,24 +1,40 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+window.addEventListener('load', () => {
+    const fenetre = document.querySelector<HTMLElement>('main.fenetre');
+    if (fenetre) {
+        fenetre.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'center' });
+    }
+});
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+/*import Router from "./Router.ts";
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+// création des vues de notre application
+const helpView = new HelpView(document.querySelector('.viewContent .help')!);
+const gameListView = new GameListView(
+    document.querySelector('.viewContent > .gameList')
+);
+const aboutView = new AboutView(
+    document.querySelector('.viewContent > .about')
+);
+const gameDetailView = new GameDetailView(
+    document.querySelector('.viewContent > .gameDetail')
+);
+
+const routes = [
+    { path: '/', view: gameListView, title: 'Magasin' },
+    { path: '/about', view: aboutView, title: 'À propos' },
+    { path: '/help', view: helpView, title: 'Support' },
+    { path: '/detail-*', view: gameDetailView, title: 'Détail jeu' },
+];
+Router.routes = routes;
+// élément dans lequel afficher le <h1> de la vue
+Router.titleElement = document.querySelector('.viewTitle');
+// gestion des liens du menu (détection du clic et activation/désactivation)
+Router.setMenuElement(document.querySelector('.mainMenu')!);
+
+// chargement de la vue initiale selon l'URL demandée par l'utilisateur.rice (Deep linking)
+Router.navigate(window.location.pathname, true);
+// gestion des boutons précédent/suivant du navigateur (History API)
+window.onpopstate = () => Router.navigate(document.location.pathname, true);
+*/
+// Auto-scroll vers la fenêtre de la borne au chargement
+
