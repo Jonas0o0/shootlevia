@@ -1,5 +1,5 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Pixelify Sans', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -41,9 +41,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 17px;
   color: white;
   font-size: clamp(1rem, 3vw, 3rem);
   font-weight: 700;
   pointer-events: auto;
   overflow: hidden;
+  background-color: #5A5C74;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.fenetre nav {
+  background-color: #9a3f3f;
+  width: 25%;
+  height: 100%;
+}
+
+.fenetre section {
+  background-color: #499338;
+  width: 100%;
+  height: 100%;
+  box-shadow: 3px 2px 6.3px 7px rgba(0, 0, 0, 0.25);
+  border-radius: 25px;
 }
