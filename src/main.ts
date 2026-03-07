@@ -1,6 +1,7 @@
 import Router from "./Router.ts";
 import View from "./View.ts";
 import type {Route} from "./types.ts";
+import HomeView from "./HomeView.ts";
 
 // Auto-scroll vers la fenêtre de la borne au chargement
 window.addEventListener('load', () => {
@@ -12,7 +13,10 @@ window.addEventListener('load', () => {
 
 
 // création des vues de notre application
-const homeView = new View(document.querySelector('.fenetre .home')!);
+const banner = document.querySelector('.fenetre .banner')!;
+const background = document.querySelector('.fenetre .background')!;
+
+const homeView = new HomeView(document.querySelector('.fenetre .home')!, background, banner)
 const leaderboard = new View(document.querySelector('.fenetre .leaderboard')!);
 const credit = new View(document.querySelector('.fenetre .credit')!);
 const play = new View(document.querySelector('.fenetre .play')!);
@@ -26,7 +30,7 @@ const routes: Route[] = [
 
 Router.routes = routes;
 // élément dans lequel afficher le <h1> de la vue
-Router.titleElement = document.querySelector('.fenetre .title')!;
+Router.titleElement = document.querySelector('.fenetre .banner .title')!;
 // gestion des liens du menu (détection du clic et activation/désactivation)
 Router.setMenuElement(document.querySelector('.fenetre nav')!);
 
