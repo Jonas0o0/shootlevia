@@ -1,0 +1,40 @@
+.credit .credit-container {
+    display: flex;
+    gap: 5px;
+    justify-content: space-around;
+}
+
+.credit .credit-card {
+    background: #545268;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.credit .credit-surnom {
+    color: #FF3030;
+}
+
+.credit .credit-devider {
+    color: #B7B7B7;
+    font-weight: bold;
+}
+
+.credit .credit-label {
+    color: #EF990F;
+    font-weight: bolder;
+}
+
+.credit .credit-info {
+    color: #FFFFFF;
+}
+
+.credit .credit-implication {
+    margin-top: 10px;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+    border: 1px solid #FFF;
+    background: #14A8F2;
+    padding: 2px 5px;
+}

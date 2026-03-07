@@ -29,7 +29,7 @@ export default class Router {
         menuLinks.forEach(link =>
             link.addEventListener('click', (event: MouseEvent) => {
                 event.preventDefault();
-                const target = event.target as HTMLElement;
+                const target = event.currentTarget as HTMLAnchorElement;
                 // on récupère le href du lien cliqué pour déclencher navigate(...)
                 const linkHref = target.getAttribute('href')!;
                 Router.navigate(linkHref);
@@ -44,10 +44,9 @@ export default class Router {
     static navigate(path: string, skipPushState = false) {
         const route = this.routes.find(route => route.path === path);
         if (route) {
-            // on masque la vue précédente
-            if (this.currentRoute) {
-                this.currentRoute.view.hide();
-            }
+            // on masque toutes les vues
+            this.routes.forEach(r => r.view.hide());
+
             this.currentRoute = route;
             route.view.show();
             this.titleElement.innerHTML = `<h1>${route.title}</h1>`;

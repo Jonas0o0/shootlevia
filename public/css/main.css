@@ -13,11 +13,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-#app {
-  width: 100%;
+* {
   margin: 0;
   padding: 0;
-  text-align: center;
+  box-sizing: border-box;
+}
+
+#app {
+  width: 100%;
 }
 
 /* ===== Borne ===== */
@@ -60,6 +63,16 @@
   background-color: #499338;
   width: 100%;
   height: 100%;
+  padding: 15px;
+  overflow: hidden;
   box-shadow: 3px 2px 6.3px 7px rgba(0, 0, 0, 0.25);
   border-radius: 25px;
+}
+
+.fenetre section article {
+  display: none;
+}
+
+.fenetre section article.active {
+  display: block;
 }
