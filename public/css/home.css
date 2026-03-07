@@ -1,0 +1,33 @@
+.fenetre .banner .subtitle{
+    display: none;
+}
+
+.fenetre .banner .subtitle.active {
+    display: block;
+}
+
+.fenetre .home img{
+    width: 20%;
+    height: 20%;
+    object-fit: cover;
+    margin-left: 5%;
+}
+
+.fenetre .home .playButton {
+    background: #F70000;
+    border-radius: 25px;
+    color: #FFF;
+    width: 30%;
+    height: 30%;
+    position: absolute;
+    right: 5%;
+    bottom: 5%;
+    text-align: center;
+    text-decoration: none;
+    font-size: 50px;
+    align-content: center;
+}
+
+.fenetre .home .playButton:hover {
+    background: #d10000;
+}
