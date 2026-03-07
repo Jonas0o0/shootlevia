@@ -2,7 +2,10 @@
   "name": "shootlevia",
   "private": true,
   "version": "0.0.0",
-  "types": ["vite/client", "node"],
+  "types": [
+    "vite/client",
+    "node"
+  ],
   "scripts": {
     "start": "vite --port=8000",
     "build": "tsc && vite build",
