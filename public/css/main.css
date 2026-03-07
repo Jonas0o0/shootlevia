@@ -43,8 +43,6 @@
   align-items: center;
   gap: 17px;
   color: white;
-  font-size: clamp(1rem, 3vw, 3rem);
-  font-weight: 700;
   pointer-events: auto;
   overflow: hidden;
   background-color: #5A5C74;
