@@ -1,0 +1,45 @@
+/*Position des boutons pour les différentes vues*/
+nav {
+    display: flex;
+    flex-direction: column; 
+    justify-content: center;
+    gap: 15px;
+}
+
+/*Visuelle des boutons pour les différentes vues*/
+nav>a {
+    color: white;
+    text-decoration: none;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.5rem;
+}
+
+/*Logo Ilévia*/
+.ilevia {
+    margin-bottom: auto;
+    
+    max-width: 120px;
+    width: 100%;
+    object-fit: contain;
+    
+    align-self: flex-start;
+}
+
+
+/*Bouton Déconnexion*/
+.btn_deconnexion {
+    background-color: #F70000;
+    color: white;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.5rem;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-top: auto;
+}

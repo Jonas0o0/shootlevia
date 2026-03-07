@@ -54,19 +54,19 @@
 }
 
 .fenetre nav {
-  background-color: #9a3f3f;
   width: 25%;
   height: 100%;
 }
 
 .fenetre section {
-  background-color: #499338;
+  background-color: #CECAB7;
   width: 100%;
   height: 100%;
   padding: 15px;
   overflow: hidden;
   box-shadow: 3px 2px 6.3px 7px rgba(0, 0, 0, 0.25);
   border-radius: 25px;
+  position: relative;
 }
 
 .fenetre section article {
@@ -75,4 +75,55 @@
 
 .fenetre section article.active {
   display: block;
+}
+
+.fenetre section .background {
+  width: 100%;
+  height: 80%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #5A5C74;
+  padding-top: 45px;
+  transition: 0.3s ease-in-out;
+}
+
+.fenetre section .background.minimize {
+  height: 60%;
+}
+
+.fenetre section .banner {
+  width: 100%;
+  height: 20%;
+  display: flex;
+  align-items: center;
+  transition: 0.3s ease-in-out;
+}
+
+.fenetre section .banner.maximize {
+  height: 40%;
+}
+
+.fenetre section .background .bariere {
+    width: 100%;
+    position: absolute;
+    left: 0;
+}
+
+.fenetre section .background .bariere.primary {
+  height: 10px;
+  top: 0;
+  background: #B2ADA4;
+}
+
+.fenetre section .background .bariere.secondary {
+  height: 9px;
+  top: 38px;
+  background: #C1C5C9;
+}
+
+.fenetre section .background .bariere.tertiary {
+  height: 18px;
+  top: 14px;
+  background: #897D8B;
 }
