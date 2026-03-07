@@ -23,6 +23,7 @@ nav>a {
     object-fit: contain;
     
     align-self: flex-start;
+    border-radius: 10px;
 }
 
 
