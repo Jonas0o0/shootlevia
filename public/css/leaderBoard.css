@@ -1,7 +1,10 @@
-.leaderboard .leaderboard-container {
-    width: 100%;
+.leaderboard {
     height: 100%;
     overflow-y: auto;
+}
+
+.leaderboard .leaderboard-container {
+    width: 100%;
 }
 
 .leaderboard table {
