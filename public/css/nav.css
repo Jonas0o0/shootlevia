@@ -12,19 +12,25 @@ nav>a {
     text-decoration: none;
     font-family: 'Pixelify Sans', sans-serif;
     font-size: 1.5rem;
+    border-radius: 8px;
+    padding: 3px;
+
 }
 
-/*Logo Ilévia*/
-.ilevia {
+/*Logo ILévia*/
+.logo_link {
     margin-bottom: auto;
-    
+    align-self: flex-start;
     max-width: 120px;
     width: 100%;
-    object-fit: contain;
-    
-    align-self: flex-start;
+    border-radius: 20px;
 }
 
+.ilevia {
+    width: 100%;
+    object-fit: contain;
+    display: block;
+}
 
 /*Bouton Déconnexion*/
 .btn_deconnexion {
@@ -42,4 +48,14 @@ nav>a {
     gap: 10px;
 
     margin-top: auto;
+}
+
+/*Hover sur les boutons des différentes vues*/
+nav a:not(.logo_link):not(.btn_deconnexion):hover {
+    background-color: #ff000055;
+}
+
+/*Active*/
+nav .active:not(.logo_link){
+    background-color: #F70000;
 }
