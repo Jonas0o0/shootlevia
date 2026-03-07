@@ -1,0 +1,7 @@
+test_and_build:
+  stage: test
+  image: node:latest
+  script:
+    - npm ci
+    - npm run build
+    - npm run test
