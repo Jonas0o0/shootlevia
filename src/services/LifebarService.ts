@@ -35,7 +35,7 @@ export class LifebarService {
 	 * @param amount Nombre de vie à ajouter
 	 */
 	addLife(amount: number): void {
-		this.life = Math.min(this.maxLife, this.life + amount);
+		this.life = Math.min(this.maxLife, this.life + Math.abs(amount));
 	}
 
 }
