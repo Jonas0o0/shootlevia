@@ -1,0 +1,22 @@
+.jeu-container {
+    position: relative;
+}
+
+.jeu-container .lifebar {
+    background: slategray;
+    border-radius: 50px;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    border: solid 2px #000000;
+    position: absolute;
+    z-index: 100;
+    top: 15px;
+    left: 15px;
+}
+
+.jeu-container .lifebar img {
+    height: 40px;
+}
