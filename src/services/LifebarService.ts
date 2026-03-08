@@ -47,4 +47,13 @@ export class LifebarService {
 		this.life = Math.max(0, this.life - Math.abs(amount));
 	}
 
+	/**
+	 * Permet de savoir s'il reste des vies au joueur
+	 *
+	 * @return true si le joueur est encore en vie
+	 */
+	isAlive(): boolean {
+		return false;
+	}
+
 }

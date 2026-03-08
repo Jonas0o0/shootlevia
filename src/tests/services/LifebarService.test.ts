@@ -74,3 +74,19 @@ describe('removeLife gerer les nombres négatifs', () => {
 	});
 });
 
+describe('isAlive savoir si le joueur peut continue a jouer', () => {
+	it('devrait retourner true car le joueur a encore des vies', () => {
+		const lifebar = new LifebarService(8);
+		lifebar.removeLife(4);
+		assert.ok(lifebar.isAlive());
+	});
+});
+
+describe('isAlive savoir si le joueur peut continue a jouer', () => {
+	it('devrait retourner false car le joueur na plus de vie', () => {
+		const lifebar = new LifebarService(8);
+		lifebar.removeLife(8);
+		assert.ok(!lifebar.isAlive());
+	});
+});
+
