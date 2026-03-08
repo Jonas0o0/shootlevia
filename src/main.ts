@@ -2,6 +2,7 @@ import Router from './Router.ts';
 import View from './View.ts';
 import type { Route } from './types.ts';
 import HomeView from './HomeView.ts';
+import PlayView from './PlayView.ts';
 
 // Auto-scroll vers la fenêtre de la borne au chargement
 window.addEventListener('load', () => {
@@ -26,7 +27,7 @@ const homeView = new HomeView(
 );
 const leaderboard = new View(document.querySelector('.fenetre .leaderboard')!);
 const credit = new View(document.querySelector('.fenetre .credit')!);
-const play = new View(document.querySelector('.fenetre .play')!);
+const play = new PlayView(document.querySelector('.fenetre .play')!);
 
 const routes: Route[] = [
 	{ path: '/', view: homeView, title: 'ShootLévia' },
