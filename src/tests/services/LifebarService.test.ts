@@ -49,3 +49,11 @@ describe('addLife mettre une valeur négative', () => {
 		assert.strictEqual(lifebar.life, 3);
 	});
 });
+
+describe('removeLife enlever la bonne quantité de vie', () => {
+	it('devrait rendre la vie restante moin la vie enlever', () => {
+		const lifebar = new LifebarService(20);
+		lifebar.removeLife(10);
+		assert.strictEqual(lifebar.life, 10);
+	});
+});

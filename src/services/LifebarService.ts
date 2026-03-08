@@ -38,4 +38,13 @@ export class LifebarService {
 		this.life = Math.min(this.maxLife, this.life + Math.abs(amount));
 	}
 
+	/**
+	 * Permet d'enlever une quantité de vie aux vies restantes
+	 *
+	 * @param amount Nombre de vie à enlever
+	 */
+	removeLife(amount: number): void {
+		console.log(amount);
+	}
+
 }
