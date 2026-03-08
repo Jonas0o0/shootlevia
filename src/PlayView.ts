@@ -8,6 +8,11 @@ export default class PlayView extends View {
 	private speed: number = 5;
 	private keysPressed: Set<string> = new Set();
 	private animationFrameId: number | null = null;
+	private isJumping: boolean = false;
+	private jumpStartY: number = 0;
+	private jumpFrame: number = 0;
+	private jumpDuration: number = 30;
+	private jumpHeight: number = 75;
 
 
 
@@ -41,8 +46,14 @@ export default class PlayView extends View {
 	 * Ajoute la touche pressée à l'ensemble des touches actuellement appuyées
 	 */
 	private handleKeyDown(event: KeyboardEvent) {
-		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 's', 'q', 'd'].includes(event.key)) {
 			this.keysPressed.add(event.key);
+			event.preventDefault();
+		}
+		if (event.key === ' ' && !this.isJumping) {
+			this.isJumping = true;
+			this.jumpStartY = this.positionY;
+			this.jumpFrame = 0;
 			event.preventDefault();
 		}
 	}
@@ -51,7 +62,7 @@ export default class PlayView extends View {
 	 * Gère la libération des touches fléchées en les retirant de l'ensemble des touches actuellement appuyées
 	 */
 	private handleKeyUp(event: KeyboardEvent) {
-		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 's', 'q', 'd'].includes(event.key)) {
 			this.keysPressed.delete(event.key);
 			event.preventDefault();
 		}
@@ -83,16 +94,29 @@ export default class PlayView extends View {
 	 * Cette méthode est appelée à chaque frame (60 fois par seconde)
 	 */
 	private updatePosition() {
-		if (this.keysPressed.has('ArrowUp')) {
+		if (this.isJumping) {
+			this.jumpFrame++;
+			let progress = this.jumpFrame / this.jumpDuration;
+			if (progress <= 0.5) {
+				this.positionY = this.jumpStartY - (progress * 2 * this.jumpHeight);
+			} else {
+				this.positionY = this.jumpStartY - ((1 - progress) * 2 * this.jumpHeight);
+			}
+			if (this.jumpFrame >= this.jumpDuration) {
+				this.isJumping = false;
+				this.positionY = this.jumpStartY;
+			}
+		}
+		if (this.keysPressed.has('ArrowUp') || this.keysPressed.has('z')) {
 			this.positionY -= this.speed;
 		}
-		if (this.keysPressed.has('ArrowDown')) {
+		if (this.keysPressed.has('ArrowDown') || this.keysPressed.has('s')) {
 			this.positionY += this.speed;
 		}
-		if (this.keysPressed.has('ArrowLeft')) {
+		if (this.keysPressed.has('ArrowLeft') || this.keysPressed.has('q')) {
 			this.positionX -= this.speed;
 		}
-		if (this.keysPressed.has('ArrowRight')) {
+		if (this.keysPressed.has('ArrowRight') || this.keysPressed.has('d')) {
 			this.positionX += this.speed;
 		}
 		this.img.style.left = `${this.positionX}px`;
