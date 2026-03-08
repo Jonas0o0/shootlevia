@@ -22,3 +22,12 @@ describe('constructeur accept pas les valeurs négatives et 0', () => {
 		assert.strictEqual(lifebar.life, 3);
 	});
 });
+
+describe('addLife ajouter de la vie', () => {
+	it('devrait renvoyer l addition des vies plus celle ajoutées', () => {
+		const lifebar = new LifebarService(20);
+		lifebar.life = 10;
+		lifebar.addLife(3);
+		assert.strictEqual(lifebar.life, 13);
+	});
+});

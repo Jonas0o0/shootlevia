@@ -21,4 +21,13 @@ export class LifebarService {
 		this.life = amountOfLife <= 0 ? 3 : amountOfLife;
 	}
 
+	/**
+	 * Permet d'ajouter une quantité de vie aux vies restantes
+	 *
+	 * @param amount Nombre de vie à ajouter
+	 */
+	addLife(amount: number): void {
+		console.log(amount);
+	}
+
 }
