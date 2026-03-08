@@ -66,3 +66,11 @@ describe('removeLife sans depasser 0', () => {
 	});
 });
 
+describe('removeLife gerer les nombres négatifs', () => {
+	it('devrait utiliser la valeur absolue de la valeur enlevé', () => {
+		const lifebar = new LifebarService(8);
+		lifebar.removeLife(-12);
+		assert.strictEqual(lifebar.life, 0);
+	});
+});
+
