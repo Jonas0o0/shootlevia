@@ -40,3 +40,12 @@ describe('addLife sans depasser le max', () => {
 		assert.strictEqual(lifebar.life, 20);
 	});
 });
+
+describe('addLife mettre une valeur négative', () => {
+	it('devrait devrait faire utilisé la valeur absolue de la valeur ajouté', () => {
+		const lifebar = new LifebarService(5);
+		lifebar.life = 1;
+		lifebar.addLife(-2);
+		assert.strictEqual(lifebar.life, 3);
+	});
+});
