@@ -31,3 +31,12 @@ describe('addLife ajouter de la vie', () => {
 		assert.strictEqual(lifebar.life, 13);
 	});
 });
+
+describe('addLife sans depasser le max', () => {
+	it('devrait rendre le max de vie', () => {
+		const lifebar = new LifebarService(20);
+		lifebar.life = 10;
+		lifebar.addLife(20);
+		assert.strictEqual(lifebar.life, 20);
+	});
+});
