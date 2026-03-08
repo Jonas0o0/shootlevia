@@ -15,3 +15,10 @@ describe('constructeur avec un nombre de vie donné', () => {
 		assert.strictEqual(lifebar.life, 10);
 	});
 });
+
+describe('constructeur accept pas les valeurs négatives et 0', () => {
+	it('vue que valeur négative alors donne la valeur par default', () => {
+		const lifebar = new LifebarService(-2);
+		assert.strictEqual(lifebar.life, 3);
+	});
+});
