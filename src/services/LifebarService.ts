@@ -18,7 +18,7 @@ export class LifebarService {
 	 * Par default 3 vies
 	 */
 	constructor(amountOfLife: number = 3) {
-		this.life = amountOfLife;
+		this.life = amountOfLife <= 0 ? 3 : amountOfLife;
 	}
 
 }
