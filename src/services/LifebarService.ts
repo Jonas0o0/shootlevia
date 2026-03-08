@@ -44,7 +44,7 @@ export class LifebarService {
 	 * @param amount Nombre de vie à enlever
 	 */
 	removeLife(amount: number): void {
-		this.life = Math.max(0, this.life - amount);
+		this.life = Math.max(0, this.life - Math.abs(amount));
 	}
 
 }
