@@ -53,7 +53,7 @@ export class LifebarService {
 	 * @return true si le joueur est encore en vie
 	 */
 	isAlive(): boolean {
-		return false;
+		return this.life > 0;
 	}
 
 }
