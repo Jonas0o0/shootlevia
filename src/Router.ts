@@ -68,11 +68,11 @@ export default class Router {
 			route.view.show();
 			this.titleElement.innerHTML = `<h1>${route.title}</h1>`;
 
-			// Activation/désactivation des liens du menu
-			const previousMenuLink = this.#menuElement.querySelector('a.active'),
-				newMenuLink = this.#menuElement.querySelector(`a[href="${path}"]`);
-			previousMenuLink?.classList.remove('active'); // on retire la classe "active" du précédent menu
-			newMenuLink?.classList.add('active'); // on ajoute la classe CSS "active" sur le nouveau lien
+            // Activation/désactivation des liens du menu
+            const previousMenuLink = this.#menuElement.querySelector('a.active'),
+            newMenuLink = this.#menuElement.querySelector(`a[href="${path}"]:not(.logo_link)`);
+            previousMenuLink?.classList.remove('active'); // on retire la classe "active" du précédent menu
+            newMenuLink?.classList.add('active'); // on ajoute la classe CSS "active" sur le nouveau lien
 
 			// History API : ajout d'une entrée dans l'historique du navigateur
 			// pour pouvoir utiliser les boutons précédent/suivant

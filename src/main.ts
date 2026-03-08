@@ -47,6 +47,6 @@ Router.registerLinks(
 );
 
 // chargement de la vue initiale selon l'URL demandée par l'utilisateur.rice (Deep linking)
-Router.navigate(window.location.pathname, true);
+Router.navigate('/', true);
 // gestion des boutons précédent/suivant du navigateur (History API)
 window.onpopstate = () => Router.navigate(document.location.pathname, true);
