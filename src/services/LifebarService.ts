@@ -44,7 +44,7 @@ export class LifebarService {
 	 * @param amount Nombre de vie à enlever
 	 */
 	removeLife(amount: number): void {
-		console.log(amount);
+		this.life -= amount;
 	}
 
 }
