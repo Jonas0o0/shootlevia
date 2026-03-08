@@ -5,6 +5,13 @@
 export class LifebarService {
 
 	/**
+	 * Nombre de vies maximum
+	 * @type {number}
+	 * @private
+	 */
+	private readonly maxLife: number;
+
+	/**
 	 * Nombre de vies restantes au joueur
 	 * @type {number}
 	 */
@@ -18,6 +25,7 @@ export class LifebarService {
 	 * Par default 3 vies
 	 */
 	constructor(amountOfLife: number = 3) {
+		this.maxLife = amountOfLife <= 0 ? 3 : amountOfLife;
 		this.life = amountOfLife <= 0 ? 3 : amountOfLife;
 	}
 
@@ -27,7 +35,7 @@ export class LifebarService {
 	 * @param amount Nombre de vie à ajouter
 	 */
 	addLife(amount: number): void {
-		this.life += amount;
+		this.life = Math.min(this.maxLife, this.life + amount);
 	}
 
 }
