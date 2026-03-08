@@ -36,6 +36,7 @@ export class LifebarService {
 	 */
 	addLife(amount: number): void {
 		this.life = Math.min(this.maxLife, this.life + Math.abs(amount));
+		this.notify();
 	}
 
 	/**
@@ -45,6 +46,7 @@ export class LifebarService {
 	 */
 	removeLife(amount: number): void {
 		this.life = Math.max(0, this.life - Math.abs(amount));
+		this.notify();
 	}
 
 	/**
@@ -54,6 +56,28 @@ export class LifebarService {
 	 */
 	isAlive(): boolean {
 		return this.life > 0;
+	}
+
+	/**
+	 * Listes des observers de la lifebar (leur callback)
+	 * @private
+	 */
+	private onChangeListeners: ((amountOfLife: number) => void)[] = [];
+
+	/**
+	 * Permet au composant de s'inscrire comme observer
+	 * @param callBack
+	 */
+	public onLifeChange(callBack: (amountOfLife: number) => void) {
+		this.onChangeListeners.push(callBack);
+	}
+
+	/**
+	 * Permet de notifier les observers du changement du nombre de vies
+	 * @private
+	 */
+	private notify() {
+		this.onChangeListeners.forEach(callBack => callBack(this.life));
 	}
 
 }
