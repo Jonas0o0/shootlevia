@@ -57,3 +57,12 @@ describe('removeLife enlever la bonne quantité de vie', () => {
 		assert.strictEqual(lifebar.life, 10);
 	});
 });
+
+describe('removeLife sans depasser 0', () => {
+	it('devrait rentre 0 le min de vie', () => {
+		const lifebar = new LifebarService(20);
+		lifebar.removeLife(40);
+		assert.strictEqual(lifebar.life, 0);
+	});
+});
+
