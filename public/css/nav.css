@@ -53,7 +53,7 @@ nav>a {
 }
 
 /*Hover sur les boutons des différentes vues*/
-nav a:not(.logo_link):not(.btn_deconnexion):hover {
+nav a:not(.logo_link):hover {
     background-color: #ff000055;
 }
 
