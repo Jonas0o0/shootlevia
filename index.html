@@ -13,7 +13,9 @@
 	<link rel="stylesheet" href="/css/nav.css" />
 	<link rel="stylesheet" href="/css/home.css" />
 	<link rel="stylesheet" href="/css/leaderBoard.css" />
+	<link rel="stylesheet" href="/css/popup.css" />
 	<title>shootlevia</title>
+	<script type="module" src="/src/main.ts"></script>
 </head>
   <body id="app">
       <section class="borne-container">
@@ -26,10 +28,7 @@
             <a href="/" class="homePage">Home</a>
             <a href="/leaderboard">Leaderboard</a>
             <a href="/credit">Crédit</a>
-            <a href="/login" class="btn_deconnexion">
-              <img class="image_deconnexion" src="/image/logo_Deconnexion.png" alt="logo deconnexion">
-              Déconnexion
-            </a>
+            <a href="" class="btn_deconnexion"></a>
           </nav>
 		<section>
 			<div class="banner">
@@ -105,8 +104,47 @@
 				</article>
 			</div>
 		</section>
+			<form id="popup">
+				<h1>Connexion</h1>
+				<input type="text" placeholder="pseudo">
+
+				<div class="avatar-choice">
+
+					<label>
+						<input type="radio" name="avatar" value="avatar1.png" required>
+						<img src="/image/ilevia_logo.png" alt="avatar1">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="avatar2.png">
+						<img src="/image/ilevia_logo.png" alt="avatar2">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="avatar3.png">
+						<img src="/image/ilevia_logo.png" alt="avatar3">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="avatar4.png">
+						<img src="/image/ilevia_logo.png" alt="avatar4">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="avatar5.png">
+						<img src="/image/ilevia_logo.png" alt="avatar5">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="avatar6.png">
+						<img src="/image/ilevia_logo.png" alt="avatar6">
+					</label>
+
+				</div>
+
+				<input type="submit" value="Se connecter">
+			</form>
 	</main>
-</section>
-<script type="module" src="/src/main.ts"></script>
+  </section>
 </body>
 </html>

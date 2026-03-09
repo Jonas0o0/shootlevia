@@ -21,6 +21,7 @@ class LoginServiceMemory implements LoginService {
 	}
 	logout(): void {
 		this.accounts = null;
+		this.removeCookie();
 	}
 	getCurrentUser(): Account | null {
 		return this.accounts;
@@ -38,6 +39,10 @@ class LoginServiceMemory implements LoginService {
 	setCookie(account: Account): void {
 		const accountString = JSON.stringify(account);
 		document.cookie = `account=${accountString}; path=/;`;
+	}
+
+	removeCookie(): void {
+		document.cookie = `account=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
 	}
 }
 

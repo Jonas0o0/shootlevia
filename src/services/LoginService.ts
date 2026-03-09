@@ -12,4 +12,6 @@ export interface LoginService {
 	checkCoookie(): Account | null;
 
 	setCookie(account: Account): void;
+
+	removeCookie(): void;
 }
