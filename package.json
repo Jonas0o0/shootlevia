@@ -2,19 +2,17 @@
   "name": "shootlevia",
   "private": true,
   "version": "0.0.0",
-  "types": [
-    "vite/client",
-    "node"
-  ],
   "scripts": {
     "start": "vite --port=8000",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "node --test",
-    "test:watch": "node --test --watch"
+    "test:watch": "node --test --watch",
+    "testBeforeCommit": "tsc && vite build && node --test"
   },
   "devDependencies": {
     "@types/node": "^25.3.5",
+    "happy-dom": "^20.8.3",
     "prettier": "^3.8.1",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
