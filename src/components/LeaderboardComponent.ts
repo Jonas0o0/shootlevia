@@ -17,7 +17,7 @@ export class LeaderboardComponent {
 
 		let htmlGen: string = '';
 		for (let i = 0; i < entries.length && i <= 9; i++) {
-			htmlGen += `<tr><td>${i <= 2 ? '' : i + 1}</td><td>${entries[i].joueur}</td><td>${entries[i].score}</td></tr>`;
+			htmlGen += `<tr><td>${i <= 2 ? '' : i + 1}</td><td>${entries[i].joueur}</td><td>${entries[i].score}</td><td>${new Date(entries[i].date).toLocaleDateString('fr-FR')}</td></tr>`;
 		}
 
 		return htmlGen;

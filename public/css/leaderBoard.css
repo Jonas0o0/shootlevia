@@ -5,6 +5,7 @@
 
 .leaderboard .leaderboard-container {
     width: 100%;
+    background-color: #5A5C74;
 }
 
 .leaderboard table {
@@ -20,7 +21,7 @@
     padding: 6px 10px;
     text-align: center;
     color: #EF990F;
-    font-size: 1.7em;
+    font-size: 1.5em;
     border-bottom: 2px solid whitesmoke;
 }
 
@@ -32,7 +33,7 @@
     padding: 5px 10px;
     text-align: center;
     color: #ffffff;
-    font-size: 1.4em;
+    font-size: 1.2em;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
