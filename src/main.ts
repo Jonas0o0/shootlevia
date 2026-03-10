@@ -3,6 +3,7 @@ import View from './View.ts';
 import type { Route } from './types.ts';
 import HomeView from './HomeView.ts';
 import PlayView from './PlayView.ts';
+import Game from './models/Game.ts';
 
 // Auto-scroll vers la fenêtre de la borne au chargement
 window.addEventListener('load', () => {
@@ -51,3 +52,8 @@ Router.registerLinks(
 Router.navigate('/', true);
 // gestion des boutons précédent/suivant du navigateur (History API)
 window.onpopstate = () => Router.navigate(document.location.pathname, true);
+
+
+const game = new Game();
+setInterval(() => game.update(), 1000 / 60);
+requestAnimationFrame(game.update);
