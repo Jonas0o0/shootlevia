@@ -8,6 +8,7 @@ import Game from './models/Game.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 const socket: Socket = io(window.location.hostname + ':8080');
+import PlayView from './PlayView.ts';
 
 // Auto-scroll vers la fenêtre de la borne au chargement
 window.addEventListener('load', () => {
@@ -37,7 +38,7 @@ const loginService: LoginServiceMemory = new LoginServiceMemory();
 
 const leaderboard = new View(document.querySelector('.fenetre .leaderboard')!);
 const credit = new View(document.querySelector('.fenetre .credit')!);
-const play = new View(document.querySelector('.fenetre .play')!);
+const play = new PlayView(document.querySelector('.fenetre .play')!);
 
 const popup = new PopupLoginView(
 	document.querySelector('#popup')!,

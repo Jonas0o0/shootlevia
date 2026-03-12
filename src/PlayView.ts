@@ -1,125 +1,114 @@
 import View from './View.ts';
 
+const canvas: HTMLCanvasElement = document.querySelector('.fenetre .play .play_canvas')!;
+const ctx = canvas.getContext('2d')!;
+
 export default class PlayView extends View {
 
 	private img: HTMLImageElement;
-	private positionX: number = 0;
-	private positionY: number = 0;
-	private speed: number = 5;
-	private keysPressed: Set<string> = new Set();
-	private animationFrameId: number | null = null;
-	private isJumping: boolean = false;
-	private jumpStartY: number = 0;
-	private jumpFrame: number = 0;
-	private jumpDuration: number = 30;
-	private jumpHeight: number = 75;
+    private spriteWidth: number = 0;
+    private spriteHeight: number = 0;
+    private hasError: boolean = false;
+    private errorMessage: string = '';
 
+    // La première case Colonne 0, Ligne 0 (Cycliste violet)
+    private frameX: number = 0; 
+    private frameY: number = 0; 
 
+    private x: number = 50;
+    private y: number = 50;
 
 	constructor(element: Element) {
 		super(element);
-		this.img = element.querySelector('img') as HTMLImageElement;
-		this.img.style.position = 'absolute';
-		this.img.style.left = '0px';
-		this.img.style.top = '0px';
+        
+		this.img = new Image();
+        // assure-toi que Player.png est dans public/image/Player.png
+        this.img.src = '/public/assets/Player.png';
+        
+        this.img.onload = () => {
+            // 7 colonnes * 6 lignes dans le spritesheet
+            this.spriteWidth = this.img.width / 7;
+            this.spriteHeight = this.img.height / 6;
+
+            // Par défaut on affiche la première case (violet)
+            this.frameX = 0;
+            this.frameY = 0;
+
+            this.draw();
+        };
+
+        this.img.onerror = () => {
+            this.hasError = true;
+            this.errorMessage = 'Erreur: Player.png introuvable';
+            console.error('[PlayView] impossible de charger Player.png');
+            this.draw();
+        };
 	}
 
-	/* Lorsque la vue est affichée, on ajoute les écouteurs d'événements pour les touches du clavier et on démarre l'animation */
 	show() {
 		super.show();
-		document.addEventListener('keydown', this.handleKeyDown.bind(this));
-		document.addEventListener('keyup', this.handleKeyUp.bind(this));
-		this.startAnimation();
+        this.draw();
 	}
 
-	/* Lorsque la vue est cachée, on arrête l'animation et on réinitialise les touches pressées */
 	hide() {
 		super.hide();
-		document.removeEventListener('keydown', this.handleKeyDown.bind(this));
-		document.removeEventListener('keyup', this.handleKeyUp.bind(this));
-		this.stopAnimation();
-		this.keysPressed.clear();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
 
-	/**
-	 * Gère l'événement de pression d'une touche
-	 * Ajoute la touche pressée à l'ensemble des touches actuellement appuyées
-	 */
-	private handleKeyDown(event: KeyboardEvent) {
-		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 's', 'q', 'd'].includes(event.key)) {
-			this.keysPressed.add(event.key);
-			event.preventDefault();
-		}
-		if (event.key === ' ' && !this.isJumping) {
-			this.isJumping = true;
-			this.jumpStartY = this.positionY;
-			this.jumpFrame = 0;
-			event.preventDefault();
-		}
-	}
+    /**
+     * Dessine une unique case du spritesheet sur le canvas
+     */
+    private draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	/**
-	 * Gère la libération des touches fléchées en les retirant de l'ensemble des touches actuellement appuyées
-	 */
-	private handleKeyUp(event: KeyboardEvent) {
-		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 's', 'q', 'd'].includes(event.key)) {
-			this.keysPressed.delete(event.key);
-			event.preventDefault();
-		}
-	}
+        if (this.hasError) {
+            ctx.fillStyle = '#900';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = '24px sans-serif';
+            ctx.fillText(this.errorMessage, 20, 40);
+            return;
+        }
 
-	/**
-	 * Démarre la boucle d'animation qui met à jour la position du GIF à chaque frame
-	 */
-	private startAnimation() {
-		const animate = () => {
-			this.updatePosition();
-			this.animationFrameId = requestAnimationFrame(animate);
-		};
-		this.animationFrameId = requestAnimationFrame(animate);
-	}
+        if (!this.img.complete || this.img.naturalWidth === 0) {
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#fff';
+            ctx.font = '24px sans-serif';
+            ctx.fillText('Chargement...', 20, 40);
+            return;
+        }
 
-	/**
-	 * Arrête la boucle d'animation
-	 */
-	private stopAnimation() {
-		if (this.animationFrameId !== null) {
-			cancelAnimationFrame(this.animationFrameId);
-			this.animationFrameId = null;
-		}
-	}
+        const frameW = this.spriteWidth || this.img.width;
+        const frameH = this.spriteHeight || this.img.height;
 
-	/**
-	 * Met à jour la position du GIF basée sur les touches actuellement appuyées
-	 * Cette méthode est appelée à chaque frame (60 fois par seconde)
-	 */
-	private updatePosition() {
-		if (this.isJumping) {
-			this.jumpFrame++;
-			let progress = this.jumpFrame / this.jumpDuration;
-			if (progress <= 0.5) {
-				this.positionY = this.jumpStartY - (progress * 2 * this.jumpHeight);
-			} else {
-				this.positionY = this.jumpStartY - ((1 - progress) * 2 * this.jumpHeight);
-			}
-			if (this.jumpFrame >= this.jumpDuration) {
-				this.isJumping = false;
-				this.positionY = this.jumpStartY;
-			}
-		}
-		if (this.keysPressed.has('ArrowUp') || this.keysPressed.has('z')) {
-			this.positionY -= this.speed;
-		}
-		if (this.keysPressed.has('ArrowDown') || this.keysPressed.has('s')) {
-			this.positionY += this.speed;
-		}
-		if (this.keysPressed.has('ArrowLeft') || this.keysPressed.has('q')) {
-			this.positionX -= this.speed;
-		}
-		if (this.keysPressed.has('ArrowRight') || this.keysPressed.has('d')) {
-			this.positionX += this.speed;
-		}
-		this.img.style.left = `${this.positionX}px`;
-		this.img.style.top = `${this.positionY}px`;
-	}
+        if (frameW <= 0 || frameH <= 0) {
+            console.warn('[PlayView] dimensions spritesheet invalides', frameW, frameH);
+            ctx.fillStyle = '#f00';
+            ctx.fillRect(10, 10, 100, 100);
+            return;
+        }
+
+        const srcX = this.frameX * frameW;
+        const srcY = this.frameY * frameH;
+        const srcW = Math.min(frameW, this.img.width - srcX);
+        const srcH = Math.min(frameH, this.img.height - srcY);
+
+        if (srcW <= 0 || srcH <= 0) {
+            console.warn('[PlayView] zone source invalide (srcW/srcH)', srcW, srcH);
+            return;
+        }
+
+        ctx.drawImage(
+            this.img,
+            srcX,
+            srcY,
+            srcW,
+            srcH,
+            this.x,
+            this.y,
+            this.spriteWidth || srcW,
+            this.spriteHeight || srcH
+        );
+    }
 }
