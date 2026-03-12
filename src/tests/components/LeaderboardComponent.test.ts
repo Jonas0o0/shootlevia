@@ -10,7 +10,9 @@ import { LeaderboardComponent } from '../../components/LeaderboardComponent.ts';
  * @return la chaîne nettoyée
  */
 function sanitizeHtml(htmlString: string) {
-	return htmlString.replaceAll(/[\n|\t]/g, '');
+	return htmlString
+		.replaceAll(/[\n|\t]/g, '')
+		.replaceAll(/\d{2}\/\d{2}\/\d{4}/g, 'DATE');
 }
 
 describe('render', () => {
@@ -22,7 +24,7 @@ describe('render', () => {
 		leaderboardRepo.addEntry({ joueur: 'Joueur4', score: 1000, date: Date.now() });
 
 		const leaderboardComponent: LeaderboardComponent = new LeaderboardComponent();
-		const expectedHtml = sanitizeHtml('<tr><td></td><td>Joueur4</td><td>1000</td><td>09/03/2026</td></tr><tr><td></td><td>Joueur1</td><td>999</td><td>09/03/2026</td></tr><tr><td></td><td>Joueur3</td><td>300</td><td>09/03/2026</td></tr><tr><td>4</td><td>Joueur2</td><td>100</td><td>09/03/2026</td></tr>');
+		const expectedHtml = sanitizeHtml('<tr><td></td><td>Joueur4</td><td>1000</td><td>DATE</td></tr><tr><td></td><td>Joueur1</td><td>999</td><td>DATE</td></tr><tr><td></td><td>Joueur3</td><td>300</td><td>DATE</td></tr><tr><td>4</td><td>Joueur2</td><td>100</td><td>DATE</td></tr>');
 
 		assert.strictEqual(sanitizeHtml(leaderboardComponent.render(leaderboardRepo.getEntries())), expectedHtml);
 	});
@@ -45,7 +47,7 @@ describe('render plus de 10', () => {
 		leaderboardRepo.addEntry({ joueur: 'Joueur8', score: 934, date: Date.now() });
 
 		const leaderboardComponent: LeaderboardComponent = new LeaderboardComponent();
-		const expectedHtml = sanitizeHtml('<tr><td></td><td>Joueur12</td><td>6354</td><td>09/03/2026</td></tr><tr><td></td><td>Joueur5</td><td>3200</td><td>09/03/2026</td></tr><tr><td></td><td>Joueur4</td><td>1000</td><td>09/03/2026</td></tr><tr><td>4</td><td>Joueur1</td><td>999</td><td>09/03/2026</td></tr><tr><td>5</td><td>Joueur7</td><td>978</td><td>09/03/2026</td></tr><tr><td>6</td><td>Joueur8</td><td>934</td><td>09/03/2026</td></tr><tr><td>7</td><td>Joueur11</td><td>873</td><td>09/03/2026</td></tr><tr><td>8</td><td>Joueur10</td><td>845</td><td>09/03/2026</td></tr><tr><td>9</td><td>Joueur9</td><td>735</td><td>09/03/2026</td></tr><tr><td>10</td><td>Joueur3</td><td>300</td><td>09/03/2026</td></tr>');
+		const expectedHtml = sanitizeHtml('<tr><td></td><td>Joueur12</td><td>6354</td><td>DATE</td></tr><tr><td></td><td>Joueur5</td><td>3200</td><td>DATE</td></tr><tr><td></td><td>Joueur4</td><td>1000</td><td>DATE</td></tr><tr><td>4</td><td>Joueur1</td><td>999</td><td>DATE</td></tr><tr><td>5</td><td>Joueur7</td><td>978</td><td>DATE</td></tr><tr><td>6</td><td>Joueur8</td><td>934</td><td>DATE</td></tr><tr><td>7</td><td>Joueur11</td><td>873</td><td>DATE</td></tr><tr><td>8</td><td>Joueur10</td><td>845</td><td>DATE</td></tr><tr><td>9</td><td>Joueur9</td><td>735</td><td>DATE</td></tr><tr><td>10</td><td>Joueur3</td><td>300</td><td>DATE</td></tr>');
 
 		assert.strictEqual(sanitizeHtml(leaderboardComponent.render(leaderboardRepo.getEntries())), expectedHtml);
 	});
