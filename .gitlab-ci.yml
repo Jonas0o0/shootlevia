@@ -3,5 +3,5 @@ test_and_build:
   image: node:latest
   script:
     - npm ci
-    - npm run build
+    - npm run client:build
     - npm run test
