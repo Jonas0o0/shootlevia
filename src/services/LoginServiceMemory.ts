@@ -1,4 +1,4 @@
-import type { Account } from '../types.ts';
+import type { Account } from '../../common/types.ts';
 import type { LoginService } from './LoginService.ts';
 
 class LoginServiceMemory implements LoginService {

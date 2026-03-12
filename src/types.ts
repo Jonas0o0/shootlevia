@@ -5,8 +5,3 @@ export interface Route {
 	view: View;
 	title: string;
 }
-
-export interface Account {
-	username: string;
-	avatar: string;
-}
