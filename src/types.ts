@@ -8,5 +8,5 @@ export interface Route {
 
 export interface Account {
 	username: string;
-	playerColor: string;
+	avatar: string;
 }
