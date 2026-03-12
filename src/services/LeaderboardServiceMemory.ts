@@ -16,10 +16,29 @@ class LeaderboardServiceMemory implements LeaderboardService {
 
 	addEntry(entry: LeaderboardEntry): void {
 		this.leaderboardEntries.push(entry);
+		this.notify();
 	}
 
 	getEntries(): LeaderboardEntry[] {
 		return this.leaderboardEntries;
+	}
+
+	private onChangeListeners: ((entries: LeaderboardEntry[]) => void)[] = [];
+
+	/**
+	 * Permet a composant de s'inscrire comme observer
+	 * @param callBack
+	 */
+	onEntryChange(callBack: (entries: LeaderboardEntry[]) => void): void {
+		this.onChangeListeners.push(callBack);
+	};
+
+	/**
+	 * Permet de notifier les observers du changement di nombre de vies
+	 * @private
+	 */
+	private notify() {
+		this.onChangeListeners.forEach(callBack => callBack(this.getEntries()));
 	}
 }
 
