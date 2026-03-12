@@ -2,7 +2,8 @@ import Router from './Router.ts';
 import View from './View.ts';
 import type { Route } from './types.ts';
 import HomeView from './HomeView.ts';
-import PlayView from './PlayView.ts';
+import LoginServiceMemory from './services/LoginServiceMemory.ts';
+import PopupLoginView from './PopupLoginView.ts';
 import Game from './models/Game.ts';
 
 // Auto-scroll vers la fenêtre de la borne au chargement
@@ -26,9 +27,24 @@ const homeView = new HomeView(
 	background,
 	banner
 );
+
+const menuElement = document.querySelector('.fenetre nav')!;
+const loginButton = menuElement.querySelector('.btn_deconnexion')!;
+const loginService: LoginServiceMemory = new LoginServiceMemory();
+
 const leaderboard = new View(document.querySelector('.fenetre .leaderboard')!);
 const credit = new View(document.querySelector('.fenetre .credit')!);
-const play = new PlayView(document.querySelector('.fenetre .play')!);
+const play = new View(document.querySelector('.fenetre .play')!);
+
+const popup = new PopupLoginView(
+	document.querySelector('#popup')!,
+	loginButton as HTMLElement,
+	loginService
+);
+
+loginButton.addEventListener('click', () => {
+	popup.oppenPopup();
+});
 
 const routes: Route[] = [
 	{ path: '/', view: homeView, title: 'ShootLévia' },
@@ -41,7 +57,7 @@ Router.routes = routes;
 // élément dans lequel afficher le <h1> de la vue
 Router.titleElement = document.querySelector('.fenetre .banner .title')!;
 // gestion des liens du menu (détection du clic et activation/désactivation)
-Router.setMenuElement(document.querySelector('.fenetre nav')!);
+Router.setMenuElement(menuElement);
 
 // enregistrement du bouton "Jouer" comme lien de navigation interne
 Router.registerLinks(
