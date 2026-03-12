@@ -11,28 +11,28 @@ export default class PlayView extends View {
     private hasError: boolean = false;
     private errorMessage: string = '';
 
-    // La première case Colonne 0, Ligne 0 (Cycliste violet)
-    private frameX: number = 0; 
-    private frameY: number = 0; 
+    private frameX: number = 0;
+    private frameY: number = 0; //Colonne a changer pour modifier le personnage / l'animation
 
     private x: number = 50;
     private y: number = 50;
+
+    private animationId: number | null = null;
+    private animationFps: number = 8;
+    private maxFrameX: number = 6;
 
 	constructor(element: Element) {
 		super(element);
         
 		this.img = new Image();
-        // assure-toi que Player.png est dans public/image/Player.png
         this.img.src = '/public/assets/Player.png';
         
         this.img.onload = () => {
-            // 7 colonnes * 6 lignes dans le spritesheet
             this.spriteWidth = this.img.width / 7;
             this.spriteHeight = this.img.height / 6;
 
-            // Par défaut on affiche la première case (violet)
             this.frameX = 0;
-            this.frameY = 0;
+            this.frameY = 0; //Colonne a changer pour modifier le personnage / l'animation
 
             this.draw();
         };
@@ -47,17 +47,46 @@ export default class PlayView extends View {
 
 	show() {
 		super.show();
-        this.draw();
+        this.startAnimation();
 	}
 
 	hide() {
 		super.hide();
+        this.stopAnimation();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 	}
 
-    /**
-     * Dessine une unique case du spritesheet sur le canvas
-     */
+    private startAnimation() {
+        if (this.animationId !== null || this.hasError) {
+            return;
+        }
+
+        const tick = () => {
+            this.frameX = (this.frameX + 1) % this.maxFrameX;
+            this.draw();
+            this.animationId = window.setTimeout(tick, 1000 / this.animationFps);
+        };
+
+        this.frameX = 0;
+        this.draw();
+        this.animationId = window.setTimeout(tick, 1000 / this.animationFps);
+    }
+
+    setRow(row: number) {
+        if (row < 0 || row >= 6) {
+            console.warn('[PlayView] ligne invalide', row);
+            return;
+        }
+        this.frameY = row;
+    }
+
+    private stopAnimation() {
+        if (this.animationId !== null) {
+            window.clearTimeout(this.animationId);
+            this.animationId = null;
+        }
+    }
+
     private draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
