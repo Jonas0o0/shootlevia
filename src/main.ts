@@ -30,7 +30,7 @@ const play = new View(document.querySelector('.fenetre .play')!);
 
 const routes: Route[] = [
 	{ path: '/', view: homeView, title: 'ShootLévia' },
-	{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
+	{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoard' },
 	{ path: '/credit', view: credit, title: 'Crédit' },
 	{ path: '/play', view: play, title: '' },
 ];
