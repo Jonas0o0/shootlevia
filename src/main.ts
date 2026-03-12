@@ -5,6 +5,9 @@ import HomeView from './HomeView.ts';
 import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
 import Game from './models/Game.ts';
+import { io } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
+const socket: Socket = io(window.location.hostname + ':8080');
 
 // Auto-scroll vers la fenêtre de la borne au chargement
 window.addEventListener('load', () => {
@@ -69,7 +72,6 @@ Router.navigate('/', true);
 // gestion des boutons précédent/suivant du navigateur (History API)
 window.onpopstate = () => Router.navigate(document.location.pathname, true);
 
-
-const game = new Game();
+const game = new Game(socket);
 setInterval(() => game.update(), 1000 / 60);
 requestAnimationFrame(game.update);

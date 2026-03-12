@@ -1,14 +1,18 @@
+import type { Socket } from 'socket.io-client';
+
 export default class Game {
-    
-    constructor() {
-        // Initialisation du jeu
-    }
+	socet: Socket;
 
-    update():void{ //appeller par setinterval
-    
-    }
-    
-    draw():void{ //appeller par requestanimationframe
+	constructor(socket: Socket) {
+		// Initialisation du jeu
+		this.socet = socket;
+	}
 
-    }
+	update(): void {
+		//appeller par setinterval
+	}
+
+	draw(): void {
+		//appeller par requestanimationframe
+	}
 }
