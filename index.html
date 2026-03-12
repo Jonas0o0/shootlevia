@@ -14,7 +14,9 @@
 	<link rel="stylesheet" href="/css/home.css" />
 	<link rel="stylesheet" href="/css/leaderBoard.css" />
 	<link rel="stylesheet" href="/css/lifeBar.css" />
+	<link rel="stylesheet" href="/css/popup.css" />
 	<title>shootlevia</title>
+	<script type="module" src="/src/main.ts"></script>
 </head>
   <body id="app">
       <section class="borne-container">
@@ -27,10 +29,7 @@
             <a href="/" class="homePage">Home</a>
             <a href="/leaderboard">Leaderboard</a>
             <a href="/credit">Crédit</a>
-            <a href="/login" class="btn_deconnexion">
-              <img class="image_deconnexion" src="/image/logo_Deconnexion.png" alt="logo deconnexion">
-              Déconnexion
-            </a>
+            <a href="" class="btn_deconnexion"></a>
           </nav>
 		<section>
 			<div class="banner">
@@ -45,7 +44,7 @@
 				<div class="bariere secondary"></div>
 				<div class="bariere tertiary"></div>
 				<article class="home">
-					<img src="/image/pedal.gif">
+					<img src="/image/pedalBleu.gif">
 					<a class="playButton" href="/play">Jouer</a>
 				</article>
 				<article class="play">
@@ -109,8 +108,32 @@
 				</article>
 			</div>
 		</section>
+			<form id="popup">
+				<h1>Connexion</h1>
+				<input type="text" name="username" placeholder="pseudo">
+
+				<div class="avatar-choice">
+
+					<label>
+						<input type="radio" name="avatar" value="bleu" required>
+						<img src="/image/pedalBleu.gif" alt="avatar1">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="orange">
+						<img src="/image/pedalOrange.gif" alt="avatar2">
+					</label>
+
+					<label>
+						<input type="radio" name="avatar" value="violet">
+						<img src="/image/pedalViolet.gif" alt="avatar3">
+					</label>
+
+				</div>
+
+				<input type="submit" value="Se connecter">
+			</form>
 	</main>
-</section>
-<script type="module" src="/src/main.ts"></script>
+  </section>
 </body>
 </html>

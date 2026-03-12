@@ -52,8 +52,56 @@ nav>a {
     margin-top: auto;
 }
 
+/* État connecté : fond neutre avec avatar + pseudo */
+.btn_deconnexion.logged-in {
+    background-color: #3a3850;
+    transition: background-color 0.3s;
+}
+
+.btn_deconnexion.logged-in:hover {
+    background-color: #F70000;
+}
+
+/* Avatar + pseudo visible par défaut, déconnexion caché */
+.btn_deconnexion .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn_deconnexion .deconnexion-info {
+    display: none;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Au hover : on inverse */
+.btn_deconnexion.logged-in:hover .user-info {
+    display: none;
+}
+
+.btn_deconnexion.logged-in:hover .deconnexion-info {
+    display: flex;
+}
+
+/* Avatar utilisateur dans le bouton */
+.btn_deconnexion .user-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    border: 2px solid #4ca0af;
+    object-fit: cover;
+}
+
+.btn_deconnexion .user-pseudo {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}
+
 /*Hover sur les boutons des différentes vues*/
-nav a:not(.logo_link):not(.btn_deconnexion):hover {
+nav a:not(.logo_link):hover {
     background-color: #ff000055;
 }
 
