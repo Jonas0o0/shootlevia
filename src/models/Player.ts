@@ -27,16 +27,16 @@ class Player {
 		];
 		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
 		this.score = 0;
-		this.velocity = 10;
+		this.velocity = 20;
 		this.jump = { jumpping: false, cooldown: 0 };
 		switch (joueur.avatar) {
-			case 'pedalBleu':
+			case 'bleu':
 				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 4);
 				break;
-			case 'pedalOrange':
+			case 'orange':
 				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 2);
 				break;
-			case 'pedalViolet':
+			case 'violet':
 				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 0);
 				break;
 			default:
@@ -102,7 +102,6 @@ class Player {
 
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
-		console.log(frame);
 		ctx.drawImage(
 			frame.img,
 			frame.x,

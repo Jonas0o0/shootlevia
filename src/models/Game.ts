@@ -43,6 +43,8 @@ export default class Game {
 
 	update(): void {
 		//appeller par setinterval
+		this.players;
+		this.time;
 	}
 
 	draw = (): void => {

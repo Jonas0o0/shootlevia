@@ -53,6 +53,7 @@ class PopupLoginView extends View {
 		const formData = new FormData(this.element as HTMLFormElement);
 		const username = (formData.get('username') as string).trim();
 		const avatar = formData.get('avatar') as string;
+		console.log('Avatar sélectionné :', avatar);
 
 		if (username.length === 0) {
 			alert('Le pseudo est obligatoire.');
