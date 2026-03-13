@@ -9,7 +9,6 @@ import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
-import { PlaySpriteSheet } from './SpriteSheetConfig.ts';
 
 // Auto-scroll vers la fenêtre de la borne au chargement
 window.addEventListener('load', () => {
@@ -39,10 +38,15 @@ const loginService: LoginServiceMemory = new LoginServiceMemory();
 
 const leaderboard = new View(document.querySelector('.fenetre .leaderboard')!);
 const credit = new View(document.querySelector('.fenetre .credit')!);
-const play = new PlayView(document.querySelector('.fenetre .play')!, PlaySpriteSheet.PLAYER, 0, 6);
-play.setSpritePosition(400,450);
-const play2 = new PlayView(document.querySelector('.fenetre .play')!, PlaySpriteSheet.PLAYER, 1, 7);
-play2.setSpritePosition(200,450);
+const canvas: HTMLCanvasElement = document.querySelector(
+	'.fenetre .play .play_canvas'
+)!;
+const ctx = canvas.getContext('2d')!;
+const play = new PlayView(
+	document.querySelector('.fenetre .play')!,
+	canvas,
+	ctx
+);
 
 const popup = new PopupLoginView(
 	document.querySelector('#popup')!,
@@ -59,7 +63,6 @@ const routes: Route[] = [
 	{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
 	{ path: '/credit', view: credit, title: 'Crédit' },
 	{ path: '/play', view: play, title: '' },
-	{ path: '/play', view: play2, title: '' },
 ];
 
 Router.routes = routes;
@@ -78,6 +81,6 @@ Router.navigate('/', true);
 // gestion des boutons précédent/suivant du navigateur (History API)
 window.onpopstate = () => Router.navigate(document.location.pathname, true);
 
-const game = new Game(socket, [], 0);
+const game = new Game(socket, [], 0, ctx);
 setInterval(() => game.update(), 1000 / 60);
 requestAnimationFrame(game.update);

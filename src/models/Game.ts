@@ -7,6 +7,7 @@ export default class Game {
 	players: Player[];
 	joueur: Player;
 	time: number;
+	ctx: CanvasRenderingContext2D;
 
 	actions: Record<string, () => void> = {
 		Z: () => this.joueur.move(Direction.Up),
@@ -16,12 +17,18 @@ export default class Game {
 		' ': () => this.joueur.doJump(),
 	};
 
-	constructor(socket: Socket, players: Player[], joueur: number) {
+	constructor(
+		socket: Socket,
+		players: Player[],
+		joueur: number,
+		ctx: CanvasRenderingContext2D
+	) {
 		// Initialisation du jeu
 		this.socet = socket;
 		this.players = players;
 		this.joueur = players[joueur];
 		this.time = 0;
+		this.ctx = ctx;
 		window.addEventListener('keypress', (event: KeyboardEvent) => {
 			const action = this.actions[event.key.toUpperCase()];
 			if (action) {
