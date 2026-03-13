@@ -1,4 +1,4 @@
-import type { Account } from '../../common/types.ts';
+import type { Account } from '../../../common/types.ts';
 
 export interface LoginService {
 	isLoggedIn(): boolean;

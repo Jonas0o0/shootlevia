@@ -1,4 +1,4 @@
-import type { LeaderboardEntry } from '../models/LeaderboardEntry.ts';
+import type { LeaderboardEntry } from '../../../common/LeaderboardEntry.ts';
 
 /**
  * Interface qui regis les règles pour devenir un moyen de stocker des leaderEntry
@@ -6,7 +6,6 @@ import type { LeaderboardEntry } from '../models/LeaderboardEntry.ts';
  * @interface LeaderboardService
  */
 export interface LeaderboardService {
-
 	/**
 	 * Permet de récupérer tous les leaderEntry
 	 * @return {LeaderboardEntry[]}

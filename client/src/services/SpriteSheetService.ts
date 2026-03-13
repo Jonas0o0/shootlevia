@@ -4,7 +4,7 @@ import {
 	SpriteSheetConfigs,
 } from '../SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
-import AssetLoaderService from '././AssetLoaderService.ts';
+import AssetLoaderService from './AssetLoaderService.ts';
 
 export default class SpriteSheetService {
 	private spriteSheet: SpriteSheetConfig;

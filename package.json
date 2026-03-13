@@ -3,12 +3,13 @@
 	"private": true,
 	"version": "0.0.0",
 	"main": "server/index.ts",
+	"type": "module",
 	"scripts": {
-		"client:start": "vite --port=8000",
-		"client:build": "tsc && vite build",
-		"client:preview": "vite preview",
 		"test": "node --test",
 		"test:watch": "node --test --watch",
+		"client:start": "vite --port=8000 client",
+		"client:build": "tsc && vite build client",
+		"client:preview": "vite preview client",
 		"server": "node .",
 		"server:watch": "node --watch ."
 	},
@@ -20,6 +21,8 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@types/express": "^5.0.6",
+		"express": "^5.2.1",
 		"socket.io": "^4.8.3",
 		"socket.io-client": "^4.8.3"
 	}

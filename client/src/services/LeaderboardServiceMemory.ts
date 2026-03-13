@@ -1,5 +1,5 @@
 import type { LeaderboardService } from './LeaderboardService.ts';
-import type { LeaderboardEntry } from '../models/LeaderboardEntry.ts';
+import type { LeaderboardEntry } from '../../../common/LeaderboardEntry.ts';
 
 /**
  * Cette classe permet de stoker des entrées du leaderboard en mémoire
@@ -8,7 +8,6 @@ import type { LeaderboardEntry } from '../models/LeaderboardEntry.ts';
  * @implements {LeaderboardService}
  */
 class LeaderboardServiceMemory implements LeaderboardService {
-
 	/**
 	 * Tableau dans lequel sont stockées les entrées
 	 */

@@ -1,11 +1,10 @@
-import type { LeaderboardEntry } from '../models/LeaderboardEntry.ts';
+import type { LeaderboardEntry } from '../../../common/LeaderboardEntry.ts';
 import type LeaderboardServiceMemory from '../services/LeaderboardServiceMemory.ts';
 
 /**
  * Classe qui permet de générer au format html le tableau du leaderboard
  */
 export class LeaderboardComponent {
-
 	/**
 	 * Element du leaderboard
 	 * @private
@@ -29,11 +28,13 @@ export class LeaderboardComponent {
 	 * Génère le html du tableau leaderboard des dix premiers joueurs grace au score à partir d'une liste d'entrées.
 	 *
 	 * @param {LeaderboardEntry[]} entries - Tableau des joueurs qui ont joué au jeu
-	 * @returns {string} HTML généré avec les lignes du tableau (<tr>...</tr>)
+	 * @returns {void}
 	 *
 	 */
 	public render(entries: LeaderboardEntry[]): void {
-		entries = entries.sort((a: LeaderboardEntry, b: LeaderboardEntry) => b.score - a.score);
+		entries = entries.sort(
+			(a: LeaderboardEntry, b: LeaderboardEntry) => b.score - a.score
+		);
 
 		let htmlGen: string = '';
 		for (let i = 0; i < entries.length && i <= 9; i++) {
