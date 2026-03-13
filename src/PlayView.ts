@@ -1,125 +1,36 @@
 import View from './View.ts';
 
 export default class PlayView extends View {
+	canvas: HTMLCanvasElement;
+	ctx: CanvasRenderingContext2D;
+	launchGameCallback?: () => void;
 
-	private img: HTMLImageElement;
-	private positionX: number = 0;
-	private positionY: number = 0;
-	private speed: number = 5;
-	private keysPressed: Set<string> = new Set();
-	private animationFrameId: number | null = null;
-	private isJumping: boolean = false;
-	private jumpStartY: number = 0;
-	private jumpFrame: number = 0;
-	private jumpDuration: number = 30;
-	private jumpHeight: number = 75;
-
-
-
-	constructor(element: Element) {
+	constructor(
+		element: Element,
+		canvas: HTMLCanvasElement,
+		ctx: CanvasRenderingContext2D
+	) {
 		super(element);
-		this.img = element.querySelector('img') as HTMLImageElement;
-		this.img.style.position = 'absolute';
-		this.img.style.left = '0px';
-		this.img.style.top = '0px';
+		this.canvas = canvas;
+		this.ctx = ctx;
+
+		window.addEventListener('resize', this.resizeCanvas);
 	}
 
-	/* Lorsque la vue est affichée, on ajoute les écouteurs d'événements pour les touches du clavier et on démarre l'animation */
 	show() {
 		super.show();
-		document.addEventListener('keydown', this.handleKeyDown.bind(this));
-		document.addEventListener('keyup', this.handleKeyUp.bind(this));
-		this.startAnimation();
+		this.resizeCanvas();
+		if (this.launchGameCallback) {
+			this.launchGameCallback();
+		}
 	}
 
-	/* Lorsque la vue est cachée, on arrête l'animation et on réinitialise les touches pressées */
 	hide() {
 		super.hide();
-		document.removeEventListener('keydown', this.handleKeyDown.bind(this));
-		document.removeEventListener('keyup', this.handleKeyUp.bind(this));
-		this.stopAnimation();
-		this.keysPressed.clear();
 	}
 
-	/**
-	 * Gère l'événement de pression d'une touche
-	 * Ajoute la touche pressée à l'ensemble des touches actuellement appuyées
-	 */
-	private handleKeyDown(event: KeyboardEvent) {
-		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 's', 'q', 'd'].includes(event.key)) {
-			this.keysPressed.add(event.key);
-			event.preventDefault();
-		}
-		if (event.key === ' ' && !this.isJumping) {
-			this.isJumping = true;
-			this.jumpStartY = this.positionY;
-			this.jumpFrame = 0;
-			event.preventDefault();
-		}
-	}
-
-	/**
-	 * Gère la libération des touches fléchées en les retirant de l'ensemble des touches actuellement appuyées
-	 */
-	private handleKeyUp(event: KeyboardEvent) {
-		if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'z', 's', 'q', 'd'].includes(event.key)) {
-			this.keysPressed.delete(event.key);
-			event.preventDefault();
-		}
-	}
-
-	/**
-	 * Démarre la boucle d'animation qui met à jour la position du GIF à chaque frame
-	 */
-	private startAnimation() {
-		const animate = () => {
-			this.updatePosition();
-			this.animationFrameId = requestAnimationFrame(animate);
-		};
-		this.animationFrameId = requestAnimationFrame(animate);
-	}
-
-	/**
-	 * Arrête la boucle d'animation
-	 */
-	private stopAnimation() {
-		if (this.animationFrameId !== null) {
-			cancelAnimationFrame(this.animationFrameId);
-			this.animationFrameId = null;
-		}
-	}
-
-	/**
-	 * Met à jour la position du GIF basée sur les touches actuellement appuyées
-	 * Cette méthode est appelée à chaque frame (60 fois par seconde)
-	 */
-	private updatePosition() {
-		if (this.isJumping) {
-			this.jumpFrame++;
-			let progress = this.jumpFrame / this.jumpDuration;
-			if (progress <= 0.5) {
-				this.positionY = this.jumpStartY - (progress * 2 * this.jumpHeight);
-			} else {
-				this.positionY = this.jumpStartY - ((1 - progress) * 2 * this.jumpHeight);
-			}
-			if (this.jumpFrame >= this.jumpDuration) {
-				this.isJumping = false;
-				this.positionY = this.jumpStartY;
-			}
-		}
-		if (this.keysPressed.has('ArrowUp') || this.keysPressed.has('z')) {
-			this.positionY -= this.speed;
-		}
-		if (this.keysPressed.has('ArrowDown') || this.keysPressed.has('s')) {
-			this.positionY += this.speed;
-		}
-		if (this.keysPressed.has('ArrowLeft') || this.keysPressed.has('q')) {
-			this.positionX -= this.speed;
-		}
-		if (this.keysPressed.has('ArrowRight') || this.keysPressed.has('d')) {
-			this.positionX += this.speed;
-		}
-		this.img.style.left = `${this.positionX}px`;
-		this.img.style.top = `${this.positionY}px`;
+	resizeCanvas() {
+		this.canvas.width = window.innerWidth;
+		this.canvas.height = window.innerHeight;
 	}
 }

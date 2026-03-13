@@ -85,12 +85,29 @@
   width: 100vw;
   height: 100vh;
   z-index: 1000;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
-.play_canvas {
+.fenetre section article.play.active .play_canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
+  display: block;
+  object-fit: cover;
+  z-index: 1;
 }
+
+.fenetre section article.play.active .jeu-container {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
 
 .fenetre section .background {
   width: 100%;

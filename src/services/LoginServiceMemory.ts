@@ -1,18 +1,15 @@
-import type { Account } from '../types.ts';
+import type { Account } from '../../common/types.ts';
 import type { LoginService } from './LoginService.ts';
 
 class LoginServiceMemory implements LoginService {
 	accounts: Account | null;
 
 	constructor() {
-		this.accounts = this.checkCoookie();
+		this.accounts = this.checkCookie();
 	}
 
 	isLoggedIn(): boolean {
-		if (this.accounts) {
-			return true;
-		}
-		return false;
+		return !!this.accounts;
 	}
 
 	login(account: Account): void {
@@ -26,23 +23,28 @@ class LoginServiceMemory implements LoginService {
 	getCurrentUser(): Account | null {
 		return this.accounts;
 	}
-	checkCoookie(): Account | null {
+	checkCookie(): Account | null {
 		const cookie = document.cookie
 			.split(';')
 			.find(cookie => cookie.trim().startsWith('account='));
 		if (cookie) {
 			const accountString = cookie.split('=')[1];
-			return JSON.parse(accountString);
+			try {
+				return JSON.parse(decodeURIComponent(accountString));
+			} catch (e) {
+				console.error('Erreur lors du parse du cookie account', e);
+				return null;
+			}
 		}
 		return null;
 	}
 	setCookie(account: Account): void {
-		const accountString = JSON.stringify(account);
-		document.cookie = `account=${accountString}; path=/;`;
+		const accountString = encodeURIComponent(JSON.stringify(account));
+		document.cookie = `account=${accountString}; path=/; SameSite=Lax`;
 	}
 
 	removeCookie(): void {
-		document.cookie = `account=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+		document.cookie = `account=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; SameSite=Lax`;
 	}
 }
 

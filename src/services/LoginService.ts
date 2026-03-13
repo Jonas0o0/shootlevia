@@ -1,4 +1,4 @@
-import type { Account } from '../types.ts';
+import type { Account } from '../../common/types.ts';
 
 export interface LoginService {
 	isLoggedIn(): boolean;
@@ -9,7 +9,7 @@ export interface LoginService {
 
 	getCurrentUser(): Account | null;
 
-	checkCoookie(): Account | null;
+	checkCookie(): Account | null;
 
 	setCookie(account: Account): void;
 
