@@ -12,6 +12,7 @@ import { SpriteSheetConfigs } from './SpriteSheetConfig.ts';
 
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
+import Player from './models/Player.ts';
 
 async function init() {
 	// 1. Préchargement des assets
@@ -89,12 +90,13 @@ async function init() {
 		document.querySelector<HTMLAnchorElement>('.fenetre .home .playButton')!
 	);
 
+	const joueur = new Player(loginService.accounts, 0, 0);
+	const game = new Game(socket, [joueur], 0, canvas, ctx);
+	setInterval(() => game.update(), 1000 / 60);
+	game.draw();
+
 	Router.navigate(window.location.pathname || '/', true);
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);
-
-	const game = new Game(socket, [], 0, ctx);
-	setInterval(() => game.update(), 1000 / 60);
-	requestAnimationFrame(game.update);
 }
 
 // Lancement de l'application

@@ -20,6 +20,11 @@ export default class SpriteSheetService {
 		this.frameX = -1;
 		this.frameY =
 			defautRow >= 0 && defautRow < this.spriteSheet.rows ? defautRow : 0;
+		if (defautRow % 2 === 0) {
+			this.spriteSheet.columnsFrameMax = this.spriteSheet.columns - 1;
+		} else {
+			this.spriteSheet.columnsFrameMax = this.spriteSheet.columns;
+		}
 
 		// On calcule les dimensions car l'image est déjà chargée via AssetLoaderService
 		this.spriteSheet.spriteWidth = this.img.width / this.spriteSheet.columns;
@@ -29,13 +34,31 @@ export default class SpriteSheetService {
 	setRow(row: number) {
 		if (row >= 0 && row < this.spriteSheet.rows) {
 			this.frameY = row;
+			if (row % 2 === 0) {
+				this.spriteSheet.columnsFrameMax = this.spriteSheet.columns - 1;
+			} else {
+				this.spriteSheet.columnsFrameMax = this.spriteSheet.columns;
+			}
+			this.frameX = -1;
+			return;
 		}
 		console.warn('[PlayView] ligne invalide', row);
-		return;
+	}
+
+	getRow(): number {
+		return this.frameY;
+	}
+
+	getWidth(): number {
+		return this.spriteSheet.spriteWidth;
+	}
+
+	getHeight(): number {
+		return this.spriteSheet.spriteHeight;
 	}
 
 	getFrame(): Frame {
-		this.frameX = (this.frameX + 1) % this.spriteSheet.rows;
+		this.frameX = (this.frameX + 1) % this.spriteSheet.columnsFrameMax;
 
 		const frameW = this.spriteSheet.spriteWidth;
 		const frameH = this.spriteSheet.spriteHeight;

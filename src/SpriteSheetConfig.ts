@@ -10,6 +10,7 @@ export type SpriteSheetConfig = {
 	rows: number;
 	spriteWidth: number;
 	spriteHeight: number;
+	columnsFrameMax: number;
 };
 
 export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
@@ -19,5 +20,6 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		rows: 6,
 		spriteWidth: 0,
 		spriteHeight: 0,
+		columnsFrameMax: 0,
 	},
 };

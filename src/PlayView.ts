@@ -13,12 +13,12 @@ export default class PlayView extends View {
 		this.canvas = canvas;
 		this.ctx = ctx;
 
-		window.addEventListener('resize', this.updateCanvasSize);
+		window.addEventListener('resize', this.resizeCanvas);
 	}
 
 	show() {
 		super.show();
-		this.updateCanvasSize();
+		this.resizeCanvas();
 	}
 
 	hide() {
@@ -26,18 +26,8 @@ export default class PlayView extends View {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
-	private updateCanvasSize() {
-		const dpr = window.devicePixelRatio || 1;
-		const displayWidth = this.canvas.clientWidth;
-		const displayHeight = this.canvas.clientHeight;
-
-		if (displayWidth <= 0 || displayHeight <= 0) {
-			return;
-		}
-
-		this.canvas.width = Math.floor(displayWidth * dpr);
-		this.canvas.height = Math.floor(displayHeight * dpr);
-
-		this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+	resizeCanvas() {
+		this.canvas.width = window.innerWidth;
+		this.canvas.height = window.innerHeight;
 	}
 }
