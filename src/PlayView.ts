@@ -1,4 +1,5 @@
 import View from './View.ts';
+import { PlaySpriteSheet, SpriteSheetConfigs } from './SpriteSheetConfig.ts';
 
 const canvas: HTMLCanvasElement = document.querySelector('.fenetre .play .play_canvas')!;
 const ctx = canvas.getContext('2d')!;
@@ -6,24 +7,31 @@ const ctx = canvas.getContext('2d')!;
 export default class PlayView extends View {
 
 	private img: HTMLImageElement;
-    private spriteWidth: number = 0;
-    private spriteHeight: number = 0;
-    private hasError: boolean = false;
-    private errorMessage: string = '';
-    private resizeListener: ()=>void;
+	private spriteWidth: number = 0;
+	private spriteHeight: number = 0;
+	private spriteCols: number = 0;
+	private spriteRows: number = 0;
+	private hasError: boolean = false;
+	private errorMessage: string = '';
+	private resizeListener: ()=>void;
 
-    private frameX: number = 0;
-    private frameY: number = 0; //Colonne a changer pour modifier le personnage / l'animation
+	private frameX: number = 0;
+	private frameY: number = 0; // ligne à changer pour modifier le personnage / l'animation
 
-    private x: number = 50;
-    private y: number = 50;
+	private x: number = 50;
+	private y: number = 50;
 
     private animationId: number | null = null;
-    private animationFps: number = 8;
-    private maxFrameX: number = 6;
+    private animationFps: number = 9;
+    private nbFrameMax: number = 7;
 
-	constructor(element: Element) {
+constructor(element: Element, spriteSheet: PlaySpriteSheet = PlaySpriteSheet.PLAYER, choixAnim: number, frameCount: number) {
 		super(element);
+
+		const config = SpriteSheetConfigs[spriteSheet];
+		this.spriteCols = config.columns;
+		this.spriteRows = config.rows;
+		this.nbFrameMax = frameCount;
 
 		this.resizeListener = () => {
 			this.updateCanvasSize();
@@ -32,18 +40,18 @@ export default class PlayView extends View {
 		window.addEventListener('resize', this.resizeListener);
 
 		this.img = new Image();
-        this.img.src = '/public/assets/Player.png';
+		this.img.src = config.path;
         
-        this.img.onload = () => {
-            this.spriteWidth = this.img.width / 7;
-            this.spriteHeight = this.img.height / 6;
+		this.img.onload = () => {
+			this.spriteWidth = this.img.width / this.spriteCols;
+			this.spriteHeight = this.img.height / this.spriteRows;
 
-            this.frameX = 0;
-            this.frameY = 0; //Colonne a changer pour modifier le personnage / l'animation
+			this.frameX = 0;
+			this.frameY = choixAnim >= 0 && choixAnim < this.spriteRows ? choixAnim : 0;
 
-            this.updateCanvasSize();
-            this.draw();
-        };
+			this.updateCanvasSize();
+			this.draw();
+		};
 
         this.img.onerror = () => {
             this.hasError = true;
@@ -72,7 +80,7 @@ export default class PlayView extends View {
         }
 
         const tick = () => {
-            this.frameX = (this.frameX + 1) % this.maxFrameX;
+            this.frameX = (this.frameX + 1) % this.nbFrameMax;
             this.draw();
             this.animationId = window.setTimeout(tick, 1000 / this.animationFps);
         };
@@ -83,11 +91,39 @@ export default class PlayView extends View {
     }
 
     setRow(row: number) {
-        if (row < 0 || row >= 6) {
+        if (row < 0 || row >= this.spriteRows) {
             console.warn('[PlayView] ligne invalide', row);
             return;
         }
         this.frameY = row;
+    }
+
+    setSpritePosition(x: number, y: number) {
+        if (typeof x !== 'number' || typeof y !== 'number' || Number.isNaN(x) || Number.isNaN(y)) {
+            console.warn('[PlayView] coordonnées invalides', x, y);
+            return;
+        }
+        this.x = x;
+        this.y = y;
+        this.draw();
+    }
+
+    setSpriteX(x: number) {
+        if (typeof x !== 'number' || Number.isNaN(x)) {
+            console.warn('[PlayView] coordonnée X invalide', x);
+            return;
+        }
+        this.x = x;
+        this.draw();
+    }
+
+    setSpriteY(y: number) {
+        if (typeof y !== 'number' || Number.isNaN(y)) {
+            console.warn('[PlayView] coordonnée Y invalide', y);
+            return;
+        }
+        this.y = y;
+        this.draw();
     }
 
     private stopAnimation() {
@@ -110,11 +146,6 @@ export default class PlayView extends View {
         canvas.height = Math.floor(displayHeight * dpr);
 
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        if (this.spriteWidth > 0 && this.spriteHeight > 0) {
-            this.x = (displayWidth - this.spriteWidth) / 2;
-            this.y = (displayHeight - this.spriteHeight) / 2;
-        }
     }
 
     private draw() {
@@ -143,13 +174,6 @@ export default class PlayView extends View {
 
         const frameW = this.spriteWidth || this.img.width;
         const frameH = this.spriteHeight || this.img.height;
-
-        if (frameW <= 0 || frameH <= 0) {
-            console.warn('[PlayView] dimensions spritesheet invalides', frameW, frameH);
-            ctx.fillStyle = '#f00';
-            ctx.fillRect(10, 10, 100, 100);
-            return;
-        }
 
         const srcX = this.frameX * frameW;
         const srcY = this.frameY * frameH;
