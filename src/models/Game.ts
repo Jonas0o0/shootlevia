@@ -44,5 +44,6 @@ export default class Game {
 
 	draw(): void {
 		//appeller par requestanimationframe
+		//this.player.move
 	}
 }

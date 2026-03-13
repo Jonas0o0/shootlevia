@@ -1,7 +1,4 @@
 import View from './View.ts';
-import { PlaySpriteSheet } from './SpriteSheetConfig.ts';
-import SpriteSheetService from './services/SpriteSheetService.ts';
-import type { Frame } from './Frame.ts';
 
 export default class PlayView extends View {
 	canvas: HTMLCanvasElement;
@@ -22,24 +19,6 @@ export default class PlayView extends View {
 	show() {
 		super.show();
 		this.updateCanvasSize();
-		const spriteSheetService: SpriteSheetService = new SpriteSheetService(
-			PlaySpriteSheet.PLAYER,
-			0
-		);
-		spriteSheetService.getFrame();
-		const frame: Frame = spriteSheetService.getFrame();
-		console.log(frame);
-		this.ctx.drawImage(
-			frame.img,
-			frame.x,
-			frame.y,
-			frame.width,
-			frame.height,
-			50,
-			50,
-			frame.width,
-			frame.height
-		);
 	}
 
 	hide() {
