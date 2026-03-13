@@ -9,7 +9,7 @@ export interface LoginService {
 
 	getCurrentUser(): Account | null;
 
-	checkCoookie(): Account | null;
+	checkCookie(): Account | null;
 
 	setCookie(account: Account): void;
 
