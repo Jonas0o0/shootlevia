@@ -6,7 +6,7 @@ import { Direction } from '../../common/Direction.ts';
 
 class Player {
 	private joueur: Account;
-	private jump: boolean = false;
+	private jump;
 	private hitbox: HitBox;
 	private score: number;
 	private weapons: Weapon[];
@@ -28,10 +28,11 @@ class Player {
 		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
 		this.score = 0;
 		this.velocity = 2;
+		this.jump = { jumpping: false, cooldown: 0 };
 	}
 
 	isJumping(): boolean {
-		return this.jump;
+		return this.jump.jumpping;
 	}
 
 	getPostition(): HitBox {
@@ -71,6 +72,12 @@ class Player {
 				break;
 			case Direction.Down:
 				this.hitbox.y += this.velocity;
+		}
+	}
+
+	doJump(): void {
+		if (!this.isJumping() && this.jump.cooldown < 0) {
+			this.jump = { jumpping: true, cooldown: 10 };
 		}
 	}
 }
