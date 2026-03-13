@@ -10,6 +10,7 @@ export default class PlayView extends View {
     private spriteHeight: number = 0;
     private hasError: boolean = false;
     private errorMessage: string = '';
+    private resizeListener: ()=>void;
 
     private frameX: number = 0;
     private frameY: number = 0; //Colonne a changer pour modifier le personnage / l'animation
@@ -23,7 +24,13 @@ export default class PlayView extends View {
 
 	constructor(element: Element) {
 		super(element);
-        
+
+		this.resizeListener = () => {
+			this.updateCanvasSize();
+			this.draw();
+		};
+		window.addEventListener('resize', this.resizeListener);
+
 		this.img = new Image();
         this.img.src = '/public/assets/Player.png';
         
@@ -34,6 +41,7 @@ export default class PlayView extends View {
             this.frameX = 0;
             this.frameY = 0; //Colonne a changer pour modifier le personnage / l'animation
 
+            this.updateCanvasSize();
             this.draw();
         };
 
@@ -41,12 +49,14 @@ export default class PlayView extends View {
             this.hasError = true;
             this.errorMessage = 'Erreur: Player.png introuvable';
             console.error('[PlayView] impossible de charger Player.png');
+            this.updateCanvasSize();
             this.draw();
         };
 	}
 
 	show() {
 		super.show();
+        this.updateCanvasSize();
         this.startAnimation();
 	}
 
@@ -87,12 +97,35 @@ export default class PlayView extends View {
         }
     }
 
+    private updateCanvasSize() {
+        const dpr = window.devicePixelRatio || 1;
+        const displayWidth = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight;
+
+        if (displayWidth <= 0 || displayHeight <= 0) {
+            return;
+        }
+
+        canvas.width = Math.floor(displayWidth * dpr);
+        canvas.height = Math.floor(displayHeight * dpr);
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        if (this.spriteWidth > 0 && this.spriteHeight > 0) {
+            this.x = (displayWidth - this.spriteWidth) / 2;
+            this.y = (displayHeight - this.spriteHeight) / 2;
+        }
+    }
+
     private draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const displayWidth = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight;
+
+        ctx.clearRect(0, 0, displayWidth, displayHeight);
 
         if (this.hasError) {
             ctx.fillStyle = '#900';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, displayWidth, displayHeight);
             ctx.fillStyle = '#fff';
             ctx.font = '24px sans-serif';
             ctx.fillText(this.errorMessage, 20, 40);
@@ -101,7 +134,7 @@ export default class PlayView extends View {
 
         if (!this.img.complete || this.img.naturalWidth === 0) {
             ctx.fillStyle = '#333';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, displayWidth, displayHeight);
             ctx.fillStyle = '#fff';
             ctx.font = '24px sans-serif';
             ctx.fillText('Chargement...', 20, 40);
