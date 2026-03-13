@@ -2,6 +2,7 @@ import type { Account } from '../../common/types.ts';
 import type { HitBox } from '../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import type { Bonus } from '../Bonus.ts';
+import { Direction } from '../../common/Direction.ts';
 
 class Player {
 	private joueur: Account;
@@ -10,6 +11,7 @@ class Player {
 	private score: number;
 	private weapons: Weapon[];
 	private bonus: Bonus[];
+	velocity: number;
 
 	constructor(
 		joueur: Account,
@@ -25,6 +27,7 @@ class Player {
 		];
 		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
 		this.score = 0;
+		this.velocity = 2;
 	}
 
 	isJumping(): boolean {
@@ -51,8 +54,24 @@ class Player {
 		return this.weapons;
 	}
 
-	get Bonus(): Bonus[] {
+	getBonus(): Bonus[] {
 		return this.bonus;
+	}
+
+	move(direction: Direction): void {
+		switch (direction) {
+			case Direction.Left:
+				this.hitbox.x -= this.velocity;
+				break;
+			case Direction.Right:
+				this.hitbox.x += this.velocity;
+				break;
+			case Direction.Up:
+				this.hitbox.y -= this.velocity;
+				break;
+			case Direction.Down:
+				this.hitbox.y += this.velocity;
+		}
 	}
 }
 
