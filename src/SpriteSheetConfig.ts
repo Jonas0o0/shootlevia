@@ -23,3 +23,9 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		columnsFrameMax: 0,
 	},
 };
+
+export const AvatarRowMapping: Record<string, number> = {
+	bleu: 4,
+	orange: 2,
+	violet: 0,
+};

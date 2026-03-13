@@ -4,7 +4,11 @@ import type { Weapon } from '../Weapon.ts';
 import type { Bonus } from '../Bonus.ts';
 import { Direction } from '../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import { PlaySpriteSheet } from '../SpriteSheetConfig.ts';
+import {
+	PlaySpriteSheet,
+	SpriteSheetConfigs,
+	AvatarRowMapping,
+} from '../SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 
 class Player {
@@ -27,26 +31,17 @@ class Player {
 		];
 		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
 		this.score = 0;
-		this.velocity = 20;
+		this.velocity = 2;
 		this.jump = { jumpping: false, cooldown: 0 };
-		switch (joueur.avatar) {
-			case 'bleu':
-				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 4);
-				break;
-			case 'orange':
-				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 2);
-				break;
-			case 'violet':
-				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 0);
-				break;
-			default:
-				this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 4);
-		}
+
+		const row = AvatarRowMapping[joueur.avatar] ?? AvatarRowMapping.pedalBleu;
+		this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, row);
+
 		this.hitbox = {
 			x: x,
 			y: y,
 			width: this.sprite.getWidth(),
-			height: this.sprite.getHeight(),
+			height: SpriteSheetConfigs.PLAYER.spriteHeight,
 		};
 	}
 

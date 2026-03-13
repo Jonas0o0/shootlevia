@@ -9,14 +9,7 @@ export default class Game {
 	private time: number;
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
-
-	actions: Record<string, () => void> = {
-		Z: () => this.joueur.move(Direction.Up),
-		S: () => this.joueur.move(Direction.Down),
-		Q: () => this.joueur.move(Direction.Left),
-		D: () => this.joueur.move(Direction.Right),
-		' ': () => this.joueur.doJump(),
-	};
+	private keysPressed: Set<string> = new Set();
 
 	constructor(
 		socket: Socket,
@@ -32,19 +25,46 @@ export default class Game {
 		this.time = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
-		window.addEventListener('keypress', (event: KeyboardEvent) => {
-			const action = this.actions[event.key.toUpperCase()];
-			if (action) {
-				action();
-				this.socket.emit('move', this);
+
+		window.addEventListener('keydown', (event: KeyboardEvent) => {
+			this.keysPressed.add(event.key.toUpperCase());
+			// Pour le saut, on peut garder une action directe si on veut qu'il ne se déclenche qu'une fois par appui
+			if (event.key === ' ') {
+				this.joueur.doJump();
 			}
+		});
+
+		window.addEventListener('keyup', (event: KeyboardEvent) => {
+			this.keysPressed.delete(event.key.toUpperCase());
 		});
 	}
 
 	update(): void {
-		//appeller par setinterval
-		this.players;
+		// Appelé par setInterval (60fps)
+		let moved = false;
+
+		if (this.keysPressed.has('Z')) {
+			this.joueur.move(Direction.Up);
+			moved = true;
+		}
+		if (this.keysPressed.has('S')) {
+			this.joueur.move(Direction.Down);
+			moved = true;
+		}
+		if (this.keysPressed.has('Q')) {
+			this.joueur.move(Direction.Left);
+			moved = true;
+		}
+		if (this.keysPressed.has('D')) {
+			this.joueur.move(Direction.Right);
+			moved = true;
+		}
+
+		if (moved) {
+			this.socket.emit('move', this);
+		}
 		this.time;
+		this.players;
 	}
 
 	draw = (): void => {

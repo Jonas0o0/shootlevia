@@ -4,7 +4,6 @@ import type { Route } from './types.ts';
 import HomeView from './HomeView.ts';
 import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
-import Game from './models/Game.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import AssetLoaderService from './services/./AssetLoaderService.ts';
@@ -12,6 +11,7 @@ import { SpriteSheetConfigs } from './SpriteSheetConfig.ts';
 
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
+import Game from './models/Game.ts';
 import Player from './models/Player.ts';
 
 async function init() {
@@ -90,13 +90,18 @@ async function init() {
 		document.querySelector<HTMLAnchorElement>('.fenetre .home .playButton')!
 	);
 
-	const joueur = new Player(loginService.accounts, 0, 0);
-	const game = new Game(socket, [joueur], 0, canvas, ctx);
-	setInterval(() => game.update(), 1000 / 60);
-	game.draw();
-
 	Router.navigate(window.location.pathname || '/', true);
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);
+
+	play.launchGameCallback = () => {
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		const joueur = new Player(loginService.accounts, 0, 0);
+		const game = new Game(socket, [joueur], 0, canvas, ctx);
+		// On s'assure de n'avoir qu'une boucle à la fois
+		// Pour simplifier, on se contente du lancement ici
+		setInterval(() => game.update(), 1000 / 60);
+		game.draw();
+	};
 }
 
 // Lancement de l'application

@@ -12,12 +12,14 @@ export default class SpriteSheetService {
 
 	private frameX;
 	private frameY;
+	private tick: number = 0;
+	private animationSpeed: number = 5; // Plus ce nombre est grand, plus l'animation est lente
 
 	constructor(spriteSheet: PlaySpriteSheet, defautRow: number) {
 		this.spriteSheet = SpriteSheetConfigs[spriteSheet];
 		this.img = AssetLoaderService.get(this.spriteSheet.path);
 
-		this.frameX = -1;
+		this.frameX = 0;
 		this.frameY =
 			defautRow >= 0 && defautRow < this.spriteSheet.rows ? defautRow : 0;
 		if (defautRow % 2 === 0) {
@@ -39,7 +41,8 @@ export default class SpriteSheetService {
 			} else {
 				this.spriteSheet.columnsFrameMax = this.spriteSheet.columns;
 			}
-			this.frameX = -1;
+			this.frameX = 0;
+			this.tick = 0;
 			return;
 		}
 		console.warn('[PlayView] ligne invalide', row);
@@ -58,7 +61,11 @@ export default class SpriteSheetService {
 	}
 
 	getFrame(): Frame {
-		this.frameX = (this.frameX + 1) % this.spriteSheet.columnsFrameMax;
+		this.tick++;
+		if (this.tick >= this.animationSpeed) {
+			this.frameX = (this.frameX + 1) % this.spriteSheet.columnsFrameMax;
+			this.tick = 0;
+		}
 
 		const frameW = this.spriteSheet.spriteWidth;
 		const frameH = this.spriteSheet.spriteHeight;

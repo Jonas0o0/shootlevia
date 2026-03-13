@@ -3,6 +3,7 @@ import View from './View.ts';
 export default class PlayView extends View {
 	canvas: HTMLCanvasElement;
 	ctx: CanvasRenderingContext2D;
+	launchGameCallback?: () => void;
 
 	constructor(
 		element: Element,
@@ -19,11 +20,13 @@ export default class PlayView extends View {
 	show() {
 		super.show();
 		this.resizeCanvas();
+		if (this.launchGameCallback) {
+			this.launchGameCallback();
+		}
 	}
 
 	hide() {
 		super.hide();
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
 	resizeCanvas() {
