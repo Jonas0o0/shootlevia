@@ -6,7 +6,7 @@ import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
-import AssetLoaderService from './services/./AssetLoaderService.ts';
+import AssetLoaderService from './services/AssetLoaderService.ts';
 import { SpriteSheetConfigs } from './SpriteSheetConfig.ts';
 
 const socket: Socket = io(window.location.hostname + ':8080');

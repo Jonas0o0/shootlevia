@@ -1,8 +1,8 @@
-import type { Account } from '../../common/types.ts';
-import type { HitBox } from '../../common/HitBox.ts';
+import type { Account } from '../../../common/types.ts';
+import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import type { Bonus } from '../Bonus.ts';
-import { Direction } from '../../common/Direction.ts';
+import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
 import {
 	PlaySpriteSheet,

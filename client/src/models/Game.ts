@@ -1,6 +1,6 @@
 import type { Socket } from 'socket.io-client';
 import type Player from './Player.ts';
-import { Direction } from '../../common/Direction.ts';
+import { Direction } from '../../../common/Direction.ts';
 
 export default class Game {
 	private socket: Socket;
