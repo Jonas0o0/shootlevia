@@ -7,11 +7,28 @@ import PopupLoginView from './PopupLoginView.ts';
 import Game from './models/Game.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
+import AssetLoaderService from './services/./AssetLoaderService.ts';
+import { SpriteSheetConfigs } from './SpriteSheetConfig.ts';
+
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
 
-// Auto-scroll vers la fenêtre de la borne au chargement
-window.addEventListener('load', () => {
+async function init() {
+	// 1. Préchargement des assets
+	const imagesToPreload = [
+		SpriteSheetConfigs.PLAYER.path,
+		// Ajoutez d'autres images si nécessaire
+	];
+
+	try {
+		await AssetLoaderService.loadAll(imagesToPreload);
+		console.log('Tous les assets ont été chargés');
+	} catch (error) {
+		console.error('Erreur lors du chargement des assets', error);
+	}
+
+	// 2. Initialisation du DOM et des vues
+	// Auto-scroll vers la fenêtre de la borne au chargement
 	const fenetre = document.querySelector<HTMLElement>('main.fenetre');
 	if (fenetre) {
 		fenetre.scrollIntoView({
@@ -20,67 +37,65 @@ window.addEventListener('load', () => {
 			block: 'center',
 		});
 	}
-});
 
-// création des vues de notre application
-const banner = document.querySelector('.fenetre .banner')!;
-const background = document.querySelector('.fenetre .background')!;
+	const banner = document.querySelector('.fenetre .banner')!;
+	const background = document.querySelector('.fenetre .background')!;
 
-const homeView = new HomeView(
-	document.querySelector('.fenetre .home')!,
-	background,
-	banner
-);
+	const homeView = new HomeView(
+		document.querySelector('.fenetre .home')!,
+		background,
+		banner
+	);
 
-const menuElement = document.querySelector('.fenetre nav')!;
-const loginButton = menuElement.querySelector('.btn_deconnexion')!;
-const loginService: LoginServiceMemory = new LoginServiceMemory();
+	const menuElement = document.querySelector('.fenetre nav')!;
+	const loginButton = menuElement.querySelector('.btn_deconnexion')!;
+	const loginService: LoginServiceMemory = new LoginServiceMemory();
 
-const leaderboard = new View(document.querySelector('.fenetre .leaderboard')!);
-const credit = new View(document.querySelector('.fenetre .credit')!);
-const canvas: HTMLCanvasElement = document.querySelector(
-	'.fenetre .play .play_canvas'
-)!;
-const ctx = canvas.getContext('2d')!;
-const play = new PlayView(
-	document.querySelector('.fenetre .play')!,
-	canvas,
-	ctx
-);
+	const leaderboard = new View(
+		document.querySelector('.fenetre .leaderboard')!
+	);
+	const credit = new View(document.querySelector('.fenetre .credit')!);
+	const canvas: HTMLCanvasElement = document.querySelector(
+		'.fenetre .play .play_canvas'
+	)!;
+	const ctx = canvas.getContext('2d')!;
+	const play = new PlayView(
+		document.querySelector('.fenetre .play')!,
+		canvas,
+		ctx
+	);
 
-const popup = new PopupLoginView(
-	document.querySelector('#popup')!,
-	loginButton as HTMLElement,
-	loginService
-);
+	const popup = new PopupLoginView(
+		document.querySelector('#popup')!,
+		loginButton as HTMLElement,
+		loginService
+	);
 
-loginButton.addEventListener('click', () => {
-	popup.oppenPopup();
-});
+	loginButton.addEventListener('click', () => {
+		popup.oppenPopup();
+	});
 
-const routes: Route[] = [
-	{ path: '/', view: homeView, title: 'ShootLévia' },
-	{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
-	{ path: '/credit', view: credit, title: 'Crédit' },
-	{ path: '/play', view: play, title: '' },
-];
+	const routes: Route[] = [
+		{ path: '/', view: homeView, title: 'ShootLévia' },
+		{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
+		{ path: '/credit', view: credit, title: 'Crédit' },
+		{ path: '/play', view: play, title: '' },
+	];
 
-Router.routes = routes;
-// élément dans lequel afficher le <h1> de la vue
-Router.titleElement = document.querySelector('.fenetre .banner .title')!;
-// gestion des liens du menu (détection du clic et activation/désactivation)
-Router.setMenuElement(menuElement);
+	Router.routes = routes;
+	Router.titleElement = document.querySelector('.fenetre .banner .title')!;
+	Router.setMenuElement(menuElement);
+	Router.registerLinks(
+		document.querySelector<HTMLAnchorElement>('.fenetre .home .playButton')!
+	);
 
-// enregistrement du bouton "Jouer" comme lien de navigation interne
-Router.registerLinks(
-	document.querySelector<HTMLAnchorElement>('.fenetre .home .playButton')!
-);
+	Router.navigate(window.location.pathname || '/', true);
+	window.onpopstate = () => Router.navigate(document.location.pathname, true);
 
-// chargement de la vue initiale selon l'URL demandée par l'utilisateur.rice (Deep linking)
-Router.navigate('/', true);
-// gestion des boutons précédent/suivant du navigateur (History API)
-window.onpopstate = () => Router.navigate(document.location.pathname, true);
+	const game = new Game(socket, [], 0, ctx);
+	setInterval(() => game.update(), 1000 / 60);
+	requestAnimationFrame(game.update);
+}
 
-const game = new Game(socket, [], 0, ctx);
-setInterval(() => game.update(), 1000 / 60);
-requestAnimationFrame(game.update);
+// Lancement de l'application
+init();

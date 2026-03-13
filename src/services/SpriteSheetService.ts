@@ -4,6 +4,7 @@ import {
 	SpriteSheetConfigs,
 } from '../SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
+import AssetLoaderService from '././AssetLoaderService.ts';
 
 export default class SpriteSheetService {
 	private spriteSheet: SpriteSheetConfig;
@@ -14,20 +15,15 @@ export default class SpriteSheetService {
 
 	constructor(spriteSheet: PlaySpriteSheet, defautRow: number) {
 		this.spriteSheet = SpriteSheetConfigs[spriteSheet];
-		this.img = new Image();
+		this.img = AssetLoaderService.get(this.spriteSheet.path);
 
 		this.frameX = -1;
 		this.frameY =
 			defautRow >= 0 && defautRow < this.spriteSheet.rows ? defautRow : 0;
 
-		this.img.src = this.spriteSheet.path;
-
-		this.img.onload = (e: Event) => {
-			this.spriteSheet.spriteWidth =
-				(e.currentTarget as HTMLImageElement).width / this.spriteSheet.columns;
-			this.spriteSheet.spriteHeight =
-				(e.currentTarget as HTMLImageElement).height / this.spriteSheet.rows;
-		};
+		// On calcule les dimensions car l'image est déjà chargée via AssetLoaderService
+		this.spriteSheet.spriteWidth = this.img.width / this.spriteSheet.columns;
+		this.spriteSheet.spriteHeight = this.img.height / this.spriteSheet.rows;
 	}
 
 	setRow(row: number) {
