@@ -10,8 +10,8 @@
 		"client:start": "vite --port=8000 client",
 		"client:build": "tsc && vite build client",
 		"client:preview": "vite preview client",
-		"server": "node --experimental-strip-types server/index.ts",
-		"server:watch": "node --watch --experimental-strip-types server/index.ts"
+		"server": "node .",
+		"server:watch": "node --watch ."
 	},
 	"devDependencies": {
 		"@types/node": "^25.3.5",
