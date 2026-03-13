@@ -6,7 +6,7 @@ import { describe, it } from 'node:test';
 describe('addEntry et getEntries', () => {
 	it('devrait retrouver le même objet', () => {
 		const leaderboardMemory = new LeaderboardServiceMemory();
-		const entry: LeaderboardEntry = { joueur: 'Test', score: 999 };
+		const entry: LeaderboardEntry = { joueur: 'Test', score: 999, date: Date.now() };
 		leaderboardMemory.addEntry(entry);
 
 		assert.ok(leaderboardMemory.getEntries().includes(entry));

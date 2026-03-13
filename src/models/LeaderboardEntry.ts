@@ -15,4 +15,10 @@ export interface LeaderboardEntry {
 	 * @type {number}
 	 */
 	score: number;
+
+	/**
+	 * Date du score
+	 * @type {number}
+	 */
+	date: number;
 }
