@@ -43,6 +43,9 @@ export default class Game {
 		// Appelé par setInterval (60fps)
 		let moved = false;
 
+		// Mise à jour de l'état du joueur (saut, etc.)
+		this.joueur.update();
+
 		if (this.keysPressed.has('Z')) {
 			this.joueur.move(Direction.Up);
 			moved = true;
