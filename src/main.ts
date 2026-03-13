@@ -78,6 +78,6 @@ Router.navigate('/', true);
 // gestion des boutons précédent/suivant du navigateur (History API)
 window.onpopstate = () => Router.navigate(document.location.pathname, true);
 
-const game = new Game(socket);
+const game = new Game(socket, [], 0);
 setInterval(() => game.update(), 1000 / 60);
 requestAnimationFrame(game.update);
