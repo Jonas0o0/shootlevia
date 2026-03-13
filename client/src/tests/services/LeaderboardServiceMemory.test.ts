@@ -1,5 +1,5 @@
 import LeaderboardServiceMemory from '../../services/LeaderboardServiceMemory.ts';
-import type { LeaderboardEntry } from '../../models/LeaderboardEntry.ts';
+import type { LeaderboardEntry } from '../../../../common/LeaderboardEntry.ts';
 import * as assert from 'node:assert';
 import { describe, it } from 'node:test';
 
