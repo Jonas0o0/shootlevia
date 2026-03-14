@@ -12,7 +12,7 @@ export class ServerPlayer {
 	private velocity: number = 2;
 	private jumping: boolean = false;
 	private jumpTimer: number = 0;
-	private jumpCooldown: number = 20;
+	private jumpCooldown: number = 30;
 
 	constructor(id: string, account: Account, x: number, y: number) {
 		this.id = id;
