@@ -1,4 +1,4 @@
-import type { Account } from '../../../common/types.ts';
+import type { Account, PlayerData } from '../../../common/types.ts';
 import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import type { Bonus } from '../Bonus.ts';
@@ -21,6 +21,7 @@ class Player {
 	private baseRow: number;
 	velocity: number;
 	sprite: SpriteSheetService;
+	public id: string = '';
 
 	constructor(joueur: Account | null, x: number, y: number) {
 		if (joueur == null) {
@@ -45,6 +46,22 @@ class Player {
 			width: this.sprite.getWidth(),
 			height: SpriteSheetConfigs.PLAYER.spriteHeight,
 		};
+	}
+
+	updateFromData(data: PlayerData): void {
+		this.hitbox.x = data.x;
+		this.hitbox.y = data.y;
+		this.score = data.score;
+		this.jump.jumping = data.isJumping;
+		this.jump.timer = data.jumpTimer;
+		this.jump.cooldown = data.jumpCooldown;
+
+		// Mise à jour visuelle (sprite row)
+		if (this.jump.jumping) {
+			this.sprite.setRow(this.baseRow + 1);
+		} else {
+			this.sprite.setRow(this.baseRow);
+		}
 	}
 
 	isJumping(): boolean {
