@@ -8,7 +8,6 @@ export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
 	private bullets: ServerBullet[] = [];
 	private enemies: ServerEnemy[] = [];
-	private enemySpawnTimer: number = 0;
 	private time: number = 0;
 
 	constructor() {
