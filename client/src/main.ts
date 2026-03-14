@@ -13,11 +13,13 @@ const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
 import Game from './models/Game.ts';
 import Player from './models/Player.ts';
+import EnemySpawner from './EnemySpawner.ts';
 
 async function init() {
 	// 1. Préchargement des assets
 	const imagesToPreload = [
 		SpriteSheetConfigs.PLAYER.path,
+		SpriteSheetConfigs.DRONE.path,
 		// Ajoutez d'autres images si nécessaire
 	];
 
@@ -97,6 +99,19 @@ async function init() {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const joueur = new Player(loginService.accounts, 0, 0);
 		const game = new Game(socket, [joueur], 0, canvas, ctx);
+
+		
+
+		// Temp test apparition ennemis
+		const enemySpawner = new EnemySpawner(ctx);
+		enemySpawner.spawnEnemy(canvas.width - 100, 0);
+		const originalDraw = game.draw;
+		game.draw = () => {
+			originalDraw.call(game);
+			enemySpawner.updateAndDraw();
+		};
+
+
 		// On s'assure de n'avoir qu'une boucle à la fois
 		// Pour simplifier, on se contente du lancement ici
 		setInterval(() => game.update(), 1000 / 60);
