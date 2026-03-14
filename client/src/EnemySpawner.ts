@@ -4,7 +4,7 @@ class EnemySpawner {
 	private ctx: CanvasRenderingContext2D;
 	private enemies: Enemy[] = [];
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+	constructor( ctx: CanvasRenderingContext2D) {
 		this.ctx = ctx;
 	}
 

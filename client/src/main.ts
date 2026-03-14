@@ -103,8 +103,8 @@ async function init() {
 		
 
 		// Temp test apparition ennemis
-		const enemySpawner = new EnemySpawner(canvas, ctx);
-		enemySpawner.spawnEnemy(100, 0);
+		const enemySpawner = new EnemySpawner(ctx);
+		enemySpawner.spawnEnemy(canvas.width - 100, 0);
 		const originalDraw = game.draw;
 		game.draw = () => {
 			originalDraw.call(game);
