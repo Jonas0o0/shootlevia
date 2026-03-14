@@ -52,16 +52,18 @@ class Player {
 		this.hitbox.x = data.x;
 		this.hitbox.y = data.y;
 		this.score = data.score;
-		this.jump.jumping = data.isJumping;
 		this.jump.timer = data.jumpTimer;
 		this.jump.cooldown = data.jumpCooldown;
 
 		// Mise à jour visuelle (sprite row)
-		if (this.jump.jumping) {
-			this.sprite.setRow(this.baseRow + 1);
-		} else {
-			this.sprite.setRow(this.baseRow);
+		if (data.isJumping != this.jump.jumping) {
+			if (data.isJumping) {
+				this.sprite.setRow(this.baseRow + 1);
+			} else {
+				this.sprite.setRow(this.baseRow);
+			}
 		}
+		this.jump.jumping = data.isJumping;
 	}
 
 	isJumping(): boolean {
@@ -105,28 +107,6 @@ class Player {
 				break;
 			case Direction.Down:
 				this.hitbox.y += this.velocity;
-		}
-	}
-
-	doJump(): void {
-		if (!this.isJumping() && this.jump.cooldown <= 0) {
-			this.jump.jumping = true;
-			// On fait durer le saut 40 frames
-			this.jump.timer = 40;
-			this.sprite.setRow(this.baseRow + 1);
-		}
-	}
-
-	update(): void {
-		if (this.jump.jumping) {
-			this.jump.timer--;
-			if (this.jump.timer <= 0) {
-				this.jump.jumping = false;
-				this.sprite.setRow(this.baseRow);
-				this.jump.cooldown = 20; // Délai avant prochain saut
-			}
-		} else if (this.jump.cooldown > 0) {
-			this.jump.cooldown--;
 		}
 	}
 

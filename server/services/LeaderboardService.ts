@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import type { LeaderboardEntry } from '../../common/LeaderboardEntry';
+import type { LeaderboardEntry } from '../../common/LeaderboardEntry.ts';
 
 export class LeaderboardService {
 	private readonly leaderboardPath = path.resolve('./server/ressources/leaderboard.json');

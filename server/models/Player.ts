@@ -1,5 +1,5 @@
-import type { Account, PlayerData } from '../../common/types';
-import { Direction } from '../../common/Direction';
+import type { Account, PlayerData } from '../../common/types.ts';
+import { Direction } from '../../common/Direction.ts';
 
 export class ServerPlayer {
 	public id: string;

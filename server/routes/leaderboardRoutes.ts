@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { leaderboardService } from '../services/LeaderboardService';
-import type { LeaderboardEntry } from '../../common/LeaderboardEntry';
+import { leaderboardService } from '../services/LeaderboardService.ts';
+import type { LeaderboardEntry } from '../../common/LeaderboardEntry.ts';
 
 const router = Router();
 
