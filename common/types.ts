@@ -16,7 +16,17 @@ export interface PlayerData {
 	jumpCooldown: number;
 }
 
+export interface BulletData {
+	id: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	ownerId: string;
+}
+
 export interface GameState {
 	players: PlayerData[];
+	bullets: BulletData[];
 	time: number;
 }
