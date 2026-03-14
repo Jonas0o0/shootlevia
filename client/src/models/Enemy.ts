@@ -3,7 +3,6 @@ import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
 import {
 	PlaySpriteSheet,
-	SpriteSheetConfigs,
 } from '../SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 
@@ -18,7 +17,7 @@ export default class Enemy {
 		this.health = 100;
 		this.velocity = 1;
 		this.direction = Direction.Left;
-		this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, 0);
+		this.sprite = new SpriteSheetService(PlaySpriteSheet.DRONE, 0);
 
 		this.hitbox = {
 			x: x,
