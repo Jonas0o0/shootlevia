@@ -1,6 +1,6 @@
-import { ServerPlayer } from './Player';
-import type { GameState } from '../../common/types';
-import { Direction } from '../../common/Direction';
+import { ServerPlayer } from './Player.ts';
+import type { GameState } from '../../common/types.ts';
+import { Direction } from '../../common/Direction.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();

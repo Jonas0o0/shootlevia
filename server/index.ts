@@ -2,9 +2,9 @@ import http from 'http';
 import express from 'express';
 import { Server as IOServer } from 'socket.io';
 import { loadEnvFile } from 'node:process';
-import leaderboardRoutes from './routes/leaderboardRoutes';
-import { ServerGame } from './models/Game';
-import { Direction } from '../common/Direction';
+import leaderboardRoutes from './routes/leaderboardRoutes.ts';
+import { ServerGame } from './models/Game.ts';
+import { Direction } from '../common/Direction.ts';
 
 // Chargement des variables d'environnement
 loadEnvFile('.env');
