@@ -1,11 +1,13 @@
 import type { Socket } from 'socket.io-client';
 import Player from './Player.ts';
+import Bullet from './Bullet.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 
 export default class Game {
 	private socket: Socket;
 	private players: Map<string, Player> = new Map();
+	private bullets: Map<string, Bullet> = new Map();
 	private joueur: Player;
 	private time: number;
 	private canvas: HTMLCanvasElement;
@@ -29,6 +31,11 @@ export default class Game {
 		this.joueur = players[joueurIdx];
 		this.joueur.id = socket.id || '';
 		this.players.set(this.joueur.id, this.joueur);
+
+		// tire auto 500ms
+		setInterval(() => {
+			this.socket.emit('shoot');
+		}, 500);
 
 		// Rejoindre la partie côté serveur
 		this.socket.emit('join', {
@@ -70,6 +77,24 @@ export default class Game {
 					this.players.delete(id);
 				}
 			}
+
+			// Synchronisation des balles
+			state.bullets.forEach(bulletData => {
+				let b = this.bullets.get(bulletData.id);
+				if (!b) {
+					b = new Bullet(bulletData);
+					this.bullets.set(b.id, b);
+				}
+				b.updateFromData(bulletData);
+			});
+
+			// Supprimer les balles disparues
+			const currentBulletIds = state.bullets.map(b => b.id);
+			for (const id of this.bullets.keys()) {
+				if (!currentBulletIds.includes(id)) {
+					this.bullets.delete(id);
+				}
+			}
 		});
 	}
 
@@ -96,6 +121,11 @@ export default class Game {
 		// Dessiner tous les joueurs
 		this.players.forEach(player => {
 			player.draw(this.ctx);
+		});
+
+		// Dessiner toutes les balles
+		this.bullets.forEach(bullet => {
+			bullet.draw(this.ctx);
 		});
 
 		requestAnimationFrame(this.draw);
