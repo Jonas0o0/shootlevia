@@ -13,7 +13,7 @@ import type { Frame } from '../Frame.ts';
 
 class Player {
 	private joueur: Account;
-	private jump: { jumping: boolean; timer: number; cooldown: number };
+	private jump: { jumping: boolean };
 	private hitbox: HitBox;
 	private score: number;
 	private weapons: Weapon[];
@@ -34,7 +34,7 @@ class Player {
 		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
 		this.score = 0;
 		this.velocity = 2;
-		this.jump = { jumping: false, timer: 0, cooldown: 0 };
+		this.jump = { jumping: false };
 
 		this.baseRow =
 			AvatarRowMapping[joueur.avatar] ?? AvatarRowMapping.pedalBleu;
@@ -52,8 +52,6 @@ class Player {
 		this.hitbox.x = data.x;
 		this.hitbox.y = data.y;
 		this.score = data.score;
-		this.jump.timer = data.jumpTimer;
-		this.jump.cooldown = data.jumpCooldown;
 
 		// Mise à jour visuelle (sprite row)
 		if (data.isJumping != this.jump.jumping) {

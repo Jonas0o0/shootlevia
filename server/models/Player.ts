@@ -12,7 +12,7 @@ export class ServerPlayer {
 	private velocity: number = 2;
 	private jumping: boolean = false;
 	private jumpTimer: number = 0;
-	private jumpCooldown: number = 0;
+	private jumpCooldown: number = 20;
 
 	constructor(id: string, account: Account, x: number, y: number) {
 		this.id = id;
@@ -41,9 +41,9 @@ export class ServerPlayer {
 	}
 
 	doJump(): void {
-		if (!this.jumping && this.jumpCooldown <= 0) {
+		if (!this.jumping && this.jumpTimer <= 0) {
 			this.jumping = true;
-			this.jumpTimer = 40;
+			this.jumpTimer = this.jumpCooldown;
 		}
 	}
 
@@ -52,10 +52,7 @@ export class ServerPlayer {
 			this.jumpTimer--;
 			if (this.jumpTimer <= 0) {
 				this.jumping = false;
-				this.jumpCooldown = 20;
 			}
-		} else if (this.jumpCooldown > 0) {
-			this.jumpCooldown--;
 		}
 	}
 
