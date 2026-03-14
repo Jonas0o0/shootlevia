@@ -1,9 +1,11 @@
 import { ServerPlayer } from './Player.ts';
 import type { GameState } from '../../common/types.ts';
 import { Direction } from '../../common/Direction.ts';
+import { ServerBullet } from './Bullet.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
+	private bullets: ServerBullet[] = [];
 	private time: number = 0;
 
 	constructor() {
@@ -35,14 +37,26 @@ export class ServerGame {
 		}
 	}
 
+	handlePlayerShoot(id: string): void {
+		const player = this.players.get(id);
+		if (player) {
+			const bullet = new ServerBullet(id, player.x + player.width, player.y + player.height / 2);
+			this.bullets.push(bullet);
+		}
+	}
+
 	update(): void {
 		this.time++;
 		this.players.forEach(player => player.update());
+		this.bullets.forEach(bullet => bullet.update());
+		// afficher les balles le temps qu'elles ne sont pas trop loins
+		this.bullets = this.bullets.filter(b => b.x < 2000);
 	}
 
 	getState(): GameState {
 		return {
 			players: Array.from(this.players.values()).map(p => p.toData()),
+			bullets: this.bullets.map(b => b.toData()),
 			time: this.time,
 		};
 	}
