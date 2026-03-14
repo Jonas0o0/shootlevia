@@ -1,6 +1,7 @@
 import type { Socket } from 'socket.io-client';
 import Player from './Player.ts';
 import Bullet from './Bullet.ts';
+import Enemy from './Enemy.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import GameMap from './GameMap.ts';
@@ -9,6 +10,7 @@ export default class Game {
 	private socket: Socket;
 	private players: Map<string, Player> = new Map();
 	private bullets: Map<string, Bullet> = new Map();
+	private enemies: Map<string, Enemy> = new Map();
 	private joueur: Player;
 	private time: number;
 	private canvas: HTMLCanvasElement;
@@ -100,6 +102,24 @@ export default class Game {
 					this.bullets.delete(id);
 				}
 			}
+
+			// Synchronisation des ennemis
+			state.enemies.forEach(enemyData => {
+				let e = this.enemies.get(enemyData.id);
+				if (!e) {
+					e = new Enemy(enemyData);
+					this.enemies.set(e.id, e);
+				}
+				e.updateFromData(enemyData);
+			});
+
+			// Supprimer les ennemis disparus
+			const currentEnemyIds = state.enemies.map(e => e.id);
+			for (const id of this.enemies.keys()) {
+				if (!currentEnemyIds.includes(id)) {
+					this.enemies.delete(id);
+				}
+			}
 		});
 	}
 
@@ -134,6 +154,11 @@ export default class Game {
 		// Dessiner toutes les balles
 		this.bullets.forEach(bullet => {
 			bullet.draw(this.ctx);
+		});
+
+		// Dessiner tous les ennemis
+		this.enemies.forEach(enemy => {
+			enemy.draw(this.ctx);
 		});
 
 		requestAnimationFrame(this.draw);

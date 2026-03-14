@@ -25,8 +25,18 @@ export interface BulletData {
 	ownerId: string;
 }
 
+export interface EnemyData {
+	id: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	health: number;
+}
+
 export interface GameState {
 	players: PlayerData[];
 	bullets: BulletData[];
+	enemies: EnemyData[];
 	time: number;
 }
