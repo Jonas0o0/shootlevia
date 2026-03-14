@@ -3,6 +3,7 @@ import Player from './Player.ts';
 import Bullet from './Bullet.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
+import GameMap from './GameMap.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -13,6 +14,7 @@ export default class Game {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private keysPressed: Set<string> = new Set();
+	private map: GameMap;
 
 	constructor(
 		socket: Socket,
@@ -26,6 +28,9 @@ export default class Game {
 		this.time = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
+
+		//Iitialisation de la map
+		this.map = new GameMap();
 
 		// Initialisation du joueur local
 		this.joueur = players[joueurIdx];
@@ -117,6 +122,9 @@ export default class Game {
 	draw = (): void => {
 		//appeller par requestanimationframe
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+		//Dessiner la map
+		this.map.draw(this.canvas, this.ctx);
 
 		// Dessiner tous les joueurs
 		this.players.forEach(player => {
