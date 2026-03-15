@@ -63,27 +63,6 @@ class Player {
 			}
 		}
 		this.jump.jumping = data.isJumping;
-
-		// Sync bonuses
-		if (data.bonuses) {
-			// Remove bonuses that are no longer present
-			this.bonus = this.bonus.filter((b) => data.bonuses.includes(b.type.bonusType));
-
-			// Add new bonuses
-			data.bonuses.forEach((typeId) => {
-				const hasBonus = this.bonus.some((b) => b.type.bonusType === typeId);
-				if (!hasBonus) {
-					const type = Object.values(BonusType).find((bt) => bt.bonusType === typeId);
-					if (type) {
-						const sprite = new SpriteSheetService(
-							PlaySpriteSheet[type.sprite as keyof typeof PlaySpriteSheet],
-							type.rows.MAP
-						);
-						this.bonus.push(new Bonus(type, sprite));
-					}
-				}
-			});
-		}
 	}
 
 	isJumping(): boolean {
