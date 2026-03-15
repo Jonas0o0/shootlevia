@@ -19,6 +19,7 @@ async function init() {
 	const imagesToPreload = [
 		SpriteSheetConfigs.PLAYER.path,
 		SpriteSheetConfigs.DRONE.path,
+		SpriteSheetConfigs.PNEU.path,
 		// Ajoutez d'autres images si nécessaire
 	];
 

@@ -2,6 +2,7 @@ import type { EnemyData } from '../../common/types.ts';
 
 export class ServerEnemy {
 	public id: string;
+	public type: string;
 	public x: number;
 	public y: number;
 	public vx: number;
@@ -10,8 +11,9 @@ export class ServerEnemy {
 	public height: number;
 	public health: number = 100;
 
-	constructor(id: string, x: number, y: number, vx: number, vy: number) {
+	constructor(id: string, type: string, x: number, y: number, vx: number, vy: number) {
 		this.id = id;
+		this.type = type;
 		this.x = x;
 		this.y = y;
 		this.vx = vx;
@@ -28,6 +30,7 @@ export class ServerEnemy {
 	toData(): EnemyData {
 		return {
 			id: this.id,
+			type: this.type,
 			x: this.x,
 			y: this.y,
 			width: this.width,

@@ -29,22 +29,31 @@ export class SpawnEnemyService {
 
 	private generateEnemy(): ServerEnemy {
 		const id = Math.random().toString(36).substring(7);
-		const spawnOnTop = Math.random() < 0.5;
+		const type = Math.random() < 0.3 ? 'PNEU' : 'DRONE';
+		
 		let x: number, y: number;
 		let vx: number, vy: number;
 
-		if (spawnOnTop) {
-			x = Math.random() * 1920;
-			y = -100;
-			vx = (Math.random() - 0.5) * 3;
-			vy = 2 + Math.random();
+		if (type === 'PNEU') {
+			x = 1920 + Math.random() * 200;
+			y = 216 + 50 + Math.random() * (864 - 100);
+			vx = -(0.4 * (1000 / 60));
+			vy = 0;
 		} else {
-			x = 2200 + Math.random() * 300; 
-			y = Math.random() * 800;
-			vx = -(2 + Math.random() * 2);
-			vy = (Math.random() - 0.5) * 2;
+			const spawnOnTop = Math.random() < 0.5;
+			if (spawnOnTop) {
+				x = Math.random() * 1920;
+				y = -100;
+				vx = (Math.random() - 0.5) * 3;
+				vy = 2 + Math.random();
+			} else {
+				x = 2200 + Math.random() * 300; 
+				y = Math.random() * 800;
+				vx = -(2 + Math.random() * 2);
+				vy = (Math.random() - 0.5) * 2;
+			}
 		}
 
-		return new ServerEnemy(id, x, y, vx, vy);
+		return new ServerEnemy(id, type, x, y, vx, vy);
 	}
 }

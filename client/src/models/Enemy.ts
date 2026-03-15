@@ -20,7 +20,9 @@ export default class Enemy {
 		this.health = data.health;
 		this.velocity = 1;
 		this.direction = Direction.Left;
-		this.sprite = new SpriteSheetService(PlaySpriteSheet.DRONE, 0);
+		
+		const spriteSheet = data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
+		this.sprite = new SpriteSheetService(spriteSheet, 0);
 
 		this.hitbox = {
 			x: data.x,

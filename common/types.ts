@@ -27,6 +27,7 @@ export interface BulletData {
 
 export interface EnemyData {
 	id: string;
+	type?: string;
 	x: number;
 	y: number;
 	width: number;

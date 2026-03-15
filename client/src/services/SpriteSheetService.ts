@@ -22,7 +22,9 @@ export default class SpriteSheetService {
 		this.frameX = 0;
 		this.frameY =
 			defautRow >= 0 && defautRow < this.spriteSheet.rows ? defautRow : 0;
-		if (defautRow % 2 === 0) {
+		if (this.spriteSheet.isStatic) {
+			this.spriteSheet.columnsFrameMax = 1;
+		} else if (defautRow % 2 === 0) {
 			this.spriteSheet.columnsFrameMax = this.spriteSheet.columns - 1;
 		} else {
 			this.spriteSheet.columnsFrameMax = this.spriteSheet.columns;
@@ -36,7 +38,9 @@ export default class SpriteSheetService {
 	setRow(row: number) {
 		if (row >= 0 && row < this.spriteSheet.rows) {
 			this.frameY = row;
-			if (row % 2 === 0) {
+			if (this.spriteSheet.isStatic) {
+				this.spriteSheet.columnsFrameMax = 1;
+			} else if (row % 2 === 0) {
 				this.spriteSheet.columnsFrameMax = this.spriteSheet.columns - 1;
 			} else {
 				this.spriteSheet.columnsFrameMax = this.spriteSheet.columns;

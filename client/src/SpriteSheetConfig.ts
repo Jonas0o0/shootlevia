@@ -1,8 +1,9 @@
-export type PlaySpriteSheet = 'PLAYER'| 'DRONE';
+export type PlaySpriteSheet = 'PLAYER'| 'DRONE' | 'PNEU';
 
 export const PlaySpriteSheet = {
 	PLAYER: 'PLAYER' as PlaySpriteSheet,
 	DRONE: 'DRONE' as PlaySpriteSheet,
+	PNEU: 'PNEU' as PlaySpriteSheet,
 };
 
 export type SpriteSheetConfig = {
@@ -12,6 +13,7 @@ export type SpriteSheetConfig = {
 	spriteWidth: number;
 	spriteHeight: number;
 	columnsFrameMax: number;
+	isStatic?: boolean;
 };
 
 export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
@@ -30,6 +32,15 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		spriteWidth: 0,
 		spriteHeight: 0,
 		columnsFrameMax: 0,
+	},
+	PNEU: {
+		path: '/assets/Pneu-crevee-explosion-spritesheet1.png',
+		columns: 12,
+		rows: 1,
+		spriteWidth: 0,
+		spriteHeight: 0,
+		columnsFrameMax: 0,
+		isStatic: true,
 	}
 };
 
