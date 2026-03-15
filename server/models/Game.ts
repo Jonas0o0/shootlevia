@@ -3,12 +3,15 @@ import type { GameState } from '../../common/types.ts';
 import { Direction } from '../../common/Direction.ts';
 import { ServerBullet } from './Bullet.ts';
 import { ServerEnemy } from './ServerEnemy.ts';
+import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
 	private bullets: ServerBullet[] = [];
 	private enemies: ServerEnemy[] = [];
 	private time: number = 0;
+
+	private spawnEnemyService: SpawnEnemyService = new SpawnEnemyService();
 
 	constructor() {
 		// Boucle de jeu (60fps)
@@ -53,34 +56,16 @@ export class ServerGame {
 		this.bullets.forEach(bullet => bullet.update());
 		this.bullets = this.bullets.filter(b => b.x < 2000);
 
-		// Gestion de l'apparition des ennemis
-		if (this.time % 60 === 0) {
-			this.spawnEnemy();
+		if (this.players.size > 0) {
+			this.spawnEnemyService.update(this.time, true, this.enemies);
+		} else if (this.time > 0) {
+			this.time = 0;
+			this.enemies = [];
+			this.spawnEnemyService.reset();
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
 		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
-	}
-
-	private spawnEnemy(): void {
-		const id = Math.random().toString(36).substring(7);
-		const spawnOnTop = Math.random() < 0.5;
-		let x: number, y: number;
-		let vx: number, vy: number;
-
-		if (spawnOnTop) {
-			x = Math.random() * 1920;
-			y = -100;
-			vx = (Math.random() - 0.5) * 3;
-			vy = 2 + Math.random();
-		} else {
-			x = 2200 + Math.random() * 300; 
-			y = Math.random() * 800;
-			vx = -(2 + Math.random() * 2);
-			vy = (Math.random() - 0.5) * 2;
-		}
-
-		this.enemies.push(new ServerEnemy(id, x, y, vx, vy));
 	}
 
 	getState(): GameState {
