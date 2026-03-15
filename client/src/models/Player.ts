@@ -1,7 +1,6 @@
 import type { Account, PlayerData } from '../../../common/types.ts';
 import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
-import type { Bonus } from '../Bonus.ts';
 import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
 import {
@@ -10,6 +9,8 @@ import {
 	AvatarRowMapping,
 } from '../SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
+import { BonusType } from '../../../common/BonusType.ts';
+import type Bonus from './Bonus.ts';
 
 class Player {
 	private joueur: Account;
@@ -31,7 +32,7 @@ class Player {
 		this.weapons = [
 			{ nom: 'attaque de base', degat: 2, tier: 1, tierMin: 1, tierMax: 5 },
 		];
-		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
+		this.bonus = [];
 		this.score = 0;
 		this.velocity = 2;
 		this.jump = { jumping: false };
@@ -62,6 +63,27 @@ class Player {
 			}
 		}
 		this.jump.jumping = data.isJumping;
+
+		// Sync bonuses
+		if (data.bonuses) {
+			// Remove bonuses that are no longer present
+			this.bonus = this.bonus.filter((b) => data.bonuses.includes(b.type.bonusType));
+
+			// Add new bonuses
+			data.bonuses.forEach((typeId) => {
+				const hasBonus = this.bonus.some((b) => b.type.bonusType === typeId);
+				if (!hasBonus) {
+					const type = Object.values(BonusType).find((bt) => bt.bonusType === typeId);
+					if (type) {
+						const sprite = new SpriteSheetService(
+							PlaySpriteSheet[type.sprite as keyof typeof PlaySpriteSheet],
+							type.rows.MAP
+						);
+						this.bonus.push(new Bonus(type, sprite));
+					}
+				}
+			});
+		}
 	}
 
 	isJumping(): boolean {
@@ -90,6 +112,16 @@ class Player {
 
 	getBonus(): Bonus[] {
 		return this.bonus;
+	}
+
+	addBonus(bonus: Bonus): void {
+		if (bonus.type.bonusType === BonusType.Shield.bonusType) {
+			const hasShield = this.bonus.some(
+				b => b.type.bonusType === BonusType.Shield.bonusType
+			);
+			if (hasShield) return;
+		}
+		this.bonus.push(bonus);
 	}
 
 	move(direction: Direction): void {
@@ -121,6 +153,20 @@ class Player {
 			frame.width,
 			frame.height
 		);
+
+		// Dessiner les effets des bonus sur le joueur
+		this.bonus.forEach(b => {
+			b.drawOnPlayer(ctx, this.hitbox.x, this.hitbox.y);
+		});
+	}
+
+	drawHUD(ctx: CanvasRenderingContext2D): void {
+		// Dessiner les bonus dans le HUD
+		let startX = 10;
+		let startY = 10;
+		this.bonus.forEach((b, index) => {
+			b.drawInHUD(ctx, startX + index * 40, startY);
+		});
 	}
 }
 
