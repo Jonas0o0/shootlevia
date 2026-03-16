@@ -54,7 +54,31 @@ export class ServerGame {
 		this.time++;
 		this.players.forEach(player => player.update());
 		this.bullets.forEach(bullet => bullet.update());
-		this.bullets = this.bullets.filter(b => b.x < 2000);
+
+		// Détruire des drones avec les balles
+		const bulletsToRemove = new Set<string>();
+		const enemiesToRemove = new Set<string>();
+
+		this.bullets.forEach(bullet => {
+			this.enemies.forEach(enemy => {
+				if (
+					bullet.x < enemy.x + enemy.width &&
+					bullet.x + bullet.width > enemy.x &&
+					bullet.y < enemy.y + enemy.height &&
+					bullet.y + bullet.height > enemy.y
+				) {
+					if (enemy.type === 'DRONE') {
+						enemy.health -= 100;
+						bulletsToRemove.add(bullet.id);
+						if (enemy.health <= 0) {
+							enemiesToRemove.add(enemy.id);
+						}
+					}
+				}
+			});
+		});
+
+		this.bullets = this.bullets.filter(b => !bulletsToRemove.has(b.id) && b.x < 2000);
 
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
@@ -65,7 +89,7 @@ export class ServerGame {
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
+		this.enemies = this.enemies.filter(e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000);
 	}
 
 	getState(): GameState {
