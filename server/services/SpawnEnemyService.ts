@@ -3,7 +3,7 @@ import { ServerEnemy } from '../models/ServerEnemy.ts';
 export class SpawnEnemyService {
 	private baseRespawnRate: number = 300;
 	private minRespawnRate: number = 30; //nombre minimum a la quelle les ennemis spawn
-	private difficultyCurve: number = 0.1;
+	private difficultyCurve: number = 0.01;
 	private enemySpawnCooldown: number = 0;
 
 	public update(time: number, hasPlayers: boolean, enemies: ServerEnemy[]): void {
@@ -35,19 +35,19 @@ export class SpawnEnemyService {
 		let vx: number, vy: number;
 
 		if (type === 'PNEU') {
-			x = 3000 + Math.random() * 500;
+			x = 1920 + Math.random() * 200;
 			y = 216 + 50 + Math.random() * (864 - 100);
 			vx = -(0.4 * (1000 / 60));
 			vy = 0;
 		} else {
 			const spawnOnTop = Math.random() < 0.5;
 			if (spawnOnTop) {
-				x = -500 + Math.random() * 4000;
+				x = Math.random() * 1920;
 				y = -100;
 				vx = (Math.random() - 0.5) * 3;
 				vy = 2 + Math.random();
 			} else {
-				x = 3000 + Math.random() * 500;
+				x = 2200 + Math.random() * 300; 
 				y = Math.random() * 800;
 				vx = -(2 + Math.random() * 2);
 				vy = (Math.random() - 0.5) * 2;
