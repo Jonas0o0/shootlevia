@@ -54,7 +54,7 @@ export class ServerGame {
 		this.time++;
 		this.players.forEach(player => player.update());
 		this.bullets.forEach(bullet => bullet.update());
-		this.bullets = this.bullets.filter(b => b.x < 4500);
+		this.bullets = this.bullets.filter(b => b.x < 2000);
 
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
@@ -65,7 +65,7 @@ export class ServerGame {
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 4500);
+		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
 	}
 
 	getState(): GameState {
