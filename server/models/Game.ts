@@ -68,7 +68,7 @@ export class ServerGame {
 					bullet.y + bullet.height > enemy.y
 				) {
 					if (enemy.type === 'DRONE') {
-						enemy.health -= 100;
+						enemy.health -= 50;
 						bulletsToRemove.add(bullet.id);
 						if (enemy.health <= 0) {
 							enemiesToRemove.add(enemy.id);
