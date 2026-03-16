@@ -73,6 +73,12 @@ export class ServerGame {
 						if (enemy.health <= 0) {
 							enemiesToRemove.add(enemy.id);
 						}
+					} else if (enemy.type === 'PNEU') {
+						enemy.health -= 34;
+						bulletsToRemove.add(bullet.id);
+						if (enemy.health <= 0) {
+							enemiesToRemove.add(enemy.id);
+						}
 					}
 				}
 			});
