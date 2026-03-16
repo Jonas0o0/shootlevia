@@ -20,6 +20,7 @@ async function init() {
 		SpriteSheetConfigs.PLAYER.path,
 		SpriteSheetConfigs.DRONE.path,
 		SpriteSheetConfigs.PNEU.path,
+		SpriteSheetConfigs.PASS_PASS.path,
 		// Ajoutez d'autres images si nécessaire
 	];
 

@@ -5,6 +5,8 @@ import Enemy from './Enemy.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import GameMap from './GameMap.ts';
+import { BonusType } from '../../../common/BonusType.ts';
+import bonus from './Bonus.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -135,7 +137,7 @@ export default class Game {
 		if (directions.length > 0) {
 			this.socket.emit('move', directions);
 		}
-
+		this.joueur.addBonus(new bonus(BonusType.Shield));
 		this.time;
 	}
 
@@ -146,11 +148,6 @@ export default class Game {
 		//Dessiner la map
 		this.map.draw(this.canvas, this.ctx);
 
-		// Dessiner tous les joueurs
-		this.players.forEach(player => {
-			player.draw(this.ctx);
-		});
-
 		// Dessiner toutes les balles
 		this.bullets.forEach(bullet => {
 			bullet.draw(this.ctx);
@@ -159,6 +156,11 @@ export default class Game {
 		// Dessiner tous les ennemis
 		this.enemies.forEach(enemy => {
 			enemy.draw(this.ctx);
+		});
+
+		// Dessiner tous les joueurs
+		this.players.forEach(player => {
+			player.draw(this.ctx);
 		});
 
 		requestAnimationFrame(this.draw);

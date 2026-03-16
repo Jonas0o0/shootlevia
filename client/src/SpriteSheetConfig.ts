@@ -1,9 +1,10 @@
-export type PlaySpriteSheet = 'PLAYER'| 'DRONE' | 'PNEU';
+export type PlaySpriteSheet = 'PLAYER' | 'DRONE' | 'PNEU' | 'PASS_PASS';
 
 export const PlaySpriteSheet = {
 	PLAYER: 'PLAYER' as PlaySpriteSheet,
 	DRONE: 'DRONE' as PlaySpriteSheet,
 	PNEU: 'PNEU' as PlaySpriteSheet,
+	PASS_PASS: 'PASS_PASS' as PlaySpriteSheet,
 };
 
 export type SpriteSheetConfig = {
@@ -41,7 +42,15 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		spriteHeight: 0,
 		columnsFrameMax: 0,
 		isStatic: true,
-	}
+	},
+	PASS_PASS: {
+		path: '/assets/PassPass.png',
+		columns: 6,
+		rows: 3,
+		spriteWidth: 0,
+		spriteHeight: 0,
+		columnsFrameMax: 6,
+	},
 };
 
 export const AvatarRowMapping: Record<string, number> = {

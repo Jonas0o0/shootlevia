@@ -137,10 +137,7 @@ class Player {
 		this.bonus.forEach(b => {
 			b.drawOnPlayer(ctx, this.hitbox.x, this.hitbox.y);
 		});
-	}
 
-	drawHUD(ctx: CanvasRenderingContext2D): void {
-		// Dessiner les bonus dans le HUD
 		let startX = 10;
 		let startY = 10;
 		this.bonus.forEach((b, index) => {
