@@ -7,7 +7,7 @@ import PopupLoginView from './PopupLoginView.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import AssetLoaderService from './services/AssetLoaderService.ts';
-import { SpriteSheetConfigs } from './SpriteSheetConfig.ts';
+import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';

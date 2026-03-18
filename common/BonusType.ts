@@ -1,4 +1,4 @@
-import { PlaySpriteSheet } from '../client/src/SpriteSheetConfig.ts';
+import { PlaySpriteSheet } from './SpriteSheetConfig.ts';
 
 export const BonusType = {
 	Shield: {

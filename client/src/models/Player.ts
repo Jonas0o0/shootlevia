@@ -7,16 +7,15 @@ import {
 	PlaySpriteSheet,
 	SpriteSheetConfigs,
 	AvatarRowMapping,
-} from '../SpriteSheetConfig.ts';
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
-import { BonusType } from '../../../common/BonusType.ts';
-import type Bonus from './Bonus.ts';
+import Bonus from './Bonus.ts';
+import type { BonusType } from '../../../common/BonusType.ts';
 
 class Player {
 	private joueur: Account;
 	private jump: { jumping: boolean };
 	private hitbox: HitBox;
-	private score: number;
 	private weapons: Weapon[];
 	private bonus: Bonus[];
 	private baseRow: number;
@@ -33,7 +32,6 @@ class Player {
 			{ nom: 'attaque de base', degat: 2, tier: 1, tierMin: 1, tierMax: 5 },
 		];
 		this.bonus = [];
-		this.score = 0;
 		this.velocity = 2;
 		this.jump = { jumping: false };
 
@@ -52,7 +50,19 @@ class Player {
 	updateFromData(data: PlayerData): void {
 		this.hitbox.x = data.x;
 		this.hitbox.y = data.y;
-		this.score = data.score;
+		//Pour Optti on fait pas un bete remplacment, on compra les de liste por suprimer et ajputer les différence
+		const dataSet = new Set(data.bonus);
+		const currentSet = new Set(this.bonus.map(b => b.type));
+
+		// Supprimer
+		this.bonus = this.bonus.filter(b => dataSet.has(b.type));
+
+		// Ajouter
+		data.bonus.forEach((bonus: BonusType) => {
+			if (!currentSet.has(bonus)) {
+				this.bonus.push(new Bonus(bonus));
+			}
+		});
 
 		// Mise à jour visuelle (sprite row)
 		if (data.isJumping != this.jump.jumping) {
@@ -77,30 +87,8 @@ class Player {
 		return this.joueur;
 	}
 
-	getScore(): number {
-		return this.score;
-	}
-
-	addScore(score: number = 10): void {
-		this.score += score;
-	}
-
 	getWeapon(): Weapon[] {
 		return this.weapons;
-	}
-
-	getBonus(): Bonus[] {
-		return this.bonus;
-	}
-
-	addBonus(bonus: Bonus): void {
-		if (bonus.type.bonusType === BonusType.Shield.bonusType) {
-			const hasShield = this.bonus.some(
-				b => b.type.bonusType === BonusType.Shield.bonusType
-			);
-			if (hasShield) return;
-		}
-		this.bonus.push(bonus);
 	}
 
 	move(direction: Direction): void {
