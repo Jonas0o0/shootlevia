@@ -101,7 +101,7 @@ async function init() {
 	play.launchGameCallback = () => {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const joueur = new Player(loginService.accounts, 0, 0, hud);
-		const game = new Game(socket, [joueur], 0, canvas, ctx, hud);
+		const game = new Game(socket, [joueur], 0, canvas, ctx);
 
 		// On s'assure de n'avoir qu'une boucle à la fois
 		// Pour simplifier, on se contente du lancement ici

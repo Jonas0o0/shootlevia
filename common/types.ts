@@ -37,9 +37,17 @@ export interface EnemyData {
 	health: number;
 }
 
+export interface BonusData {
+	id: string;
+	type: BonusType;
+	x: number;
+	y: number;
+}
+
 export interface GameState {
 	players: PlayerData[];
 	bullets: BulletData[];
 	enemies: EnemyData[];
+	bonuses: BonusData[];
 	time: number;
 }

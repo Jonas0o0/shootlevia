@@ -5,11 +5,14 @@ import Enemy from './Enemy.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import GameMap from './GameMap.ts';
+import Bonus from './Bonus.ts';
+
 export default class Game {
 	private socket: Socket;
 	private players: Map<string, Player> = new Map();
 	private bullets: Map<string, Bullet> = new Map();
 	private enemies: Map<string, Enemy> = new Map();
+	private bonuses: Map<string, Bonus> = new Map();
 	private joueur: Player;
 	private time: number;
 	private score: number;
@@ -17,15 +20,13 @@ export default class Game {
 	private ctx: CanvasRenderingContext2D;
 	private keysPressed: Set<string> = new Set();
 	private map: GameMap;
-	private hud: Element;
 
 	constructor(
 		socket: Socket,
 		players: Player[],
 		joueurIdx: number,
 		canvas: HTMLCanvasElement,
-		ctx: CanvasRenderingContext2D,
-		hud: Element
+		ctx: CanvasRenderingContext2D
 	) {
 		// Initialisation du jeu
 		this.socket = socket;
@@ -33,8 +34,6 @@ export default class Game {
 		this.score = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
-		this.hud = hud;
-
 		//Iitialisation de la map
 		this.map = new GameMap();
 
@@ -124,6 +123,24 @@ export default class Game {
 					this.enemies.delete(id);
 				}
 			}
+
+			// Synchronisation des bonus
+			state.bonuses.forEach(bonusData => {
+				let b = this.bonuses.get(bonusData.id);
+				if (!b) {
+					b = new Bonus(bonusData);
+					this.bonuses.set(b.id, b);
+				}
+				b.updateFromData(bonusData);
+			});
+
+			// Supprimer les bonus disparus
+			const currentBonusIds = state.bonuses.map(b => b.id);
+			for (const id of this.bonuses.keys()) {
+				if (!currentBonusIds.includes(id)) {
+					this.bonuses.delete(id);
+				}
+			}
 		});
 	}
 
@@ -141,8 +158,6 @@ export default class Game {
 		}
 		this.score;
 		this.time;
-		this.hud;
-		this.hud;
 	}
 
 	draw = (): void => {
@@ -160,6 +175,11 @@ export default class Game {
 		// Dessiner tous les ennemis
 		this.enemies.forEach(enemy => {
 			enemy.draw(this.ctx);
+		});
+
+		// Dessiner tous les bonus
+		this.bonuses.forEach(bonus => {
+			bonus.drawOnMap(this.ctx);
 		});
 
 		// Dessiner tous les joueurs

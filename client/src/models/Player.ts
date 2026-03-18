@@ -138,7 +138,7 @@ class Player {
 	}
 
 	private updateHUD(): void {
-		if (!this.element) return;
+		if (!this.element) return; //On veux afficher dans l'HUD que les bonus du joueur coté cleint pas ceux des autre joueur
 
 		const currentBonusList = this.bonus.map(b => b.type.nom).join(',');
 		if (currentBonusList === this.lastBonusList) return;

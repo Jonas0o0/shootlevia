@@ -1,16 +1,35 @@
 import SpriteSheetService from '../services/SpriteSheetService.ts';
 import { type BonusType } from '../../../common/BonusType.ts';
 import type { Frame } from '../Frame.ts';
+import type { BonusData } from '../../../common/types.ts';
 
 class Bonus {
+	id: string;
 	nom: string;
 	sprite: SpriteSheetService;
 	type: BonusType;
+	x: number = 0;
+	y: number = 0;
 
-	constructor(type: BonusType) {
-		this.type = type;
-		this.nom = type.nom;
-		this.sprite = new SpriteSheetService(type.sprite, 0);
+	constructor(typeOrData: BonusType | BonusData) {
+		if ('id' in typeOrData) {
+			// C'est un BonusData (depuis le serveur)
+			this.id = typeOrData.id;
+			this.type = typeOrData.type;
+			this.x = typeOrData.x;
+			this.y = typeOrData.y;
+		} else {
+			// C'est un BonusType (pour le HUD/joueur local)
+			this.id = '';
+			this.type = typeOrData;
+		}
+		this.nom = this.type.nom;
+		this.sprite = new SpriteSheetService(this.type.sprite, 0);
+	}
+
+	updateFromData(data: BonusData): void {
+		this.x = data.x;
+		this.y = data.y;
 	}
 
 	drawInHUD(element: Element): void {
@@ -28,7 +47,7 @@ class Bonus {
 		element.appendChild(span);
 	}
 
-	drawOnMap(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+	drawOnMap(ctx: CanvasRenderingContext2D): void {
 		this.sprite.setRow(this.type.rows.MAP);
 		const frame: Frame = this.sprite.getFrame();
 		ctx.drawImage(
@@ -37,8 +56,8 @@ class Bonus {
 			frame.y,
 			frame.width,
 			frame.height,
-			x,
-			y,
+			this.x,
+			this.y,
 			frame.width,
 			frame.height
 		);
