@@ -29,8 +29,10 @@ export default class PlayView extends View {
 		super.hide();
 	}
 
-	resizeCanvas() {
-		this.canvas.width = window.innerWidth;
-		this.canvas.height = window.innerHeight;
-	}
+	resizeCanvas = () => {
+		this.canvas.width = 1920;
+		this.canvas.height = 1080;
+		this.canvas.style.width = window.innerWidth + 'px';
+		this.canvas.style.height = window.innerHeight + 'px';
+	};
 }
