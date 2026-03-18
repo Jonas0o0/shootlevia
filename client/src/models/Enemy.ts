@@ -2,9 +2,7 @@ import type { HitBox } from '../../../common/HitBox.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { EnemyData } from '../../../common/types.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import {
-	PlaySpriteSheet,
-} from '../SpriteSheetConfig.ts';
+import { PlaySpriteSheet } from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 
 export default class Enemy {
@@ -20,8 +18,9 @@ export default class Enemy {
 		this.health = data.health;
 		this.velocity = 1;
 		this.direction = Direction.Left;
-		
-		const spriteSheet = data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
+
+		const spriteSheet =
+			data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
 		this.sprite = new SpriteSheetService(spriteSheet, 0);
 
 		this.hitbox = {
@@ -61,8 +60,8 @@ export default class Enemy {
 
 	move(): void {
 		//Deplacement des ennemis
-        this.velocity;
-        this.direction;
+		this.velocity;
+		this.direction;
 	}
 
 	update(): void {

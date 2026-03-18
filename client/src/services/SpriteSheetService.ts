@@ -2,7 +2,7 @@ import {
 	PlaySpriteSheet,
 	type SpriteSheetConfig,
 	SpriteSheetConfigs,
-} from '../SpriteSheetConfig.ts';
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 import AssetLoaderService from './AssetLoaderService.ts';
 

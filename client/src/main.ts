@@ -7,7 +7,7 @@ import PopupLoginView from './PopupLoginView.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import AssetLoaderService from './services/AssetLoaderService.ts';
-import { SpriteSheetConfigs } from './SpriteSheetConfig.ts';
+import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
@@ -20,6 +20,7 @@ async function init() {
 		SpriteSheetConfigs.PLAYER.path,
 		SpriteSheetConfigs.DRONE.path,
 		SpriteSheetConfigs.PNEU.path,
+		SpriteSheetConfigs.PASS_PASS.path,
 		// Ajoutez d'autres images si nécessaire
 	];
 
@@ -78,6 +79,8 @@ async function init() {
 		popup.oppenPopup();
 	});
 
+	const hud = document.querySelector('.fenetre .play .jeu-hud')!;
+
 	const routes: Route[] = [
 		{ path: '/', view: homeView, title: 'ShootLévia' },
 		{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
@@ -97,7 +100,7 @@ async function init() {
 
 	play.launchGameCallback = () => {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		const joueur = new Player(loginService.accounts, 0, 0);
+		const joueur = new Player(loginService.accounts, 0, 0, hud);
 		const game = new Game(socket, [joueur], 0, canvas, ctx);
 
 		// On s'assure de n'avoir qu'une boucle à la fois

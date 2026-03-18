@@ -1,5 +1,6 @@
 import type { Account, PlayerData } from '../../common/types.ts';
 import { Direction } from '../../common/Direction.ts';
+import type { BonusType } from '../../common/BonusType.ts';
 
 export class ServerPlayer {
 	public id: string;
@@ -8,11 +9,11 @@ export class ServerPlayer {
 	public y: number;
 	public width: number;
 	public height: number;
-	private score: number = 0;
 	private velocity: number = 2;
 	private jumping: boolean = false;
 	private jumpTimer: number = 0;
 	private jumpCooldown: number = 30;
+	private bonus: BonusType[];
 
 	constructor(id: string, account: Account, x: number, y: number) {
 		this.id = id;
@@ -21,6 +22,7 @@ export class ServerPlayer {
 		this.y = y;
 		this.width = 74;
 		this.height = 100;
+		this.bonus = [];
 	}
 
 	move(direction: Direction): void {
@@ -56,10 +58,6 @@ export class ServerPlayer {
 		}
 	}
 
-	addScore(amount: number = 10): void {
-		this.score += amount;
-	}
-
 	toData(): PlayerData {
 		return {
 			id: this.id,
@@ -68,10 +66,10 @@ export class ServerPlayer {
 			y: this.y,
 			width: this.width,
 			height: this.height,
-			score: this.score,
 			isJumping: this.jumping,
 			jumpTimer: this.jumpTimer,
 			jumpCooldown: this.jumpCooldown,
+			bonus: this.bonus,
 		};
 	}
 }

@@ -1,3 +1,5 @@
+import type { BonusType } from './BonusType.ts';
+
 export interface Account {
 	username: string;
 	avatar: string;
@@ -10,10 +12,10 @@ export interface PlayerData {
 	y: number;
 	width: number;
 	height: number;
-	score: number;
 	isJumping: boolean;
 	jumpTimer: number;
 	jumpCooldown: number;
+	bonus: BonusType[];
 }
 
 export interface BulletData {
@@ -35,9 +37,17 @@ export interface EnemyData {
 	health: number;
 }
 
+export interface BonusData {
+	id: string;
+	type: BonusType;
+	x: number;
+	y: number;
+}
+
 export interface GameState {
 	players: PlayerData[];
 	bullets: BulletData[];
 	enemies: EnemyData[];
+	bonuses: BonusData[];
 	time: number;
 }

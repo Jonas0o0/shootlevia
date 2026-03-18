@@ -4,11 +4,14 @@ import { Direction } from '../../common/Direction.ts';
 import { ServerBullet } from './Bullet.ts';
 import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
+import ServerBonus from './Bonus.ts';
+import type { BonusType } from '../../common/BonusType.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
 	private bullets: ServerBullet[] = [];
 	private enemies: ServerEnemy[] = [];
+	private bonuses: ServerBonus[] = [];
 	private time: number = 0;
 
 	private spawnEnemyService: SpawnEnemyService = new SpawnEnemyService();
@@ -45,9 +48,18 @@ export class ServerGame {
 	handlePlayerShoot(id: string): void {
 		const player = this.players.get(id);
 		if (player) {
-			const bullet = new ServerBullet(id, player.x + player.width, player.y + player.height / 2);
+			const bullet = new ServerBullet(
+				id,
+				player.x + player.width,
+				player.y + player.height / 2
+			);
 			this.bullets.push(bullet);
 		}
+	}
+
+	addBonus(type: BonusType, x: number, y: number): void {
+		const id = crypto.randomUUID();
+		this.bonuses.push(new ServerBonus(id, type, x, y));
 	}
 
 	update(): void {
@@ -61,11 +73,15 @@ export class ServerGame {
 		} else if (this.time > 0) {
 			this.time = 0;
 			this.enemies = [];
+			this.bonuses = [];
 			this.spawnEnemyService.reset();
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
 		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
+
+		this.bonuses.forEach(bonus => bonus.update());
+		this.bonuses = this.bonuses.filter(b => b.x > -200);
 	}
 
 	getState(): GameState {
@@ -73,6 +89,7 @@ export class ServerGame {
 			players: Array.from(this.players.values()).map(p => p.toData()),
 			bullets: this.bullets.map(b => b.toData()),
 			enemies: this.enemies.map(e => e.toData()),
+			bonuses: this.bonuses.map(b => b.toData()),
 			time: this.time,
 		};
 	}
