@@ -5,9 +5,6 @@ import Enemy from './Enemy.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import GameMap from './GameMap.ts';
-import { BonusType } from '../../../common/BonusType.ts';
-import bonus from './Bonus.ts';
-
 export default class Game {
 	private socket: Socket;
 	private players: Map<string, Player> = new Map();
@@ -15,23 +12,28 @@ export default class Game {
 	private enemies: Map<string, Enemy> = new Map();
 	private joueur: Player;
 	private time: number;
+	private score: number;
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private keysPressed: Set<string> = new Set();
 	private map: GameMap;
+	private hud: Element;
 
 	constructor(
 		socket: Socket,
 		players: Player[],
 		joueurIdx: number,
 		canvas: HTMLCanvasElement,
-		ctx: CanvasRenderingContext2D
+		ctx: CanvasRenderingContext2D,
+		hud: Element
 	) {
 		// Initialisation du jeu
 		this.socket = socket;
 		this.time = 0;
+		this.score = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
+		this.hud = hud;
 
 		//Iitialisation de la map
 		this.map = new GameMap();
@@ -137,8 +139,10 @@ export default class Game {
 		if (directions.length > 0) {
 			this.socket.emit('move', directions);
 		}
-		this.joueur.addBonus(new bonus(BonusType.Shield));
+		this.score;
 		this.time;
+		this.hud;
+		this.hud;
 	}
 
 	draw = (): void => {

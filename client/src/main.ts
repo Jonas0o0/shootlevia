@@ -79,6 +79,8 @@ async function init() {
 		popup.oppenPopup();
 	});
 
+	const hud = document.querySelector('.fenetre .play .jeu-hud')!;
+
 	const routes: Route[] = [
 		{ path: '/', view: homeView, title: 'ShootLévia' },
 		{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
@@ -98,8 +100,8 @@ async function init() {
 
 	play.launchGameCallback = () => {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
-		const joueur = new Player(loginService.accounts, 0, 0);
-		const game = new Game(socket, [joueur], 0, canvas, ctx);
+		const joueur = new Player(loginService.accounts, 0, 0, hud);
+		const game = new Game(socket, [joueur], 0, canvas, ctx, hud);
 
 		// On s'assure de n'avoir qu'une boucle à la fois
 		// Pour simplifier, on se contente du lancement ici

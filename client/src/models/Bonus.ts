@@ -13,20 +13,19 @@ class Bonus {
 		this.sprite = new SpriteSheetService(type.sprite, 0);
 	}
 
-	drawInHUD(ctx: CanvasRenderingContext2D, x: number, y: number): void {
+	drawInHUD(element: Element): void {
 		this.sprite.setRow(this.type.rows.HUD);
 		const frame: Frame = this.sprite.getFrame();
-		ctx.drawImage(
-			frame.img,
-			0,
-			frame.y,
-			frame.width,
-			frame.height,
-			x,
-			y,
-			frame.width,
-			frame.height
-		);
+		const span = document.createElement('span');
+
+		span.style.display = 'inline-block';
+		span.style.width = `${frame.width}px`;
+		span.style.height = `${frame.height}px`;
+		span.style.backgroundImage = `url(${frame.img.src})`;
+		span.style.backgroundPosition = `0px -${frame.y}px`;
+		span.style.backgroundRepeat = 'no-repeat';
+
+		element.appendChild(span);
 	}
 
 	drawOnMap(ctx: CanvasRenderingContext2D, x: number, y: number): void {

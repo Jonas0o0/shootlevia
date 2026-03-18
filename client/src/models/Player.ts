@@ -19,11 +19,18 @@ class Player {
 	private weapons: Weapon[];
 	private bonus: Bonus[];
 	private baseRow: number;
-	velocity: number;
-	sprite: SpriteSheetService;
+	private velocity: number;
+	private sprite: SpriteSheetService;
 	public id: string = '';
+	private element: Element | null;
+	private lastBonusList: string = '';
 
-	constructor(joueur: Account | null, x: number, y: number) {
+	constructor(
+		joueur: Account | null,
+		x: number,
+		y: number,
+		element: Element | null = null
+	) {
 		if (joueur == null) {
 			joueur = { username: 'temp', avatar: 'pedalBleu' };
 		}
@@ -34,6 +41,7 @@ class Player {
 		this.bonus = [];
 		this.velocity = 2;
 		this.jump = { jumping: false };
+		this.element = element;
 
 		this.baseRow =
 			AvatarRowMapping[joueur.avatar] ?? AvatarRowMapping.pedalBleu;
@@ -126,10 +134,20 @@ class Player {
 			b.drawOnPlayer(ctx, this.hitbox.x, this.hitbox.y);
 		});
 
-		let startX = 10;
-		let startY = 10;
-		this.bonus.forEach((b, index) => {
-			b.drawInHUD(ctx, startX + index * 40, startY);
+		this.updateHUD();
+	}
+
+	private updateHUD(): void {
+		if (!this.element) return;
+
+		const currentBonusList = this.bonus.map(b => b.type.nom).join(',');
+		if (currentBonusList === this.lastBonusList) return;
+
+		this.lastBonusList = currentBonusList;
+		this.element.innerHTML = '';
+
+		this.bonus.forEach(b => {
+			b.drawInHUD(this.element!);
 		});
 	}
 }
