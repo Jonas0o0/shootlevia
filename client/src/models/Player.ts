@@ -27,6 +27,7 @@ class Player {
 	private hud: Element | null;
 	private lastBonusList: string = '';
 	private life: LifebarService;
+	private isInvincible: boolean;
 
 	constructor(
 		joueur: Account | null,
@@ -46,6 +47,8 @@ class Player {
 		this.jump = { jumping: false };
 		this.hud = element;
 		this.life = new LifebarService();
+		this.isInvincible = false;
+
 		if (element) {
 			new LifebarComponent(this.life, '.jeu-hud .lifebar');
 		}
@@ -65,6 +68,8 @@ class Player {
 	updateFromData(data: PlayerData): void {
 		this.hitbox.x = data.x;
 		this.hitbox.y = data.y;
+		this.isInvincible = data.isInvincible;
+
 		//Pour Optti on fait pas un bete remplacment, on compra les de liste por suprimer et ajputer les différence
 		const dataSet = new Set(data.bonus);
 		const currentSet = new Set(this.bonus.map(b => b.type));
@@ -91,6 +96,9 @@ class Player {
 		if (this.life) {
 			if (data.life.life < this.life.life) {
 				this.life.removeLife(this.life.life - data.life.life);
+			}
+			if (data.life.life > this.life.life) {
+				this.life.addLife(data.life.life - this.life.life);
 			}
 		}
 	}
@@ -129,6 +137,15 @@ class Player {
 
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
+
+		// Effet de clignotement transparent si invincible
+		if (this.isInvincible) {
+			// On fait varier l'alpha toutes les 100ms
+			if (Math.floor(Date.now() / 100) % 2 === 0) {
+				ctx.globalAlpha = 0.5;
+			}
+		}
+
 		ctx.drawImage(
 			frame.img,
 			frame.x,
@@ -140,6 +157,9 @@ class Player {
 			frame.width,
 			frame.height
 		);
+
+		// On reset l'alpha pour ne pas impacter les autres dessins
+		ctx.globalAlpha = 1.0;
 
 		// Dessiner les effets des bonus sur le joueur
 		this.bonus.forEach(b => {

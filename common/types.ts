@@ -18,6 +18,7 @@ export interface PlayerData {
 	jumpCooldown: number;
 	bonus: BonusType[];
 	life: LifebarService;
+	isInvincible: boolean;
 }
 
 export interface BulletData {

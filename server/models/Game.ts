@@ -6,6 +6,7 @@ import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
 import type { BonusType } from '../../common/BonusType.ts';
+import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -64,10 +65,6 @@ export class ServerGame {
 
 	update(): void {
 		this.time++;
-		this.players.forEach(player => player.update());
-		this.bullets.forEach(bullet => bullet.update());
-		this.bullets = this.bullets.filter(b => b.x < 2000);
-
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
 		} else if (this.time > 0) {
@@ -77,11 +74,71 @@ export class ServerGame {
 			this.spawnEnemyService.reset();
 		}
 
+		this.players.forEach(player => player.update());
+		this.bullets.forEach(bullet => bullet.update());
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
-
 		this.bonuses.forEach(bonus => bonus.update());
+
+		this.checkColision();
+
+		this.bullets = this.bullets.filter(b => b.x < 2000);
+		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
+	}
+
+	checkColision() {
+		this.players.forEach(player => {
+			this.bonuses = this.bonuses.filter(bonus => {
+				const config = SpriteSheetConfigs[bonus.type.sprite];
+				const isColliding =
+					player.x < bonus.x + config.spriteWidth &&
+					player.x + player.width > bonus.x &&
+					player.y < bonus.y + config.spriteHeight &&
+					player.y + player.height > bonus.y;
+
+				if (isColliding) {
+					player.addBonus(bonus.type);
+					return false; //pour le suprimer de la liste
+				}
+				return true;
+			});
+
+			this.enemies.forEach(enemy => {
+				const isColliding =
+					player.x < enemy.x + enemy.width &&
+					player.x + player.width > enemy.x &&
+					player.y < enemy.y + enemy.height &&
+					player.y + player.height > enemy.y;
+
+				if (isColliding) {
+					player.takeDamage();
+
+					// pour repousser le joueur bord à bord
+					const overlapX = Math.min(
+						player.x + player.width - enemy.x,
+						enemy.x + enemy.width - player.x
+					);
+					const overlapY = Math.min(
+						player.y + player.height - enemy.y,
+						enemy.y + enemy.height - player.y
+					);
+
+					if (overlapX < overlapY) {
+						if (player.x + player.width / 2 < enemy.x + enemy.width / 2) {
+							player.x = enemy.x - player.width;
+						} else {
+							player.x = enemy.x + enemy.width;
+						}
+					} else {
+						if (player.y + player.height / 2 < enemy.y + enemy.height / 2) {
+							player.y = enemy.y - player.height;
+						} else {
+							player.y = enemy.y + enemy.height;
+						}
+					}
+				}
+			});
+		});
 	}
 
 	getState(): GameState {
