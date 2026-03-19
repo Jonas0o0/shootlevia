@@ -1,6 +1,7 @@
 import type { Account, PlayerData } from '../../common/types.ts';
 import { Direction } from '../../common/Direction.ts';
-import type { BonusType } from '../../common/BonusType.ts';
+import { BonusType } from '../../common/BonusType.ts';
+import { LifebarService } from '../../common/Service/LifebarService.ts';
 
 export class ServerPlayer {
 	public id: string;
@@ -13,6 +14,7 @@ export class ServerPlayer {
 	private jumping: boolean = false;
 	private jumpTimer: number = 0;
 	private jumpCooldown: number = 30;
+	private life: LifebarService;
 	private bonus: BonusType[];
 
 	constructor(id: string, account: Account, x: number, y: number) {
@@ -23,6 +25,7 @@ export class ServerPlayer {
 		this.width = 74;
 		this.height = 100;
 		this.bonus = [];
+		this.life = new LifebarService();
 	}
 
 	move(direction: Direction): void {
@@ -58,6 +61,17 @@ export class ServerPlayer {
 		}
 	}
 
+	takeDamage(): void {
+		const hasShield = this.bonus.includes(BonusType.Shield);
+
+		if (hasShield) {
+			this.bonus = this.bonus.filter(bonus => bonus !== BonusType.Shield);
+			return;
+		}
+
+		this.life.removeLife(1);
+	}
+
 	toData(): PlayerData {
 		return {
 			id: this.id,
@@ -70,6 +84,7 @@ export class ServerPlayer {
 			jumpTimer: this.jumpTimer,
 			jumpCooldown: this.jumpCooldown,
 			bonus: this.bonus,
+			life: this.life,
 		};
 	}
 }

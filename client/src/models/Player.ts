@@ -11,6 +11,8 @@ import {
 import type { Frame } from '../Frame.ts';
 import Bonus from './Bonus.ts';
 import type { BonusType } from '../../../common/BonusType.ts';
+import { LifebarService } from '../../../common/Service/LifebarService.ts';
+import { LifebarComponent } from '../components/LifebarComponent.ts';
 
 class Player {
 	private joueur: Account;
@@ -22,8 +24,9 @@ class Player {
 	private velocity: number;
 	private sprite: SpriteSheetService;
 	public id: string = '';
-	private element: Element | null;
+	private hud: Element | null;
 	private lastBonusList: string = '';
+	private life: LifebarService;
 
 	constructor(
 		joueur: Account | null,
@@ -41,7 +44,11 @@ class Player {
 		this.bonus = [];
 		this.velocity = 2;
 		this.jump = { jumping: false };
-		this.element = element;
+		this.hud = element;
+		this.life = new LifebarService();
+		if (element) {
+			new LifebarComponent(this.life, '.jeu-hud .lifebar');
+		}
 
 		this.baseRow =
 			AvatarRowMapping[joueur.avatar] ?? AvatarRowMapping.pedalBleu;
@@ -81,6 +88,11 @@ class Player {
 			}
 		}
 		this.jump.jumping = data.isJumping;
+		if (this.life) {
+			if (data.life.life < this.life.life) {
+				this.life.removeLife(this.life.life - data.life.life);
+			}
+		}
 	}
 
 	isJumping(): boolean {
@@ -138,16 +150,16 @@ class Player {
 	}
 
 	private updateHUD(): void {
-		if (!this.element) return; //On veux afficher dans l'HUD que les bonus du joueur coté cleint pas ceux des autre joueur
+		if (!this.hud) return; //On veux afficher dans l'HUD que les bonus du joueur coté cleint pas ceux des autre joueur
 
 		const currentBonusList = this.bonus.map(b => b.type.nom).join(',');
 		if (currentBonusList === this.lastBonusList) return;
 
 		this.lastBonusList = currentBonusList;
-		this.element.innerHTML = '';
+		this.hud.innerHTML = '';
 
 		this.bonus.forEach(b => {
-			b.drawInHUD(this.element!);
+			b.drawInHUD(this.hud!);
 		});
 	}
 }

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert';
-import { LifebarService } from '../../services/LifebarService.ts';
+import { LifebarService } from '../../../../common/Service/LifebarService.ts';
 
 describe('default constructeur', () => {
 	it('il devrait avoir que 3 vie', () => {
@@ -89,4 +89,3 @@ describe('isAlive savoir si le joueur peut continue a jouer', () => {
 		assert.ok(!lifebar.isAlive());
 	});
 });
-

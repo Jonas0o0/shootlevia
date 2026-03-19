@@ -101,6 +101,11 @@
   z-index: 1;
 }
 
+.fenetre section article.play.active .jeu-hud {
+  position: absolute;
+  z-index: 5;
+}
+
 .fenetre section article.play.active .jeu-container {
   position: absolute;
   inset: 0;
