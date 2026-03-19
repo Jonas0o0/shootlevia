@@ -16,7 +16,7 @@ export default class SpriteSheetService {
 	private animationSpeed: number = 5; // Plus ce nombre est grand, plus l'animation est lente
 
 	constructor(spriteSheet: PlaySpriteSheet, defautRow: number) {
-		this.spriteSheet = SpriteSheetConfigs[spriteSheet];
+		this.spriteSheet = { ...SpriteSheetConfigs[spriteSheet] };
 		this.img = AssetLoaderService.get(this.spriteSheet.path);
 
 		this.frameX = 0;
@@ -54,6 +54,17 @@ export default class SpriteSheetService {
 
 	getRow(): number {
 		return this.frameY;
+	}
+
+	setAnimationParams(isStatic: boolean, columns: number) {
+		this.spriteSheet.isStatic = isStatic;
+		this.spriteSheet.columnsFrameMax = columns;
+		this.frameX = 0;
+		this.tick = 0;
+	}
+
+	isAnimationFinished(): boolean {
+		return this.frameX >= this.spriteSheet.columnsFrameMax - 1;
 	}
 
 	getWidth(): number {

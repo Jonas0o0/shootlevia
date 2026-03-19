@@ -116,11 +116,14 @@ export default class Game {
 				e.updateFromData(enemyData);
 			});
 
-			// Supprimer les ennemis disparus
+			// Supprimer les ennemis disparus (avec animation de mort)
 			const currentEnemyIds = state.enemies.map(e => e.id);
-			for (const id of this.enemies.keys()) {
+			for (const [id, enemy] of this.enemies.entries()) {
 				if (!currentEnemyIds.includes(id)) {
-					this.enemies.delete(id);
+					enemy.die();
+					if (enemy.readyToRemove) {
+						this.enemies.delete(id);
+					}
 				}
 			}
 

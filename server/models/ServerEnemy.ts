@@ -21,7 +21,7 @@ export class ServerEnemy {
 		y: number,
 		vx: number,
 		vy: number,
-		health: number = 100
+		health: number = 30
 	) {
 		this.id = id;
 		this.type = type;

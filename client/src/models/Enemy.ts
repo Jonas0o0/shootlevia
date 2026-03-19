@@ -2,7 +2,10 @@ import type { HitBox } from '../../../common/HitBox.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { EnemyData } from '../../../common/types.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import { PlaySpriteSheet } from '../../../common/SpriteSheetConfig.ts';
+import {
+	PlaySpriteSheet,
+	SpriteSheetConfigs,
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 
 export default class Enemy {
@@ -12,15 +15,18 @@ export default class Enemy {
 	private sprite: SpriteSheetService;
 	private direction: Direction;
 	private isDamaged: boolean = false;
+	private isDying: boolean = false;
+	public readyToRemove: boolean = false;
+	private spriteSheetType: PlaySpriteSheet;
 
 	constructor(data: EnemyData) {
 		this.id = data.id;
 		this.velocity = 1;
 		this.direction = Direction.Left;
 
-		const spriteSheet =
+		this.spriteSheetType =
 			data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
-		this.sprite = new SpriteSheetService(spriteSheet, 0);
+		this.sprite = new SpriteSheetService(this.spriteSheetType, 0);
 
 		this.hitbox = {
 			x: data.x,
@@ -52,8 +58,24 @@ export default class Enemy {
 		this.move();
 	}
 
+	die(): void {
+		if (this.isDying) return;
+		this.isDying = true;
+
+		if (this.spriteSheetType === PlaySpriteSheet.PNEU) {
+			const config = SpriteSheetConfigs.PNEU;
+			this.sprite.setAnimationParams(false, config.columns);
+		} else {
+			this.readyToRemove = true;
+		}
+	}
+
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
+
+		if (this.isDying && this.sprite.isAnimationFinished()) {
+			this.readyToRemove = true;
+		}
 
 		if (this.isDamaged) {
 			// Applique un filtre rouge intense
