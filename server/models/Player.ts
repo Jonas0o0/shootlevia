@@ -17,6 +17,8 @@ export class ServerPlayer {
 	private jumpCooldown: number = 30;
 	private life: LifebarService;
 	private bonus: BonusType[];
+	private invincibilityTimer: number = 0;
+	private readonly INVINCIBILITY_DURATION: number = 60;
 
 	constructor(id: string, account: Account, x: number, y: number) {
 		this.id = id;
@@ -60,17 +62,23 @@ export class ServerPlayer {
 				this.jumping = false;
 			}
 		}
+		if (this.invincibilityTimer > 0) {
+			this.invincibilityTimer--;
+		}
 	}
 
 	takeDamage(): void {
+		if (this.invincibilityTimer > 0) return;
+
 		const hasShield = this.bonus.includes(BonusType.Shield);
 
 		if (hasShield) {
 			this.bonus = this.bonus.filter(bonus => bonus !== BonusType.Shield);
-			return;
+		} else {
+			this.life.removeLife(1);
 		}
 
-		this.life.removeLife(1);
+		this.invincibilityTimer = this.INVINCIBILITY_DURATION;
 	}
 
 	addBonus(bonus: BonusType): void {
@@ -92,6 +100,7 @@ export class ServerPlayer {
 			jumpCooldown: this.jumpCooldown,
 			bonus: this.bonus,
 			life: this.life,
+			isInvincible: this.invincibilityTimer > 0,
 		};
 	}
 }

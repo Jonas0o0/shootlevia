@@ -102,6 +102,42 @@ export class ServerGame {
 				}
 				return true;
 			});
+
+			this.enemies.forEach(enemy => {
+				const isColliding =
+					player.x < enemy.x + enemy.width &&
+					player.x + player.width > enemy.x &&
+					player.y < enemy.y + enemy.height &&
+					player.y + player.height > enemy.y;
+
+				if (isColliding) {
+					player.takeDamage();
+
+					// pour repousser le joueur bord à bord
+					const overlapX = Math.min(
+						player.x + player.width - enemy.x,
+						enemy.x + enemy.width - player.x
+					);
+					const overlapY = Math.min(
+						player.y + player.height - enemy.y,
+						enemy.y + enemy.height - player.y
+					);
+
+					if (overlapX < overlapY) {
+						if (player.x + player.width / 2 < enemy.x + enemy.width / 2) {
+							player.x = enemy.x - player.width;
+						} else {
+							player.x = enemy.x + enemy.width;
+						}
+					} else {
+						if (player.y + player.height / 2 < enemy.y + enemy.height / 2) {
+							player.y = enemy.y - player.height;
+						} else {
+							player.y = enemy.y + enemy.height;
+						}
+					}
+				}
+			});
 		});
 	}
 
