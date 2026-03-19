@@ -139,6 +139,21 @@ export class ServerGame {
 				}
 			});
 		});
+		this.bullets = this.bullets.filter(bullet => {
+			this.enemies.forEach(enemy => {
+				const isColliding =
+					bullet.x < enemy.x + enemy.width &&
+					bullet.x + bullet.width > enemy.x &&
+					bullet.y < enemy.y + enemy.height &&
+					bullet.y + bullet.height > enemy.y;
+
+				if (isColliding) {
+					enemy.takeDamage(10);
+					return false;
+				}
+				return true;
+			});
+		});
 	}
 
 	getState(): GameState {
