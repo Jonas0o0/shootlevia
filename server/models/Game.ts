@@ -50,11 +50,7 @@ export class ServerGame {
 	handlePlayerShoot(id: string): void {
 		const player = this.players.get(id);
 		if (player) {
-			const bullet = new ServerBullet(
-				id,
-				player.x + player.width,
-				player.y + player.height / 2
-			);
+			const bullet = new ServerBullet(id, player.x + player.width, player.y + player.height / 2);
 			this.bullets.push(bullet);
 		}
 	}
@@ -64,8 +60,56 @@ export class ServerGame {
 		this.bonuses.push(new ServerBonus(id, type, x, y));
 	}
 
+	private dropRandomBonus(x: number, y: number): void {
+		const allBonusTypes = Object.values(BonusType);
+		const randomIndex = Math.floor(Math.random() * allBonusTypes.length);
+		const randomType = allBonusTypes[randomIndex];
+		this.addBonus(randomType, x, y);
+	}
+
 	update(): void {
 		this.time++;
+		this.players.forEach(player => player.update());
+		this.bullets.forEach(bullet => bullet.update());
+		this.bonuses.forEach(bonus => bonus.update());
+
+		// Détruire des drones avec les balles
+		const bulletsToRemove = new Set<string>();
+		const enemiesToRemove = new Set<string>();
+
+		this.bullets.forEach(bullet => {
+			this.enemies.forEach(enemy => {
+				if (
+					bullet.x < enemy.x + enemy.width &&
+					bullet.x + bullet.width > enemy.x &&
+					bullet.y < enemy.y + enemy.height &&
+					bullet.y + bullet.height > enemy.y
+				) {
+					if (enemy.type === 'DRONE') {
+						enemy.takeDamage(16);
+						bulletsToRemove.add(bullet.id);
+						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
+							enemiesToRemove.add(enemy.id);
+							this.score += 20;
+							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+						}
+					} else if (enemy.type === 'PNEU') {
+						enemy.takeDamage(11);
+						bulletsToRemove.add(bullet.id);
+						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
+							enemiesToRemove.add(enemy.id);
+							this.score += 10;
+							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+						}
+					}
+				}
+			});
+		});
+
+		this.checkPlayerCollisions();
+
+		this.bullets = this.bullets.filter(b => !bulletsToRemove.has(b.id) && b.x < 2000);
+
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
 		} else if (this.time > 0) {
@@ -75,41 +119,12 @@ export class ServerGame {
 			this.spawnEnemyService.reset();
 		}
 
-		this.players.forEach(player => player.update());
-		this.bullets.forEach(bullet => bullet.update());
 		this.enemies.forEach(enemy => enemy.update());
-		this.bonuses.forEach(bonus => bonus.update());
-
-		this.checkColision();
-
-		this.bullets = this.bullets.filter(b => b.x < 2000);
-		this.enemies = this.enemies.filter(e => {
-			if (!e.isAlive()) {
-				if (e.type === 'PNEU') {
-					this.score += 10;
-				} else if (e.type === 'DRONE') {
-					this.score += 20;
-				} else {
-					this.score += 0;
-				}
-				if (Math.random() < 0.2) {
-					this.dropRandomBonus(e.x, e.y);
-				}
-				return false;
-			}
-			return e.x > -200 && e.y < 2000;
-		});
+		this.enemies = this.enemies.filter(e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 	}
 
-	private dropRandomBonus(x: number, y: number): void {
-		const allBonusTypes = Object.values(BonusType);
-		const randomIndex = Math.floor(Math.random() * allBonusTypes.length);
-		const randomType = allBonusTypes[randomIndex];
-		this.addBonus(randomType, x, y);
-	}
-
-	checkColision() {
+	private checkPlayerCollisions() {
 		this.players.forEach(player => {
 			this.bonuses = this.bonuses.filter(bonus => {
 				const config = SpriteSheetConfigs[bonus.type.sprite];
@@ -144,11 +159,11 @@ export class ServerGame {
 					// pour repousser le joueur bord à bord
 					const overlapX = Math.min(
 						player.x + player.width - enemy.x,
-						enemy.x + enemy.width - player.x
+						enemy.x + enemy.width - player.x,
 					);
 					const overlapY = Math.min(
 						player.y + player.height - enemy.y,
-						enemy.y + enemy.height - player.y
+						enemy.y + enemy.height - player.y,
 					);
 
 					if (overlapX < overlapY) {
@@ -166,23 +181,6 @@ export class ServerGame {
 					}
 				}
 			});
-		});
-		this.bullets = this.bullets.filter(bullet => {
-			let hit = false;
-			for (const enemy of this.enemies) {
-				const isColliding =
-					bullet.x < enemy.x + enemy.width &&
-					bullet.x + bullet.width > enemy.x &&
-					bullet.y < enemy.y + enemy.height &&
-					bullet.y + bullet.height > enemy.y;
-
-				if (isColliding) {
-					enemy.takeDamage(10);
-					hit = true;
-					break;
-				}
-			}
-			return !hit;
 		});
 	}
 
