@@ -53,4 +53,5 @@ export interface GameState {
 	enemies: EnemyData[];
 	bonuses: BonusData[];
 	time: number;
+	score: number;
 }

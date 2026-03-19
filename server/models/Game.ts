@@ -14,6 +14,7 @@ export class ServerGame {
 	private enemies: ServerEnemy[] = [];
 	private bonuses: ServerBonus[] = [];
 	private time: number = 0;
+	private score: number = 0;
 
 	private spawnEnemyService: SpawnEnemyService = new SpawnEnemyService();
 
@@ -84,6 +85,13 @@ export class ServerGame {
 		this.bullets = this.bullets.filter(b => b.x < 2000);
 		this.enemies = this.enemies.filter(e => {
 			if (!e.isAlive()) {
+				if (e.type === 'PNEU') {
+					this.score += 15;
+				} else if (e.type === 'DRONE') {
+					this.score += 20;
+				} else {
+					this.score += 0;
+				}
 				if (Math.random() < 0.2) {
 					this.dropRandomBonus(e.x, e.y);
 				}
@@ -185,6 +193,7 @@ export class ServerGame {
 			enemies: this.enemies.map(e => e.toData()),
 			bonuses: this.bonuses.map(b => b.toData()),
 			time: this.time,
+			score: this.score,
 		};
 	}
 }

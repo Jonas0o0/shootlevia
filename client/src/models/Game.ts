@@ -69,6 +69,11 @@ export default class Game {
 		// Synchronisation avec le serveur
 		this.socket.on('gameState', (state: GameState) => {
 			this.time = state.time;
+			this.score = state.score || 0;
+			const scoreElement = document.getElementById('game-score');
+			if (scoreElement) {
+				scoreElement.textContent = this.score.toString();
+			}
 			state.players.forEach(playerData => {
 				let p = this.players.get(playerData.id);
 				if (!p) {
