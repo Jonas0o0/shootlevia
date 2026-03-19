@@ -140,7 +140,8 @@ export class ServerGame {
 			});
 		});
 		this.bullets = this.bullets.filter(bullet => {
-			this.enemies.forEach(enemy => {
+			let hit = false;
+			for (const enemy of this.enemies) {
 				const isColliding =
 					bullet.x < enemy.x + enemy.width &&
 					bullet.x + bullet.width > enemy.x &&
@@ -149,10 +150,11 @@ export class ServerGame {
 
 				if (isColliding) {
 					enemy.takeDamage(10);
-					return false;
+					hit = true;
+					break;
 				}
-				return true;
-			});
+			}
+			return !hit;
 		});
 	}
 
