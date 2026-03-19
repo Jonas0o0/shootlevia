@@ -5,7 +5,7 @@ import { ServerBullet } from './Bullet.ts';
 import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
-import type { BonusType } from '../../common/BonusType.ts';
+import { BonusType } from '../../common/BonusType.ts';
 import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 
 export class ServerGame {
