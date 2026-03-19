@@ -82,10 +82,23 @@ export class ServerGame {
 		this.checkColision();
 
 		this.bullets = this.bullets.filter(b => b.x < 2000);
-		this.enemies = this.enemies.filter(
-			e => e.isAlive() && e.x > -200 && e.y < 2000
-		);
+		this.enemies = this.enemies.filter(e => {
+			if (!e.isAlive()) {
+				if (Math.random() < 0.2) {
+					this.dropRandomBonus(e.x, e.y);
+				}
+				return false;
+			}
+			return e.x > -200 && e.y < 2000;
+		});
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
+	}
+
+	private dropRandomBonus(x: number, y: number): void {
+		const allBonusTypes = Object.values(BonusType);
+		const randomIndex = Math.floor(Math.random() * allBonusTypes.length);
+		const randomType = allBonusTypes[randomIndex];
+		this.addBonus(randomType, x, y);
 	}
 
 	checkColision() {
