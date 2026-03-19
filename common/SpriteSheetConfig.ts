@@ -47,8 +47,8 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		path: '/assets/PassPass.png',
 		columns: 6,
 		rows: 3,
-		spriteWidth: 0,
-		spriteHeight: 0,
+		spriteWidth: 63,
+		spriteHeight: 54,
 		columnsFrameMax: 6,
 	},
 };

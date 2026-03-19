@@ -6,6 +6,7 @@ import { LifebarService } from '../../common/Service/LifebarService.ts';
 export class ServerPlayer {
 	public id: string;
 	private account: Account;
+
 	public x: number;
 	public y: number;
 	public width: number;
@@ -70,6 +71,12 @@ export class ServerPlayer {
 		}
 
 		this.life.removeLife(1);
+	}
+
+	addBonus(bonus: BonusType): void {
+		if (!this.bonus.includes(bonus)) {
+			this.bonus.push(bonus);
+		}
 	}
 
 	toData(): PlayerData {

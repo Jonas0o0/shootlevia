@@ -6,6 +6,7 @@ import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
 import type { BonusType } from '../../common/BonusType.ts';
+import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -64,10 +65,6 @@ export class ServerGame {
 
 	update(): void {
 		this.time++;
-		this.players.forEach(player => player.update());
-		this.bullets.forEach(bullet => bullet.update());
-		this.bullets = this.bullets.filter(b => b.x < 2000);
-
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
 		} else if (this.time > 0) {
@@ -77,11 +74,35 @@ export class ServerGame {
 			this.spawnEnemyService.reset();
 		}
 
+		this.players.forEach(player => player.update());
+		this.bullets.forEach(bullet => bullet.update());
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
-
 		this.bonuses.forEach(bonus => bonus.update());
+
+		this.checkColision();
+
+		this.bullets = this.bullets.filter(b => b.x < 2000);
+		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
+	}
+
+	checkColision() {
+		this.players.forEach(player => {
+			this.bonuses = this.bonuses.filter(bonus => {
+				const config = SpriteSheetConfigs[bonus.type.sprite];
+				const isColliding =
+					player.x < bonus.x + config.spriteWidth &&
+					player.x + player.width > bonus.x &&
+					player.y < bonus.y + config.spriteHeight &&
+					player.y + player.height > bonus.y;
+
+				if (isColliding) {
+					player.addBonus(bonus.type);
+					return false; //pour le suprimer de la liste
+				}
+				return true;
+			});
+		});
 	}
 
 	getState(): GameState {
