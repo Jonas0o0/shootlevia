@@ -86,7 +86,7 @@ export class ServerGame {
 					bullet.y + bullet.height > enemy.y
 				) {
 					if (enemy.type === 'DRONE') {
-						enemy.takeDamage(50);
+						enemy.takeDamage(16);
 						bulletsToRemove.add(bullet.id);
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
@@ -94,7 +94,7 @@ export class ServerGame {
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					} else if (enemy.type === 'PNEU') {
-						enemy.takeDamage(34);
+						enemy.takeDamage(11);
 						bulletsToRemove.add(bullet.id);
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
@@ -159,11 +159,11 @@ export class ServerGame {
 					// pour repousser le joueur bord à bord
 					const overlapX = Math.min(
 						player.x + player.width - enemy.x,
-						enemy.x + enemy.width - player.x
+						enemy.x + enemy.width - player.x,
 					);
 					const overlapY = Math.min(
 						player.y + player.height - enemy.y,
-						enemy.y + enemy.height - player.y
+						enemy.y + enemy.height - player.y,
 					);
 
 					if (overlapX < overlapY) {
