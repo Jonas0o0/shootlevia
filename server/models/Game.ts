@@ -82,7 +82,9 @@ export class ServerGame {
 		this.checkColision();
 
 		this.bullets = this.bullets.filter(b => b.x < 2000);
-		this.enemies = this.enemies.filter(e => e.x > -200 && e.y < 2000);
+		this.enemies = this.enemies.filter(
+			e => e.isAlive() && e.x > -200 && e.y < 2000
+		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 	}
 
