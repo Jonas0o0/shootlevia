@@ -86,7 +86,7 @@ export class ServerGame {
 		this.enemies = this.enemies.filter(e => {
 			if (!e.isAlive()) {
 				if (e.type === 'PNEU') {
-					this.score += 15;
+					this.score += 10;
 				} else if (e.type === 'DRONE') {
 					this.score += 20;
 				} else {
