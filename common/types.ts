@@ -37,7 +37,6 @@ export interface EnemyData {
 	y: number;
 	width: number;
 	height: number;
-	health: number;
 }
 
 export interface BonusData {

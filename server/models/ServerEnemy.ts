@@ -1,4 +1,5 @@
 import type { EnemyData } from '../../common/types.ts';
+import { LifebarService } from '../../common/Service/LifebarService.ts';
 
 export class ServerEnemy {
 	public id: string;
@@ -9,9 +10,17 @@ export class ServerEnemy {
 	public vy: number;
 	public width: number;
 	public height: number;
-	public health: number = 100;
+	public health: LifebarService;
 
-	constructor(id: string, type: string, x: number, y: number, vx: number, vy: number) {
+	constructor(
+		id: string,
+		type: string,
+		x: number,
+		y: number,
+		vx: number,
+		vy: number,
+		health: number = 100
+	) {
 		this.id = id;
 		this.type = type;
 		this.x = x;
@@ -20,6 +29,7 @@ export class ServerEnemy {
 		this.vy = vy;
 		this.width = 50;
 		this.height = 50;
+		this.health = new LifebarService(health);
 	}
 
 	update(): void {
@@ -35,7 +45,14 @@ export class ServerEnemy {
 			y: this.y,
 			width: this.width,
 			height: this.height,
-			health: this.health,
 		};
+	}
+
+	takeDamage(damage: number): void {
+		this.health.removeLife(damage);
+	}
+
+	isAlive(): boolean {
+		return this.health.isAlive();
 	}
 }
