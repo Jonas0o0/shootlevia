@@ -1,8 +1,8 @@
-.jeu-container {
+.jeu-hud {
     position: relative;
 }
 
-.jeu-container .lifebar {
+.jeu-hud .lifebar {
     background: slategray;
     border-radius: 50px;
     width: fit-content;
@@ -17,6 +17,6 @@
     left: 15px;
 }
 
-.jeu-container .lifebar img {
+.jeu-hud .lifebar img {
     height: 40px;
 }
