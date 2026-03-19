@@ -113,7 +113,9 @@ export class ServerGame {
 					player.y + player.height > enemy.y;
 
 				if (isColliding) {
-					player.takeDamage();
+					if (!(player.getIsJumping() && enemy.type === 'PNEU')) {
+						player.takeDamage();
+					}
 
 					// pour repousser le joueur bord à bord
 					const overlapX = Math.min(

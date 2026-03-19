@@ -87,6 +87,10 @@ export class ServerPlayer {
 		}
 	}
 
+	public getIsJumping(): boolean {
+		return this.jumping;
+	}
+
 	toData(): PlayerData {
 		return {
 			id: this.id,
