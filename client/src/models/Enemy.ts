@@ -11,6 +11,7 @@ export default class Enemy {
 	private velocity: number;
 	private sprite: SpriteSheetService;
 	private direction: Direction;
+	private isDamaged: boolean = false;
 
 	constructor(data: EnemyData) {
 		this.id = data.id;
@@ -34,6 +35,7 @@ export default class Enemy {
 		this.hitbox.y = data.y;
 		if (data.width) this.hitbox.width = data.width;
 		if (data.height) this.hitbox.height = data.height;
+		this.isDamaged = data.isDamaged ?? false;
 	}
 
 	getPosition(): HitBox {
@@ -52,6 +54,12 @@ export default class Enemy {
 
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
+
+		if (this.isDamaged) {
+			// Applique un filtre rouge intense
+			ctx.filter = 'sepia(1) saturate(1000%) hue-rotate(-50deg)';
+		}
+
 		ctx.drawImage(
 			frame.img,
 			frame.x,
@@ -63,5 +71,9 @@ export default class Enemy {
 			frame.width,
 			frame.height
 		);
+
+		if (this.isDamaged) {
+			ctx.filter = 'none';
+		}
 	}
 }

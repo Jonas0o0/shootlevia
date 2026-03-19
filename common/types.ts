@@ -37,6 +37,7 @@ export interface EnemyData {
 	y: number;
 	width: number;
 	height: number;
+	isDamaged?: boolean;
 }
 
 export interface BonusData {

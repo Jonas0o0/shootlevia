@@ -11,6 +11,8 @@ export class ServerEnemy {
 	public width: number;
 	public height: number;
 	public health: LifebarService;
+	private damageTimer: number = 0;
+	private readonly DAMAGE_FEEDBACK_DURATION: number = 10;
 
 	constructor(
 		id: string,
@@ -35,6 +37,9 @@ export class ServerEnemy {
 	update(): void {
 		this.x += this.vx;
 		this.y += this.vy;
+		if (this.damageTimer > 0) {
+			this.damageTimer--;
+		}
 	}
 
 	toData(): EnemyData {
@@ -45,11 +50,13 @@ export class ServerEnemy {
 			y: this.y,
 			width: this.width,
 			height: this.height,
+			isDamaged: this.damageTimer > 0,
 		};
 	}
 
 	takeDamage(damage: number): void {
 		this.health.removeLife(damage);
+		this.damageTimer = this.DAMAGE_FEEDBACK_DURATION;
 	}
 
 	isAlive(): boolean {
