@@ -1,4 +1,5 @@
 import type { BonusType } from './BonusType.ts';
+import type { LifebarService } from './Service/LifebarService.ts';
 
 export interface Account {
 	username: string;
@@ -16,6 +17,7 @@ export interface PlayerData {
 	jumpTimer: number;
 	jumpCooldown: number;
 	bonus: BonusType[];
+	life: LifebarService;
 }
 
 export interface BulletData {

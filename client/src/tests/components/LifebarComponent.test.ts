@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { Window } from 'happy-dom';
-import { LifebarService } from '../../services/LifebarService.ts';
+import { LifebarService } from '../../../../common/Service/LifebarService.ts';
 import { LifebarComponent } from '../../components/LifebarComponent.ts';
 import assert from 'node:assert';
 
