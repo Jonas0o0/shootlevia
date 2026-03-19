@@ -4,25 +4,29 @@ import type { EnemyData } from '../../../common/types.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
 import {
 	PlaySpriteSheet,
-} from '../SpriteSheetConfig.ts';
+	SpriteSheetConfigs,
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 
 export default class Enemy {
 	public id: string;
 	private hitbox: HitBox;
-	private health: number;
 	private velocity: number;
 	private sprite: SpriteSheetService;
 	private direction: Direction;
+	private isDamaged: boolean = false;
+	private isDying: boolean = false;
+	public readyToRemove: boolean = false;
+	private spriteSheetType: PlaySpriteSheet;
 
 	constructor(data: EnemyData) {
 		this.id = data.id;
-		this.health = data.health;
 		this.velocity = 1;
 		this.direction = Direction.Left;
-		
-		const spriteSheet = data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
-		this.sprite = new SpriteSheetService(spriteSheet, 0);
+
+		this.spriteSheetType =
+			data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
+		this.sprite = new SpriteSheetService(this.spriteSheetType, 0);
 
 		this.hitbox = {
 			x: data.x,
@@ -35,42 +39,49 @@ export default class Enemy {
 	updateFromData(data: EnemyData): void {
 		this.hitbox.x = data.x;
 		this.hitbox.y = data.y;
-		this.health = data.health;
 		if (data.width) this.hitbox.width = data.width;
 		if (data.height) this.hitbox.height = data.height;
+		this.isDamaged = data.isDamaged ?? false;
 	}
 
 	getPosition(): HitBox {
 		return this.hitbox;
 	}
 
-	getHealth(): number {
-		return this.health;
-	}
-
-	takeDamage(damage: number): void {
-		this.health -= damage;
-		if (this.health < 0) {
-			this.health = 0;
-		}
-	}
-
-	isAlive(): boolean {
-		return this.health > 0;
-	}
-
 	move(): void {
 		//Deplacement des ennemis
-        this.velocity;
-        this.direction;
+		this.velocity;
+		this.direction;
 	}
 
 	update(): void {
 		this.move();
 	}
 
+	die(): void {
+		if (this.isDying) return;
+		this.isDying = true;
+
+		if (this.spriteSheetType === PlaySpriteSheet.PNEU) {
+			const config = SpriteSheetConfigs.PNEU;
+			this.sprite.setAnimationParams(false, config.columns);
+		} else {
+			this.readyToRemove = true;
+		}
+	}
+
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
+
+		if (this.isDying && this.sprite.isAnimationFinished()) {
+			this.readyToRemove = true;
+		}
+
+		if (this.isDamaged) {
+			// Applique un filtre rouge intense
+			ctx.filter = 'sepia(1) saturate(1000%) hue-rotate(-50deg)';
+		}
+
 		ctx.drawImage(
 			frame.img,
 			frame.x,
@@ -82,5 +93,9 @@ export default class Enemy {
 			frame.width,
 			frame.height
 		);
+
+		if (this.isDamaged) {
+			ctx.filter = 'none';
+		}
 	}
 }

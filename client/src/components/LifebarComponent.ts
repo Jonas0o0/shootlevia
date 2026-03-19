@@ -1,10 +1,9 @@
-import type { LifebarService } from '../services/LifebarService.ts';
+import type { LifebarService } from '../../../common/Service/LifebarService.ts';
 
 /**
  * Classe qui permet de générer l'HTML des coeurs dans la lifebar
  */
 export class LifebarComponent {
-
 	/**
 	 * Element de la lifebar
 	 * @private
@@ -20,7 +19,7 @@ export class LifebarComponent {
 	constructor(lifebarService: LifebarService, lifebar: string) {
 		this.lifebar = document.querySelector(lifebar)!;
 		this.lifebarService = lifebarService;
-		this.lifebarService.onLifeChange((amountOfLife) => this.render(amountOfLife));
+		this.lifebarService.onLifeChange(amountOfLife => this.render(amountOfLife));
 		this.render(this.lifebarService.life);
 	}
 

@@ -1,29 +1,40 @@
 import type { Account, PlayerData } from '../../../common/types.ts';
 import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
-import type { Bonus } from '../Bonus.ts';
 import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
 import {
 	PlaySpriteSheet,
 	SpriteSheetConfigs,
 	AvatarRowMapping,
-} from '../SpriteSheetConfig.ts';
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
+import Bonus from './Bonus.ts';
+import type { BonusType } from '../../../common/BonusType.ts';
+import { LifebarService } from '../../../common/Service/LifebarService.ts';
+import { LifebarComponent } from '../components/LifebarComponent.ts';
 
 class Player {
 	private joueur: Account;
 	private jump: { jumping: boolean };
 	private hitbox: HitBox;
-	private score: number;
 	private weapons: Weapon[];
 	private bonus: Bonus[];
 	private baseRow: number;
-	velocity: number;
-	sprite: SpriteSheetService;
+	private velocity: number;
+	private sprite: SpriteSheetService;
 	public id: string = '';
+	private hud: Element | null;
+	private lastBonusList: string = '';
+	private life: LifebarService;
+	private isInvincible: boolean;
 
-	constructor(joueur: Account | null, x: number, y: number) {
+	constructor(
+		joueur: Account | null,
+		x: number,
+		y: number,
+		element: Element | null = null
+	) {
 		if (joueur == null) {
 			joueur = { username: 'temp', avatar: 'pedalBleu' };
 		}
@@ -31,10 +42,16 @@ class Player {
 		this.weapons = [
 			{ nom: 'attaque de base', degat: 2, tier: 1, tierMin: 1, tierMax: 5 },
 		];
-		this.bonus = [{ nom: 'Passpass', time: 2, avantage: 'Invincibilité' }];
-		this.score = 0;
+		this.bonus = [];
 		this.velocity = 2;
 		this.jump = { jumping: false };
+		this.hud = element;
+		this.life = new LifebarService();
+		this.isInvincible = false;
+
+		if (element) {
+			new LifebarComponent(this.life, '.jeu-hud .lifebar');
+		}
 
 		this.baseRow =
 			AvatarRowMapping[joueur.avatar] ?? AvatarRowMapping.pedalBleu;
@@ -51,7 +68,21 @@ class Player {
 	updateFromData(data: PlayerData): void {
 		this.hitbox.x = data.x;
 		this.hitbox.y = data.y;
-		this.score = data.score;
+		this.isInvincible = data.isInvincible;
+
+		//Pour Optti on fait pas un bete remplacment, on compra les de liste por suprimer et ajputer les différence
+		const dataSet = new Set(data.bonus);
+		const currentSet = new Set(this.bonus.map(b => b.type));
+
+		// Supprimer
+		this.bonus = this.bonus.filter(b => dataSet.has(b.type));
+
+		// Ajouter
+		data.bonus.forEach((bonus: BonusType) => {
+			if (!currentSet.has(bonus)) {
+				this.bonus.push(new Bonus(bonus));
+			}
+		});
 
 		// Mise à jour visuelle (sprite row)
 		if (data.isJumping != this.jump.jumping) {
@@ -62,6 +93,14 @@ class Player {
 			}
 		}
 		this.jump.jumping = data.isJumping;
+		if (this.life) {
+			if (data.life.life < this.life.life) {
+				this.life.removeLife(this.life.life - data.life.life);
+			}
+			if (data.life.life > this.life.life) {
+				this.life.addLife(data.life.life - this.life.life);
+			}
+		}
 	}
 
 	isJumping(): boolean {
@@ -76,20 +115,8 @@ class Player {
 		return this.joueur;
 	}
 
-	getScore(): number {
-		return this.score;
-	}
-
-	addScore(score: number = 10): void {
-		this.score += score;
-	}
-
 	getWeapon(): Weapon[] {
 		return this.weapons;
-	}
-
-	getBonus(): Bonus[] {
-		return this.bonus;
 	}
 
 	move(direction: Direction): void {
@@ -110,6 +137,15 @@ class Player {
 
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
+
+		// Effet de clignotement transparent si invincible
+		if (this.isInvincible) {
+			// On fait varier l'alpha toutes les 100ms
+			if (Math.floor(Date.now() / 100) % 2 === 0) {
+				ctx.globalAlpha = 0.5;
+			}
+		}
+
 		ctx.drawImage(
 			frame.img,
 			frame.x,
@@ -121,6 +157,30 @@ class Player {
 			frame.width,
 			frame.height
 		);
+
+		// On reset l'alpha pour ne pas impacter les autres dessins
+		ctx.globalAlpha = 1.0;
+
+		// Dessiner les effets des bonus sur le joueur
+		this.bonus.forEach(b => {
+			b.drawOnPlayer(ctx, this.hitbox.x, this.hitbox.y);
+		});
+
+		this.updateHUD();
+	}
+
+	private updateHUD(): void {
+		if (!this.hud) return; //On veux afficher dans l'HUD que les bonus du joueur coté cleint pas ceux des autre joueur
+
+		const currentBonusList = this.bonus.map(b => b.type.nom).join(',');
+		if (currentBonusList === this.lastBonusList) return;
+
+		this.lastBonusList = currentBonusList;
+		this.hud.innerHTML = '';
+
+		this.bonus.forEach(b => {
+			b.drawInHUD(this.hud!);
+		});
 	}
 }
 
