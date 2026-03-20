@@ -1,9 +1,10 @@
 import type { BulletData } from '../../common/types.ts';
+import type { HitBox } from '../../common/HitBox.ts';
 
 /**
  * Représente une balle tirée par un joueur côté serveur
  */
-export class ServerBullet {
+export class ServerBullet implements HitBox {
 	public id: string;
 	public x: number;
 	public y: number;

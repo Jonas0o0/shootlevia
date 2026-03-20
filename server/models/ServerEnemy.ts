@@ -1,7 +1,8 @@
 import type { EnemyData } from '../../common/types.ts';
 import { LifebarService } from '../../common/Service/LifebarService.ts';
+import type { HitBox } from '../../common/HitBox.ts';
 
-export class ServerEnemy {
+export class ServerEnemy implements HitBox {
 	public id: string;
 	public type: string;
 	public x: number;

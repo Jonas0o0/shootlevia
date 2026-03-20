@@ -8,7 +8,7 @@ import AssetLoaderService from './AssetLoaderService.ts';
 
 export default class SpriteSheetService {
 	private spriteSheet: SpriteSheetConfig;
-	private img: HTMLImageElement;
+	private readonly img: HTMLImageElement;
 
 	private frameX;
 	private frameY;
@@ -30,7 +30,7 @@ export default class SpriteSheetService {
 			this.spriteSheet.columnsFrameMax = this.spriteSheet.columns;
 		}
 
-		// On calcule les dimensions car l'image est déjà chargée via AssetLoaderService
+		// On calcule les dimensions, car l'image est déjà chargée via AssetLoaderService
 		this.spriteSheet.spriteWidth = this.img.width / this.spriteSheet.columns;
 		this.spriteSheet.spriteHeight = this.img.height / this.spriteSheet.rows;
 	}
@@ -50,10 +50,6 @@ export default class SpriteSheetService {
 			return;
 		}
 		console.warn('[PlayView] ligne invalide', row);
-	}
-
-	getRow(): number {
-		return this.frameY;
 	}
 
 	setAnimationParams(isStatic: boolean, columns: number) {
@@ -79,7 +75,7 @@ export default class SpriteSheetService {
 		currentFrame: number,
 		currentTick: number,
 		animationSpeed: number,
-		maxFrames: number,
+		maxFrames: number
 	): { nextFrame: number; nextTick: number } {
 		let nextTick = currentTick + 1;
 		let nextFrame = currentFrame;
@@ -96,7 +92,7 @@ export default class SpriteSheetService {
 		frameX: number,
 		frameY: number,
 		spriteWidth: number,
-		spriteHeight: number,
+		spriteHeight: number
 	): { srcX: number; srcY: number } {
 		return {
 			srcX: frameX * spriteWidth,
@@ -109,7 +105,7 @@ export default class SpriteSheetService {
 			this.frameX,
 			this.tick,
 			this.animationSpeed,
-			this.spriteSheet.columnsFrameMax,
+			this.spriteSheet.columnsFrameMax
 		);
 
 		this.frameX = nextFrame;
@@ -119,7 +115,7 @@ export default class SpriteSheetService {
 			this.frameX,
 			this.frameY,
 			this.spriteSheet.spriteWidth,
-			this.spriteSheet.spriteHeight,
+			this.spriteSheet.spriteHeight
 		);
 
 		return {
