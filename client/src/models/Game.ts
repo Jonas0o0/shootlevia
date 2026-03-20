@@ -19,6 +19,7 @@ export default class Game {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private keysPressed: Set<string> = new Set();
+	private mousePosition: { x: number; y: number } | null = null;
 	private map: GameMap;
 
 	constructor(
@@ -64,6 +65,18 @@ export default class Game {
 
 		window.addEventListener('keyup', (event: KeyboardEvent) => {
 			this.keysPressed.delete(event.key.toUpperCase());
+		});
+
+		window.addEventListener('mousemove', (event: MouseEvent) => {
+			const rect = this.canvas.getBoundingClientRect();
+			this.mousePosition = {
+				x: event.clientX - rect.left,
+				y: event.clientY - rect.top,
+			};
+		});
+
+		window.addEventListener('mouseout', () => {
+			this.mousePosition = null;
 		});
 
 		// Synchronisation avec le serveur
@@ -154,15 +167,32 @@ export default class Game {
 
 	update(): void {
 		// Appelé par setInterval (60fps)
-		const directions: Direction[] = [];
+		const directionsSet: Set<Direction> = new Set();
 
-		if (this.keysPressed.has('Z')) directions.push(Direction.Up);
-		if (this.keysPressed.has('S')) directions.push(Direction.Down);
-		if (this.keysPressed.has('Q')) directions.push(Direction.Left);
-		if (this.keysPressed.has('D')) directions.push(Direction.Right);
+		if (this.keysPressed.has('Z')) directionsSet.add(Direction.Up);
+		if (this.keysPressed.has('S')) directionsSet.add(Direction.Down);
+		if (this.keysPressed.has('Q')) directionsSet.add(Direction.Left);
+		if (this.keysPressed.has('D')) directionsSet.add(Direction.Right);
 
-		if (directions.length > 0) {
-			this.socket.emit('move', directions);
+		if (this.mousePosition) {
+			const playerPos = this.joueur.getPostition();
+			const playerCenterX = playerPos.x + playerPos.width / 2;
+			const playerCenterY = playerPos.y + playerPos.height / 2;
+
+			const threshold = 20; //pour éviter le jitter
+
+			if (this.mousePosition.x < playerCenterX - threshold)
+				directionsSet.add(Direction.Left);
+			if (this.mousePosition.x > playerCenterX + threshold)
+				directionsSet.add(Direction.Right);
+			if (this.mousePosition.y < playerCenterY - threshold)
+				directionsSet.add(Direction.Up);
+			if (this.mousePosition.y > playerCenterY + threshold)
+				directionsSet.add(Direction.Down);
+		}
+
+		if (directionsSet.size > 0) {
+			this.socket.emit('move', Array.from(directionsSet));
 		}
 		this.score;
 		this.time;
