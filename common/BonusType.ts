@@ -10,6 +10,16 @@ export const BonusType = {
 			MAP: 1,
 			PLAYER: 2,
 		},
+		sheetSize: {
+			HUD: {
+				width: 37,
+				height: 24,
+			},
+			MAP: {
+				width: 63,
+				height: 54,
+			},
+		},
 	},
 } as const;
 

@@ -6,6 +6,7 @@ import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
+import { DeplacementType } from './DeplacementType.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -19,7 +20,9 @@ export default class Game {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private keysPressed: Set<string> = new Set();
+	private mousePosition: { x: number; y: number } | null = null;
 	private map: GameMap;
+	private souris: boolean;
 
 	constructor(
 		socket: Socket,
@@ -34,6 +37,7 @@ export default class Game {
 		this.score = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
+
 		//Iitialisation de la map
 		this.map = new GameMap();
 
@@ -41,6 +45,10 @@ export default class Game {
 		this.joueur = players[joueurIdx];
 		this.joueur.id = socket.id || '';
 		this.players.set(this.joueur.id, this.joueur);
+
+		this.souris =
+			this.joueur.getAccoutn().deplacement === DeplacementType.Mouse;
+
 
 		// Rejoindre la partie côté serveur avec la taille du canvas
 		this.socket.emit('join', {
@@ -50,19 +58,32 @@ export default class Game {
 			canvasHeight: this.canvas.height
 		});
 
-		window.addEventListener('keydown', (event: KeyboardEvent) => {
-			const key = event.key.toUpperCase();
-			this.keysPressed.add(key);
+		if (!this.souris) {
+			window.addEventListener('keydown', (event: KeyboardEvent) => {
+				const key = event.key.toUpperCase();
+				this.keysPressed.add(key);
 
-			if (key === ' ') {
-				this.socket.emit('jump');
-			}
-		});
+				if (key === ' ') {
+					this.socket.emit('jump');
+				}
+			});
 
-		window.addEventListener('keyup', (event: KeyboardEvent) => {
-			this.keysPressed.delete(event.key.toUpperCase());
-		});
+			window.addEventListener('keyup', (event: KeyboardEvent) => {
+				this.keysPressed.delete(event.key.toUpperCase());
+			});
+		} else {
+			window.addEventListener('mousemove', (event: MouseEvent) => {
+				const rect = this.canvas.getBoundingClientRect();
+				this.mousePosition = {
+					x: event.clientX - rect.left,
+					y: event.clientY - rect.top,
+				};
+			});
 
+			window.addEventListener('mouseout', () => {
+				this.mousePosition = null;
+			});
+		}
 		// Synchronisation avec le serveur
 		this.socket.on('gameState', (state: GameState) => {
 			this.time = state.time;
@@ -151,15 +172,32 @@ export default class Game {
 
 	update(): void {
 		// Appelé par setInterval (60fps)
-		const directions: Direction[] = [];
+		const directionsSet: Set<Direction> = new Set();
 
-		if (this.keysPressed.has('Z')) directions.push(Direction.Up);
-		if (this.keysPressed.has('S')) directions.push(Direction.Down);
-		if (this.keysPressed.has('Q')) directions.push(Direction.Left);
-		if (this.keysPressed.has('D')) directions.push(Direction.Right);
+		if (this.keysPressed.has('Z')) directionsSet.add(Direction.Up);
+		if (this.keysPressed.has('S')) directionsSet.add(Direction.Down);
+		if (this.keysPressed.has('Q')) directionsSet.add(Direction.Left);
+		if (this.keysPressed.has('D')) directionsSet.add(Direction.Right);
 
-		if (directions.length > 0) {
-			this.socket.emit('move', directions);
+		if (this.mousePosition) {
+			const playerPos = this.joueur.getPostition();
+			const playerCenterX = playerPos.x + playerPos.width / 2;
+			const playerCenterY = playerPos.y + playerPos.height / 2;
+
+			const threshold = 20; //pour éviter le jitter
+
+			if (this.mousePosition.x < playerCenterX - threshold)
+				directionsSet.add(Direction.Left);
+			if (this.mousePosition.x > playerCenterX + threshold)
+				directionsSet.add(Direction.Right);
+			if (this.mousePosition.y < playerCenterY - threshold)
+				directionsSet.add(Direction.Up);
+			if (this.mousePosition.y > playerCenterY + threshold)
+				directionsSet.add(Direction.Down);
+		}
+
+		if (directionsSet.size > 0) {
+			this.socket.emit('move', Array.from(directionsSet));
 		}
 		this.score;
 		this.time;

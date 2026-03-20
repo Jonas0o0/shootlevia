@@ -35,7 +35,7 @@ nav>a {
 }
 
 /*Bouton Déconnexion*/
-.btn_deconnexion {
+.btn_deconnexion, .btn_parametres {
     background-color: #F70000;
     color: white;
     font-family: 'Pixelify Sans', sans-serif;
@@ -50,6 +50,15 @@ nav>a {
     gap: 10px;
 
     margin-top: auto;
+}
+
+.btn_parametres {
+    background-color: #3a3850;
+    margin-top: 10px; /* Petit espace au-dessus du bouton de déconnexion */
+}
+
+.btn_parametres:hover {
+    background-color: #4ca0af;
 }
 
 /* État connecté : fond neutre avec avatar + pseudo */

@@ -4,17 +4,18 @@ import type { Route } from './types.ts';
 import HomeView from './HomeView.ts';
 import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
+import SettingsView from './SettingsView.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 import AssetLoaderService from './services/AssetLoaderService.ts';
 import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
+import PlayView from './PlayView.ts';
+import Game from './models/Game.ts';
+import Player from './models/Player.ts';
 
 const loader = new View(document.querySelector('section.loader')!);
 
 const socket: Socket = io(window.location.hostname + ':8080');
-import PlayView from './PlayView.ts';
-import Game from './models/Game.ts';
-import Player from './models/Player.ts';
 
 async function init() {
 	// 1. Préchargement des assets
@@ -56,6 +57,9 @@ async function init() {
 
 	const menuElement = document.querySelector('.fenetre nav')!;
 	const loginButton = menuElement.querySelector('.btn_deconnexion')!;
+	const settingsButton = menuElement.querySelector(
+		'.btn_parametres'
+	) as HTMLElement;
 	const loginService: LoginServiceMemory = new LoginServiceMemory();
 
 	const leaderboard = new View(
@@ -72,11 +76,31 @@ async function init() {
 		ctx
 	);
 
+	const updateSettingsButtonVisibility = () => {
+		if (loginService.isLoggedIn()) {
+			settingsButton.style.display = 'block';
+		} else {
+			settingsButton.style.display = 'none';
+		}
+	};
+
+	const settings = new SettingsView(
+		document.querySelector('.fenetre .settings')!,
+		loginService,
+		() => {
+			popup.updateButton();
+			updateSettingsButtonVisibility();
+		}
+	);
+
 	const popup = new PopupLoginView(
 		document.querySelector('#popup')!,
 		loginButton as HTMLElement,
-		loginService
+		loginService,
+		() => updateSettingsButtonVisibility()
 	);
+
+	updateSettingsButtonVisibility();
 
 	loginButton.addEventListener('click', () => {
 		popup.oppenPopup();
@@ -89,14 +113,24 @@ async function init() {
 		{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
 		{ path: '/credit', view: credit, title: 'Crédit' },
 		{ path: '/play', view: play, title: '' },
+		{ path: '/settings', view: settings, title: 'Paramètres' },
 	];
 
 	Router.routes = routes;
 	Router.titleElement = document.querySelector('.fenetre .banner .title')!;
 	Router.setMenuElement(menuElement);
-	Router.registerLinks(
-		document.querySelector<HTMLAnchorElement>('.fenetre .home .playButton')!
-	);
+
+	const playButton = document.querySelector<HTMLAnchorElement>(
+		'.fenetre .home .playButton'
+	)!;
+	playButton.addEventListener('click', event => {
+		if (!loginService.isLoggedIn()) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			popup.show();
+		}
+	});
+	Router.registerLinks(playButton);
 
 	Router.navigate(window.location.pathname || '/', true);
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);
