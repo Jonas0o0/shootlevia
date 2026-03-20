@@ -15,13 +15,14 @@ export class ServerBullet {
 	 * @type {number}
 	 * @private
 	 */
-	private speed: number = 10;
+	public speed: number;
 
-	constructor(ownerId: string, x: number, y: number) {
+	constructor(ownerId: string, x: number, y: number, speed: number) {
 		this.id = crypto.randomUUID();
 		this.ownerId = ownerId;
 		this.x = x;
 		this.y = y;
+		this.speed = speed;
 	}
 
 	update(): void {
