@@ -23,6 +23,17 @@ export class ServerGame {
 		setInterval(() => this.update(), 1000 / 60);
 	}
 
+	reset(): void {
+		console.log('reset la partie est cense fonctionne');
+		this.players.clear();
+		this.bullets = [];
+		this.enemies = [];
+		this.bonuses = [];
+		this.time = 0;
+		this.score = 0;
+		this.spawnEnemyService = new SpawnEnemyService();
+	}
+
 	addPlayer(id: string, username: string, avatar: string, canvasWidth: number, canvasHeight: number): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;

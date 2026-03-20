@@ -102,6 +102,7 @@ async function init() {
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);
 
 	play.launchGameCallback = () => {
+		socket.emit('reset');
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const joueur = new Player(loginService.accounts, 0, 0, hud);
 		const game = new Game(socket, [joueur], 0, canvas, ctx);
