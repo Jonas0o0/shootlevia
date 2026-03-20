@@ -19,19 +19,19 @@
 	<title>Shootlevia</title>
 	<script type="module" src="./src/main.ts"></script>
 </head>
-  <body id="app">
-      <section class="borne-container">
-        <img src="/image/Borne.svg" alt="Borne" class="borne-svg" />
-        <main class="fenetre">
-          <nav>
-            <a href="/" class="logo_link">
-              <img class="ilevia" src="/image/ilevia_logo.png" alt="logo ilevia">
-            </a>
-            <a href="/" class="homePage">Home</a>
-            <a href="/leaderboard">Leaderboard</a>
-            <a href="/credit">Crédit</a>
-            <a href="" class="btn_deconnexion"></a>
-          </nav>
+<body id="app">
+<section class="borne-container">
+	<img src="/image/Borne.svg" alt="Borne" class="borne-svg" />
+	<main class="fenetre">
+		<nav>
+			<a href="/" class="logo_link">
+				<img class="ilevia" src="/image/ilevia_logo.png" alt="logo ilevia">
+			</a>
+			<a href="/" class="homePage">Home</a>
+			<a href="/leaderboard">Leaderboard</a>
+			<a href="/credit">Crédit</a>
+			<a href="" class="btn_deconnexion"></a>
+		</nav>
 		<section>
 			<div class="banner">
 				<h1 class="title"></h1>
@@ -45,15 +45,16 @@
 				<div class="bariere secondary"></div>
 				<div class="bariere tertiary"></div>
 				<article class="home">
-					<img src="/image/pedalBleu.gif">
+					<img src="/image/pedalBleu.gif" alt="Gif d'une personne qui pedal sur un vélo">
 					<a class="playButton" href="/play">Jouer</a>
 				</article>
 				<article class="play">
 					<canvas width="1920" height="1080" class="play_canvas">
 					</canvas>
 					<div class="jeu-hud">
-						<div class="score-display">Score: <span id="game-score">0</span></div>
 						<div class="lifebar"></div>
+						<div class="score-display">Score: <span id="game-score">0</span></div>
+						<div class="bonus-container"></div>
 					</div>
 				</article>
 				<article class="leaderboard">
@@ -112,31 +113,31 @@
 				</article>
 			</div>
 		</section>
-			<form id="popup">
-				<h1>Connexion</h1>
-				<input type="text" name="username" placeholder="pseudo">
+		<form id="popup">
+			<h1>Connexion</h1>
+			<input type="text" name="username" placeholder="pseudo">
 
-				<div class="avatar-choice">
+			<div class="avatar-choice">
 
-					<label>
-						<input type="radio" name="avatar" value="bleu" required>
-						<img src="/image/pedalBleu.gif" alt="avatar1">
-					</label>
+				<label>
+					<input type="radio" name="avatar" value="bleu" required>
+					<img src="/image/pedalBleu.gif" alt="avatar1">
+				</label>
 
-					<label>
-						<input type="radio" name="avatar" value="orange">
-						<img src="/image/pedalOrange.gif" alt="avatar2">
-					</label>
+				<label>
+					<input type="radio" name="avatar" value="orange">
+					<img src="/image/pedalOrange.gif" alt="avatar2">
+				</label>
 
-					<label>
-						<input type="radio" name="avatar" value="violet">
-						<img src="/image/pedalViolet.gif" alt="avatar3">
-					</label>
+				<label>
+					<input type="radio" name="avatar" value="violet">
+					<img src="/image/pedalViolet.gif" alt="avatar3">
+				</label>
 
-				</div>
+			</div>
 
-				<input type="submit" value="Se connecter">
-			</form>
+			<input type="submit" value="Se connecter">
+		</form>
 	</main>
   </section>
   <section class="loader active">
