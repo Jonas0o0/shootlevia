@@ -11,6 +11,8 @@ export class ServerPlayer {
 	public y: number;
 	public width: number;
 	public height: number;
+	private canvasWidth: number;
+	private canvasHeight: number;
 	private velocity: number = 2;
 	private jumping: boolean = false;
 	private jumpTimer: number = 0;
@@ -20,13 +22,15 @@ export class ServerPlayer {
 	private invincibilityTimer: number = 0;
 	private readonly INVINCIBILITY_DURATION: number = 60;
 
-	constructor(id: string, account: Account, x: number, y: number) {
+	constructor(id: string, account: Account, x: number, y: number, canvasWidth: number, canvasHeight: number) {
 		this.id = id;
 		this.account = account;
 		this.x = x;
 		this.y = y;
 		this.width = 74;
 		this.height = 100;
+		this.canvasWidth = canvasWidth;
+		this.canvasHeight = canvasHeight;
 		this.bonus = [];
 		this.life = new LifebarService();
 	}
@@ -46,6 +50,9 @@ export class ServerPlayer {
 				this.y += this.velocity;
 				break;
 		}
+
+		this.x = Math.max(0, Math.min(this.x, this.canvasWidth - this.width));
+		this.y = Math.max((this.canvasHeight * 0.2) - 45, Math.min(this.y, this.canvasHeight - this.height));
 	}
 
 	doJump(): void {

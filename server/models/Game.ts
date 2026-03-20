@@ -23,10 +23,10 @@ export class ServerGame {
 		setInterval(() => this.update(), 1000 / 60);
 	}
 
-	addPlayer(id: string, username: string, avatar: string): void {
+	addPlayer(id: string, username: string, avatar: string, canvasWidth: number, canvasHeight: number): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
-		this.players.set(id, new ServerPlayer(id, { username, avatar }, x, y));
+		this.players.set(id, new ServerPlayer(id, { username, avatar }, x, y, canvasWidth, canvasHeight));
 	}
 
 	removePlayer(id: string): void {
