@@ -6,7 +6,7 @@ import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
 import { BonusType } from '../../common/BonusType.ts';
-import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
+import { checkCollision } from '../../common/HitBox.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -34,10 +34,26 @@ export class ServerGame {
 		this.spawnEnemyService = new SpawnEnemyService();
 	}
 
-	addPlayer(id: string, username: string, avatar: string, canvasWidth: number, canvasHeight: number): void {
+	addPlayer(
+		id: string,
+		username: string,
+		avatar: string,
+		canvasWidth: number,
+		canvasHeight: number
+	): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
-		this.players.set(id, new ServerPlayer(id, { username, avatar }, x, y, canvasWidth, canvasHeight));
+		this.players.set(
+			id,
+			new ServerPlayer(
+				id,
+				{ username, avatar },
+				x,
+				y,
+				canvasWidth,
+				canvasHeight
+			)
+		);
 	}
 
 	removePlayer(id: string): void {
@@ -61,7 +77,11 @@ export class ServerGame {
 	handlePlayerShoot(id: string): void {
 		const player = this.players.get(id);
 		if (player) {
-			const bullet = new ServerBullet(id, player.x + player.width, player.y + player.height / 2);
+			const bullet = new ServerBullet(
+				id,
+				player.x + player.width,
+				player.y + player.height / 2
+			);
 			this.bullets.push(bullet);
 		}
 	}
@@ -90,12 +110,7 @@ export class ServerGame {
 
 		this.bullets.forEach(bullet => {
 			this.enemies.forEach(enemy => {
-				if (
-					bullet.x < enemy.x + enemy.width &&
-					bullet.x + bullet.width > enemy.x &&
-					bullet.y < enemy.y + enemy.height &&
-					bullet.y + bullet.height > enemy.y
-				) {
+				if (checkCollision(bullet, enemy)) {
 					if (enemy.type === 'DRONE') {
 						enemy.takeDamage(16);
 						bulletsToRemove.add(bullet.id);
@@ -119,7 +134,9 @@ export class ServerGame {
 
 		this.checkPlayerCollisions();
 
-		this.bullets = this.bullets.filter(b => !bulletsToRemove.has(b.id) && b.x < 2000);
+		this.bullets = this.bullets.filter(
+			b => !bulletsToRemove.has(b.id) && b.x < 2000
+		);
 
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
@@ -131,19 +148,16 @@ export class ServerGame {
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000);
+		this.enemies = this.enemies.filter(
+			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000
+		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 	}
 
 	private checkPlayerCollisions() {
 		this.players.forEach(player => {
 			this.bonuses = this.bonuses.filter(bonus => {
-				const config = SpriteSheetConfigs[bonus.type.sprite];
-				const isColliding =
-					player.x < bonus.x + config.spriteWidth &&
-					player.x + player.width > bonus.x &&
-					player.y < bonus.y + config.spriteHeight &&
-					player.y + player.height > bonus.y;
+				const isColliding = checkCollision(player, bonus);
 
 				if (isColliding) {
 					player.addBonus(bonus.type);
@@ -153,13 +167,7 @@ export class ServerGame {
 			});
 
 			this.enemies.forEach(enemy => {
-				const isColliding =
-					player.x < enemy.x + enemy.width &&
-					player.x + player.width > enemy.x &&
-					player.y < enemy.y + enemy.height &&
-					player.y + player.height > enemy.y;
-
-				if (isColliding) {
+				if (checkCollision(player, enemy)) {
 					// Pas de collision du tout si on saute par-dessus un pneu
 					if (player.getIsJumping() && enemy.type === 'PNEU') {
 						return;
@@ -170,11 +178,11 @@ export class ServerGame {
 					// pour repousser le joueur bord à bord
 					const overlapX = Math.min(
 						player.x + player.width - enemy.x,
-						enemy.x + enemy.width - player.x,
+						enemy.x + enemy.width - player.x
 					);
 					const overlapY = Math.min(
 						player.y + player.height - enemy.y,
-						enemy.y + enemy.height - player.y,
+						enemy.y + enemy.height - player.y
 					);
 
 					if (overlapX < overlapY) {

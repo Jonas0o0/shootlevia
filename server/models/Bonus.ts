@@ -6,6 +6,8 @@ class ServerBonus {
 	public type: BonusType;
 	public x: number;
 	public y: number;
+	public width: number;
+	public height: number;
 	private speed: number = -(0.4 * (1000 / 60)); // Vitesse de la map
 
 	constructor(id: string, type: BonusType, x: number, y: number) {
@@ -13,6 +15,8 @@ class ServerBonus {
 		this.type = type;
 		this.x = x;
 		this.y = y;
+		this.width = type.sheetSize.MAP.width;
+		this.height = type.sheetSize.MAP.height;
 	}
 
 	update(): void {
