@@ -1,7 +1,7 @@
 #popup{
     display: none;
 }
-#popup.active, .settings form {
+#popup.active {
     background: #545268;
     border: 2px solid #fff;
     border-radius: 10px;
@@ -17,12 +17,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 1001;
-}
-
-.settings form {
-    width: 100%;
-    max-width: 600px;
-    margin: 20px auto;
 }
 
 /* Overlay sombre + flou quand la popup est active */
@@ -84,6 +78,10 @@
 
     margin-top: auto;
     align-self: flex-end;
+}
+
+#popup input[type="submit"]:hover {
+    background-color: #c80000;
 }
 
 #popup input[type="text"]{

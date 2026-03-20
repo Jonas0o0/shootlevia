@@ -23,7 +23,7 @@ class PopupLoginView extends View {
 		this.element.addEventListener('submit', e => this.submitForm(e));
 	}
 
-	private updateButton() {
+	updateButton() {
 		if (this.loginService.isLoggedIn()) {
 			const user = this.loginService.getCurrentUser()!;
 			this.loginButton.innerHTML =
@@ -76,7 +76,10 @@ class PopupLoginView extends View {
 			return;
 		}
 
-		const deplacementType = deplacement === 'mouse' ? DeplacementType.Mouse : DeplacementType.Keyboard;
+		const deplacementType =
+			deplacement === 'mouse'
+				? DeplacementType.Mouse
+				: DeplacementType.Keyboard;
 
 		this.loginService.login({
 			username,

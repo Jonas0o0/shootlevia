@@ -73,9 +73,46 @@
   display: none;
 }
 
-.fenetre section article.active, .fenetre section article.settings.active {
+.fenetre section article.active {
   display: block;
   height: auto;
+}
+
+.fenetre section article.settings.active {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.fenetre section article.settings.active form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+}
+
+.fenetre section article.settings.active form input[type=submit] {
+  background-color: #F70000;
+  color: white;
+  font-family: 'Pixelify Sans', sans-serif;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: auto;
+}
+
+.fenetre section article.settings.active form input[type=submit]:hover {
+  background-color: #c80000;
 }
 
 .fenetre section article.play.active {
