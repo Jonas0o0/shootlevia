@@ -35,7 +35,7 @@ export class ServerPlayer {
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
 		this.life = new LifebarService();
-		this.arme = new Arme(10, [Direction.Right], 1, /*10*/);
+		this.arme = new Arme(10, [Direction.Right], 1, 500);
 	}
 
 	move(direction: Direction): void {
@@ -66,6 +66,7 @@ export class ServerPlayer {
 	}
 
 	update(): void {
+		this.arme.autoShoot(this.id, this.x + this.width, this.y + this.height / 2);
 		if (this.jumping) {
 			this.jumpTimer--;
 			if (this.jumpTimer <= 0) {

@@ -54,13 +54,6 @@ export class ServerGame {
 		}
 	}
 
-	handlePlayerShoot(id: string): void {
-		const player = this.players.get(id);
-		if (player) {
-			player.shoot();
-		}
-	}
-
 	addBonus(type: BonusType, x: number, y: number): void {
 		const id = crypto.randomUUID();
 		this.bonuses.push(new ServerBonus(id, type, x, y));

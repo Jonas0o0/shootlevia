@@ -42,11 +42,6 @@ export default class Game {
 		this.joueur.id = socket.id || '';
 		this.players.set(this.joueur.id, this.joueur);
 
-		// tire auto 500ms
-		setInterval(() => {
-			this.socket.emit('shoot');
-		}, 500);
-
 		// Rejoindre la partie côté serveur avec la taille du canvas
 		this.socket.emit('join', {
 			username: this.joueur.getAccoutn().username,
