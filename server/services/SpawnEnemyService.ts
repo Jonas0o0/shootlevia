@@ -6,17 +6,23 @@ export class SpawnEnemyService {
 	private difficultyCurve: number = 0.01;
 	private enemySpawnCooldown: number = 0;
 
+	public calculateRespawnRate(time: number): number {
+		return Math.max(
+			this.minRespawnRate,
+			Math.floor(this.baseRespawnRate - time * this.difficultyCurve),
+		);
+	}
+
+	public getEnemyType(randomValue: number): 'PNEU' | 'DRONE' {
+		return randomValue < 0.3 ? 'PNEU' : 'DRONE';
+	}
+
 	public update(time: number, hasPlayers: boolean, enemies: ServerEnemy[]): void {
 		if (hasPlayers) {
 			this.enemySpawnCooldown--;
 			if (this.enemySpawnCooldown <= 0) {
 				enemies.push(this.generateEnemy());
-				
-				const currentRespawnRate = Math.max(
-					this.minRespawnRate, 
-					Math.floor(this.baseRespawnRate - (time * this.difficultyCurve))
-				);
-				this.enemySpawnCooldown = currentRespawnRate;
+				this.enemySpawnCooldown = this.calculateRespawnRate(time);
 			}
 		} else {
 			this.reset();
@@ -29,7 +35,7 @@ export class SpawnEnemyService {
 
 	private generateEnemy(): ServerEnemy {
 		const id = Math.random().toString(36).substring(7);
-		const type = Math.random() < 0.3 ? 'PNEU' : 'DRONE';
+		const type = this.getEnemyType(Math.random());
 		
 		let x: number, y: number;
 		let vx: number, vy: number;

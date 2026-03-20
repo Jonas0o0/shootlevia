@@ -40,7 +40,7 @@ class PopupLoginView extends View {
 		} else {
 			this.loginButton.innerHTML = 'Connexion';
 			this.loginButton.classList.remove('logged-in');
-			if (Router.currentRoute.path === '/settings') {
+			if (Router.currentRoute && Router.currentRoute.path === '/settings') {
 				Router.navigate('/');
 			}
 		}
