@@ -19,19 +19,20 @@
 	<title>Shootlevia</title>
 	<script type="module" src="./src/main.ts"></script>
 </head>
-<body id="app">
-<section class="borne-container">
-	<img src="/image/Borne.svg" alt="Borne" class="borne-svg" />
-	<main class="fenetre">
-		<nav>
-			<a href="/" class="logo_link">
-				<img class="ilevia" src="/image/ilevia_logo.png" alt="logo ilevia">
-			</a>
-			<a href="/" class="homePage">Home</a>
-			<a href="/leaderboard">Leaderboard</a>
-			<a href="/credit">Crédit</a>
-			<a href="" class="btn_deconnexion"></a>
-		</nav>
+  <body id="app">
+      <section class="borne-container">
+        <img src="/image/Borne.svg" alt="Borne" class="borne-svg" />
+        <main class="fenetre">
+          <nav>
+            <a href="/" class="logo_link">
+              <img class="ilevia" src="/image/ilevia_logo.png" alt="logo ilevia">
+            </a>
+            <a href="/" class="homePage">Home</a>
+            <a href="/leaderboard">Leaderboard</a>
+            <a href="/credit">Crédit</a>
+            <a href="/settings" class="btn_parametres" style="display: none;">Paramètres</a>
+            <a href="" class="btn_deconnexion"></a>
+          </nav>
 		<section>
 			<div class="banner">
 				<h1 class="title"></h1>
@@ -72,6 +73,36 @@
 							</tbody>
 						</table>
 					</div>
+				</article>
+				<article class="settings">
+					<form>
+						<div class="avatar-choice">
+							<label>
+								<input type="radio" name="avatar" value="bleu" required>
+								<img src="/image/pedalBleu.gif" alt="avatar1">
+							</label>
+							<label>
+								<input type="radio" name="avatar" value="orange">
+								<img src="/image/pedalOrange.gif" alt="avatar2">
+							</label>
+							<label>
+								<input type="radio" name="avatar" value="violet">
+								<img src="/image/pedalViolet.gif" alt="avatar3">
+							</label>
+						</div>
+						<div class="deplacement-choice">
+							<span>Ce déplacer avec : </span>
+							<label>
+								<input type="radio" name="deplacement" value="mouse" required>
+								La souris
+							</label>
+							<label>
+								<input type="radio" name="deplacement" value="keyboard">
+								Le clavier
+							</label>
+						</div>
+						<input type="submit" value="Enregistrer">
+					</form>
 				</article>
 				<article class="credit">
 					<div class="credit-container">
@@ -119,10 +150,10 @@
 
 			<div class="avatar-choice">
 
-				<label>
-					<input type="radio" name="avatar" value="bleu" required>
-					<img src="/image/pedalBleu.gif" alt="avatar1">
-				</label>
+					<label>
+						<input type="radio" name="avatar" value="bleu" checked required>
+						<img src="/image/pedalBleu.gif" alt="avatar1">
+					</label>
 
 				<label>
 					<input type="radio" name="avatar" value="orange">
@@ -136,8 +167,22 @@
 
 			</div>
 
-			<input type="submit" value="Se connecter">
-		</form>
+				<div class="deplacement-choice">
+					<span>Ce déplacer avec : </span>
+					<label>
+						<input type="radio" name="deplacement" value="mouse" checked required>
+						La souris
+					</label>
+
+					<label>
+						<input type="radio" name="deplacement" value="keyboard">
+						Le clavier
+					</label>
+
+				</div>
+
+				<input type="submit" value="Se connecter">
+			</form>
 	</main>
   </section>
   <section class="loader active">

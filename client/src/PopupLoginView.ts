@@ -1,25 +1,30 @@
 import View from './View.ts';
 import type LoginServiceMemory from './services/LoginServiceMemory.ts';
+import { DeplacementType } from './models/DeplacementType.ts';
+import Router from './Router.ts';
 
 class PopupLoginView extends View {
 	loginButton: HTMLElement;
 	loginService: LoginServiceMemory;
+	onLoginChange?: () => void;
 
 	constructor(
 		element: HTMLElement,
 		loginButton: HTMLElement,
-		loginService: LoginServiceMemory
+		loginService: LoginServiceMemory,
+		onLoginChange?: () => void
 	) {
 		super(element);
 		this.loginButton = loginButton;
 		this.loginService = loginService;
+		this.onLoginChange = onLoginChange;
 
 		this.updateButton();
 
 		this.element.addEventListener('submit', e => this.submitForm(e));
 	}
 
-	private updateButton() {
+	updateButton() {
 		if (this.loginService.isLoggedIn()) {
 			const user = this.loginService.getCurrentUser()!;
 			this.loginButton.innerHTML =
@@ -35,6 +40,9 @@ class PopupLoginView extends View {
 		} else {
 			this.loginButton.innerHTML = 'Connexion';
 			this.loginButton.classList.remove('logged-in');
+			if (Router.currentRoute.path === '/settings') {
+				Router.navigate('/');
+			}
 		}
 	}
 
@@ -42,6 +50,7 @@ class PopupLoginView extends View {
 		if (this.loginService.isLoggedIn()) {
 			this.loginService.logout();
 			this.updateButton();
+			if (this.onLoginChange) this.onLoginChange();
 		} else {
 			this.show();
 		}
@@ -53,7 +62,7 @@ class PopupLoginView extends View {
 		const formData = new FormData(this.element as HTMLFormElement);
 		const username = (formData.get('username') as string).trim();
 		const avatar = formData.get('avatar') as string;
-		console.log('Avatar sélectionné :', avatar);
+		const deplacement = formData.get('deplacement') as string;
 
 		if (username.length === 0) {
 			alert('Le pseudo est obligatoire.');
@@ -71,9 +80,19 @@ class PopupLoginView extends View {
 			return;
 		}
 
-		this.loginService.login({ username, avatar: avatar });
+		const deplacementType =
+			deplacement === 'mouse'
+				? DeplacementType.Mouse
+				: DeplacementType.Keyboard;
+
+		this.loginService.login({
+			username,
+			avatar: avatar,
+			deplacement: deplacementType,
+		});
 		this.hide();
 		this.updateButton();
+		if (this.onLoginChange) this.onLoginChange();
 	}
 }
 
