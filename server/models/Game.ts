@@ -1,7 +1,6 @@
 import { ServerPlayer } from './Player.ts';
 import type { GameState } from '../../common/types.ts';
 import { Direction } from '../../common/Direction.ts';
-import { ServerBullet } from './Bullet.ts';
 import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
@@ -10,7 +9,6 @@ import { checkCollision } from '../../common/HitBox.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
-	private bullets: ServerBullet[] = [];
 	private enemies: ServerEnemy[] = [];
 	private bonuses: ServerBonus[] = [];
 	private time: number = 0;
@@ -24,9 +22,7 @@ export class ServerGame {
 	}
 
 	reset(): void {
-		console.log('reset la partie est cense fonctionne');
 		this.players.clear();
-		this.bullets = [];
 		this.enemies = [];
 		this.bonuses = [];
 		this.time = 0;
@@ -74,18 +70,6 @@ export class ServerGame {
 		}
 	}
 
-	handlePlayerShoot(id: string): void {
-		const player = this.players.get(id);
-		if (player) {
-			const bullet = new ServerBullet(
-				id,
-				player.x + player.width,
-				player.y + player.height / 2
-			);
-			this.bullets.push(bullet);
-		}
-	}
-
 	addBonus(type: BonusType, x: number, y: number): void {
 		const id = crypto.randomUUID();
 		this.bonuses.push(new ServerBonus(id, type, x, y));
@@ -101,14 +85,16 @@ export class ServerGame {
 	update(): void {
 		this.time++;
 		this.players.forEach(player => player.update());
-		this.bullets.forEach(bullet => bullet.update());
+		this.players.forEach(player => player.arme.updateBullets());
 		this.bonuses.forEach(bonus => bonus.update());
 
 		// Détruire des drones avec les balles
 		const bulletsToRemove = new Set<string>();
 		const enemiesToRemove = new Set<string>();
 
-		this.bullets.forEach(bullet => {
+		const allBullets = Array.from(this.players.values()).flatMap(p => p.arme.bullets);
+
+		allBullets.forEach(bullet => {
 			this.enemies.forEach(enemy => {
 				if (checkCollision(bullet, enemy)) {
 					if (enemy.type === 'DRONE') {
@@ -134,9 +120,9 @@ export class ServerGame {
 
 		this.checkPlayerCollisions();
 
-		this.bullets = this.bullets.filter(
-			b => !bulletsToRemove.has(b.id) && b.x < 2000
-		);
+		this.players.forEach(player => {
+			player.arme.bullets = player.arme.bullets.filter(b => !bulletsToRemove.has(b.id));
+		});
 
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
@@ -206,7 +192,7 @@ export class ServerGame {
 	getState(): GameState {
 		return {
 			players: Array.from(this.players.values()).map(p => p.toData()),
-			bullets: this.bullets.map(b => b.toData()),
+			bullets: Array.from(this.players.values()).flatMap(p => p.arme.bullets.map(b => b.toData())),
 			enemies: this.enemies.map(e => e.toData()),
 			bonuses: this.bonuses.map(b => b.toData()),
 			time: this.time,

@@ -49,10 +49,6 @@ export default class Game {
 		this.souris =
 			this.joueur.getAccoutn().deplacement === DeplacementType.Mouse;
 
-		// tire auto 500ms
-		setInterval(() => {
-			this.socket.emit('shoot');
-		}, 500);
 
 		// Rejoindre la partie côté serveur avec la taille du canvas
 		this.socket.emit('join', {
