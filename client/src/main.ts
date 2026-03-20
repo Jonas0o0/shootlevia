@@ -9,6 +9,8 @@ import type { Socket } from 'socket.io-client';
 import AssetLoaderService from './services/AssetLoaderService.ts';
 import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 
+const loader = new View(document.querySelector('section.loader')!);
+
 const socket: Socket = io(window.location.hostname + ':8080');
 import PlayView from './PlayView.ts';
 import Game from './models/Game.ts';
@@ -31,6 +33,7 @@ async function init() {
 		console.error('Erreur lors du chargement des assets', error);
 	}
 
+	loader.hide();
 	// 2. Initialisation du DOM et des vues
 	// Auto-scroll vers la fenêtre de la borne au chargement
 	const fenetre = document.querySelector<HTMLElement>('main.fenetre');
