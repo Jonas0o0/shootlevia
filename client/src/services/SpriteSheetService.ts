@@ -75,27 +75,59 @@ export default class SpriteSheetService {
 		return this.spriteSheet.spriteHeight;
 	}
 
-	getFrame(): Frame {
-		this.tick++;
-		if (this.tick >= this.animationSpeed) {
-			this.frameX = (this.frameX + 1) % this.spriteSheet.columnsFrameMax;
-			this.tick = 0;
+	public static calculateFrameIndex(
+		currentFrame: number,
+		currentTick: number,
+		animationSpeed: number,
+		maxFrames: number,
+	): { nextFrame: number; nextTick: number } {
+		let nextTick = currentTick + 1;
+		let nextFrame = currentFrame;
+
+		if (nextTick >= animationSpeed) {
+			nextFrame = (currentFrame + 1) % maxFrames;
+			nextTick = 0;
 		}
 
-		const frameW = this.spriteSheet.spriteWidth;
-		const frameH = this.spriteSheet.spriteHeight;
+		return { nextFrame, nextTick };
+	}
 
-		const srcX = this.frameX * frameW;
-		const srcY = this.frameY * frameH;
-		//const srcW = Math.min(frameW, this.img.width - srcX);
-		//const srcH = Math.min(frameH, this.img.height - srcY);
+	public static calculateSourceCoords(
+		frameX: number,
+		frameY: number,
+		spriteWidth: number,
+		spriteHeight: number,
+	): { srcX: number; srcY: number } {
+		return {
+			srcX: frameX * spriteWidth,
+			srcY: frameY * spriteHeight,
+		};
+	}
+
+	getFrame(): Frame {
+		const { nextFrame, nextTick } = SpriteSheetService.calculateFrameIndex(
+			this.frameX,
+			this.tick,
+			this.animationSpeed,
+			this.spriteSheet.columnsFrameMax,
+		);
+
+		this.frameX = nextFrame;
+		this.tick = nextTick;
+
+		const { srcX, srcY } = SpriteSheetService.calculateSourceCoords(
+			this.frameX,
+			this.frameY,
+			this.spriteSheet.spriteWidth,
+			this.spriteSheet.spriteHeight,
+		);
 
 		return {
 			img: this.img,
 			x: srcX,
 			y: srcY,
-			width: frameW,
-			height: frameH,
+			width: this.spriteSheet.spriteWidth,
+			height: this.spriteSheet.spriteHeight,
 		};
 	}
 }
