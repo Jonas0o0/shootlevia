@@ -27,8 +27,10 @@ class SettingsView extends View {
 		if (this.loginService.isLoggedIn()) {
 			const user = this.loginService.getCurrentUser()!;
 			const form = this.element.querySelector('form') as HTMLFormElement;
-			
-			const usernameInput = form.querySelector('input[name="username"]') as HTMLInputElement;
+
+			const usernameInput = form.querySelector(
+				'input[name="username"]'
+			) as HTMLInputElement;
 			if (usernameInput) usernameInput.value = user.username;
 
 			const avatarValue = user.avatar.replace('pedal', '').toLowerCase();
@@ -37,7 +39,8 @@ class SettingsView extends View {
 			) as HTMLInputElement;
 			if (avatarInput) avatarInput.checked = true;
 
-			const deplacementValue = user.deplacement === DeplacementType.Mouse ? 'mouse' : 'keyboard';
+			const deplacementValue =
+				user.deplacement === DeplacementType.Mouse ? 'mouse' : 'keyboard';
 			const deplacementInput = form.querySelector(
 				`input[name="deplacement"][value="${deplacementValue}"]`
 			) as HTMLInputElement;
@@ -50,32 +53,26 @@ class SettingsView extends View {
 
 		const form = e.target as HTMLFormElement;
 		const formData = new FormData(form);
-		const username = (formData.get('username') as string).trim();
 		const avatar = formData.get('avatar') as string;
 		const deplacement = formData.get('deplacement') as string;
 
-		if (username.length === 0) {
-			alert('Le pseudo est obligatoire.');
-			return;
+		const deplacementType =
+			deplacement === 'mouse'
+				? DeplacementType.Mouse
+				: DeplacementType.Keyboard;
+
+		if (this.loginService.accounts) {
+			this.loginService.login({
+				username: this.loginService.accounts.username,
+				avatar: avatar,
+				deplacement: deplacementType,
+			});
 		}
-
-		if (!/^[a-zA-Z0-9_-]{3,15}$/.test(username)) {
-			alert('Pseudo invalide (3-15 caractères, alphanumérique, - ou _)');
-			return;
-		}
-
-		const deplacementType = deplacement === 'mouse' ? DeplacementType.Mouse : DeplacementType.Keyboard;
-
-		this.loginService.login({
-			username,
-			avatar: avatar,
-			deplacement: deplacementType,
-		});
 
 		if (this.onSettingsChanged) {
 			this.onSettingsChanged();
 		}
-		
+
 		alert('Paramètres enregistrés !');
 	}
 }
