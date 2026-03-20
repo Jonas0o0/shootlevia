@@ -56,4 +56,7 @@ export interface GameState {
 	bonuses: BonusData[];
 	time: number;
 	score: number;
+	enemyCount: number;
+	countDrone: number;
+	countPneu: number;
 }

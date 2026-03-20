@@ -17,6 +17,7 @@ export default class Game {
 	private joueur: Player;
 	private time: number;
 	private score: number;
+	private enemyCount: number;
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private keysPressed: Set<string> = new Set();
@@ -35,6 +36,7 @@ export default class Game {
 		this.socket = socket;
 		this.time = 0;
 		this.score = 0;
+		this.enemyCount = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
 
@@ -86,12 +88,21 @@ export default class Game {
 		}
 		// Synchronisation avec le serveur
 		this.socket.on('gameState', (state: GameState) => {
+			//temps
 			this.time = state.time;
+			//score
 			this.score = state.score || 0;
 			const scoreElement = document.getElementById('game-score');
 			if (scoreElement) {
 				scoreElement.textContent = this.score.toString();
 			}
+			//ennemis total tués
+			this.enemyCount = state.enemyCount || 0;
+			const enemyCountElement = document.getElementById('nb-enemy-count');
+			if (enemyCountElement) {
+				enemyCountElement.textContent = this.enemyCount.toString();
+			}
+
 			state.players.forEach(playerData => {
 				let p = this.players.get(playerData.id);
 				if (!p) {
@@ -199,7 +210,6 @@ export default class Game {
 		if (directionsSet.size > 0) {
 			this.socket.emit('move', Array.from(directionsSet));
 		}
-		this.score;
 		this.time;
 	}
 

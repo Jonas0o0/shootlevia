@@ -13,6 +13,9 @@ export class ServerGame {
 	private bonuses: ServerBonus[] = [];
 	private time: number = 0;
 	private score: number = 0;
+	private enemyCount: number = 0;
+	private countDrone: number = 0;
+	private countPneu: number = 0;
 
 	private spawnEnemyService: SpawnEnemyService = new SpawnEnemyService();
 
@@ -27,6 +30,9 @@ export class ServerGame {
 		this.bonuses = [];
 		this.time = 0;
 		this.score = 0;
+		this.enemyCount = 0;
+		this.countDrone = 0;
+		this.countPneu = 0;
 		this.spawnEnemyService = new SpawnEnemyService();
 	}
 
@@ -92,6 +98,8 @@ export class ServerGame {
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
 							this.score += 20;
+							this.enemyCount++;
+							this.countDrone++;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					} else if (enemy.type === 'PNEU') {
@@ -100,6 +108,8 @@ export class ServerGame {
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
 							this.score += 10;
+							this.enemyCount++;
+							this.countPneu++;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					}
@@ -195,6 +205,9 @@ export class ServerGame {
 			bonuses: this.bonuses.map(b => b.toData()),
 			time: this.time,
 			score: this.score,
+			enemyCount: this.enemyCount,
+			countDrone: this.countDrone,
+			countPneu: this.countPneu
 		};
 	}
 }
