@@ -1,0 +1,41 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import { ServerPlayer } from './Player.ts';
+import { BonusType } from '../../common/BonusType.ts';
+
+describe('ServerPlayer', () => {
+    describe('clamp', () => {
+        it('devrait garder la valeur si elle est dans les bornes', () => {
+            assert.strictEqual(ServerPlayer.clamp(50, 0, 100), 50);
+        });
+
+        it('devrait retourner le min si la valeur est trop basse', () => {
+            assert.strictEqual(ServerPlayer.clamp(-10, 0, 100), 0);
+        });
+
+        it('devrait retourner le max si la valeur est trop haute', () => {
+            assert.strictEqual(ServerPlayer.clamp(150, 0, 100), 100);
+        });
+    });
+
+    describe('calculateDamageOutcome', () => {
+        it('ne devrait pas prendre de dégâts si le joueur est invincible', () => {
+            const outcome = ServerPlayer.calculateDamageOutcome([BonusType.Shield], 10);
+            assert.strictEqual(outcome.shouldTakeLife, false);
+            assert.deepStrictEqual(outcome.newBonuses, [BonusType.Shield]);
+        });
+
+        it('devrait consommer le bouclier et ne pas perdre de vie si un bouclier est présent', () => {
+            const outcome = ServerPlayer.calculateDamageOutcome([BonusType.Shield, BonusType.Speed], 0);
+            assert.strictEqual(outcome.shouldTakeLife, false);
+            assert.ok(!outcome.newBonuses.includes(BonusType.Shield), 'Le bouclier devrait être supprimé');
+            assert.ok(outcome.newBonuses.includes(BonusType.Speed), 'Les autres bonus devraient rester');
+        });
+
+        it('devrait perdre une vie si aucun bouclier n\'est présent', () => {
+            const outcome = ServerPlayer.calculateDamageOutcome([BonusType.Speed], 0);
+            assert.strictEqual(outcome.shouldTakeLife, true);
+            assert.deepStrictEqual(outcome.newBonuses, [BonusType.Speed]);
+        });
+    });
+});
