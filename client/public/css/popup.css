@@ -56,6 +56,10 @@
     border:3px solid #4ca0af;
 }
 
+.deplacement-choice input {
+    margin-left: 10px;
+}
+
 #popup input[type="submit"]{
     background-color: #F70000;
     color: white;

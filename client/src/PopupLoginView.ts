@@ -1,5 +1,6 @@
 import View from './View.ts';
 import type LoginServiceMemory from './services/LoginServiceMemory.ts';
+import { DeplacementType } from './models/DeplacementType.ts';
 
 class PopupLoginView extends View {
 	loginButton: HTMLElement;
@@ -53,6 +54,7 @@ class PopupLoginView extends View {
 		const formData = new FormData(this.element as HTMLFormElement);
 		const username = (formData.get('username') as string).trim();
 		const avatar = formData.get('avatar') as string;
+		const deplacement = formData.get('deplacement') as string;
 		console.log('Avatar sélectionné :', avatar);
 
 		if (username.length === 0) {
@@ -71,7 +73,21 @@ class PopupLoginView extends View {
 			return;
 		}
 
-		this.loginService.login({ username, avatar: avatar });
+		console.log(deplacement);
+		let deplacementType;
+		if (deplacement === 'mouse') {
+			deplacementType = DeplacementType.Mouse;
+		} else if (deplacement === 'keyboard') {
+			deplacementType = DeplacementType.Keyboard;
+		} else {
+			deplacementType = DeplacementType.Keyboard;
+		}
+
+		this.loginService.login({
+			username,
+			avatar: avatar,
+			deplacement: deplacementType,
+		});
 		this.hide();
 		this.updateButton();
 	}
