@@ -94,9 +94,18 @@ async function init() {
 	Router.routes = routes;
 	Router.titleElement = document.querySelector('.fenetre .banner .title')!;
 	Router.setMenuElement(menuElement);
-	Router.registerLinks(
-		document.querySelector<HTMLAnchorElement>('.fenetre .home .playButton')!
-	);
+
+	const playButton = document.querySelector<HTMLAnchorElement>(
+		'.fenetre .home .playButton'
+	)!;
+	playButton.addEventListener('click', event => {
+		if (!loginService.isLoggedIn()) {
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			popup.show();
+		}
+	});
+	Router.registerLinks(playButton);
 
 	Router.navigate(window.location.pathname || '/', true);
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);
