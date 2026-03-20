@@ -13,6 +13,7 @@ import Bonus from './Bonus.ts';
 import type { BonusType } from '../../../common/BonusType.ts';
 import { LifebarService } from '../../../common/Service/LifebarService.ts';
 import { LifebarComponent } from '../components/LifebarComponent.ts';
+import { DeplacementType } from './DeplacementType.ts';
 
 class Player {
 	private joueur: Account;
@@ -36,7 +37,11 @@ class Player {
 		element: Element | null = null
 	) {
 		if (joueur == null) {
-			joueur = { username: 'temp', avatar: 'pedalBleu' };
+			joueur = {
+				username: 'temp',
+				avatar: 'pedalBleu',
+				deplacement: DeplacementType.Keyboard,
+			};
 		}
 		this.joueur = joueur;
 		this.weapons = [

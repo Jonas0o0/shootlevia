@@ -1,9 +1,11 @@
 import type { BonusType } from './BonusType.ts';
 import type { LifebarService } from './Service/LifebarService.ts';
+import type { DeplacementType } from '../client/src/models/DeplacementType.ts';
 
 export interface Account {
 	username: string;
 	avatar: string;
+	deplacement: DeplacementType;
 }
 
 export interface PlayerData {

@@ -6,6 +6,7 @@ import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
+import { DeplacementType } from './DeplacementType.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -21,6 +22,7 @@ export default class Game {
 	private keysPressed: Set<string> = new Set();
 	private mousePosition: { x: number; y: number } | null = null;
 	private map: GameMap;
+	private souris: boolean;
 
 	constructor(
 		socket: Socket,
@@ -35,6 +37,7 @@ export default class Game {
 		this.score = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
+
 		//Iitialisation de la map
 		this.map = new GameMap();
 
@@ -42,6 +45,9 @@ export default class Game {
 		this.joueur = players[joueurIdx];
 		this.joueur.id = socket.id || '';
 		this.players.set(this.joueur.id, this.joueur);
+
+		this.souris =
+			this.joueur.getAccoutn().deplacement === DeplacementType.Mouse;
 
 		// tire auto 500ms
 		setInterval(() => {
@@ -54,31 +60,32 @@ export default class Game {
 			avatar: this.joueur.getAccoutn().avatar,
 		});
 
-		window.addEventListener('keydown', (event: KeyboardEvent) => {
-			const key = event.key.toUpperCase();
-			this.keysPressed.add(key);
+		if (!this.souris) {
+			window.addEventListener('keydown', (event: KeyboardEvent) => {
+				const key = event.key.toUpperCase();
+				this.keysPressed.add(key);
 
-			if (key === ' ') {
-				this.socket.emit('jump');
-			}
-		});
+				if (key === ' ') {
+					this.socket.emit('jump');
+				}
+			});
 
-		window.addEventListener('keyup', (event: KeyboardEvent) => {
-			this.keysPressed.delete(event.key.toUpperCase());
-		});
+			window.addEventListener('keyup', (event: KeyboardEvent) => {
+				this.keysPressed.delete(event.key.toUpperCase());
+			});
+		} else {
+			window.addEventListener('mousemove', (event: MouseEvent) => {
+				const rect = this.canvas.getBoundingClientRect();
+				this.mousePosition = {
+					x: event.clientX - rect.left,
+					y: event.clientY - rect.top,
+				};
+			});
 
-		window.addEventListener('mousemove', (event: MouseEvent) => {
-			const rect = this.canvas.getBoundingClientRect();
-			this.mousePosition = {
-				x: event.clientX - rect.left,
-				y: event.clientY - rect.top,
-			};
-		});
-
-		window.addEventListener('mouseout', () => {
-			this.mousePosition = null;
-		});
-
+			window.addEventListener('mouseout', () => {
+				this.mousePosition = null;
+			});
+		}
 		// Synchronisation avec le serveur
 		this.socket.on('gameState', (state: GameState) => {
 			this.time = state.time;
