@@ -38,13 +38,12 @@ class Bonus {
 		const span = document.createElement('span');
 
 		span.style.display = 'inline-block';
-		span.style.width = `${frame.width}px`;
-		span.style.height = `${frame.height}px`;
+		span.style.width = `${this.type.sheetSize.HUD.width}px`;
+		span.style.height = `${this.type.sheetSize.HUD.height}px`;
 		span.style.backgroundImage = `url(${frame.img.src})`;
 		span.style.backgroundPosition = `0px -${frame.y}px`;
 		span.style.backgroundRepeat = 'no-repeat';
-
-		element.appendChild(span);
+		element.querySelector('.bonus-container')?.appendChild(span);
 	}
 
 	drawOnMap(ctx: CanvasRenderingContext2D): void {

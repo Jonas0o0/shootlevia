@@ -27,10 +27,13 @@ const game = new ServerGame();
 io.on('connection', socket => {
 	console.log('Client connected:', socket.id);
 
-	// On pourrait recevoir les infos du joueur lors de la connexion
-	socket.on('join', (data: { username: string; avatar: string }) => {
-		game.addPlayer(socket.id, data.username, data.avatar);
+	socket.on('reset', () => {
+		game.reset();
 	});
+	// On pourrait recevoir les infos du joueur lors de la connexion
+socket.on('join', (data: { username: string; avatar: string; canvasWidth: number; canvasHeight: number }) => {
+			game.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
+		});
 
 	socket.on('move', (directions: Direction[]) => {
 		game.handlePlayerMove(socket.id, directions);

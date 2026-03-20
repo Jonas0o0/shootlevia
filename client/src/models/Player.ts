@@ -3,11 +3,7 @@ import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import {
-	PlaySpriteSheet,
-	SpriteSheetConfigs,
-	AvatarRowMapping,
-} from '../../../common/SpriteSheetConfig.ts';
+import { AvatarRowMapping, PlaySpriteSheet, SpriteSheetConfigs } from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 import Bonus from './Bonus.ts';
 import type { BonusType } from '../../../common/BonusType.ts';
@@ -34,7 +30,7 @@ class Player {
 		joueur: Account | null,
 		x: number,
 		y: number,
-		element: Element | null = null
+		element: Element | null = null,
 	) {
 		if (joueur == null) {
 			joueur = {
@@ -160,7 +156,7 @@ class Player {
 			this.hitbox.x,
 			this.hitbox.y,
 			frame.width,
-			frame.height
+			frame.height,
 		);
 
 		// On reset l'alpha pour ne pas impacter les autres dessins
@@ -181,7 +177,10 @@ class Player {
 		if (currentBonusList === this.lastBonusList) return;
 
 		this.lastBonusList = currentBonusList;
-		this.hud.innerHTML = '';
+		const container = this.hud.querySelector('.bonus-container');
+		if (container) {
+			container.innerHTML = '';
+		}
 
 		this.bonus.forEach(b => {
 			b.drawInHUD(this.hud!);

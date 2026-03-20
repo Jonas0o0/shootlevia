@@ -46,15 +46,16 @@
 				<div class="bariere secondary"></div>
 				<div class="bariere tertiary"></div>
 				<article class="home">
-					<img src="/image/pedalBleu.gif">
+					<img src="/image/pedalBleu.gif" alt="Gif d'une personne qui pedal sur un vélo">
 					<a class="playButton" href="/play">Jouer</a>
 				</article>
 				<article class="play">
 					<canvas width="1920" height="1080" class="play_canvas">
 					</canvas>
 					<div class="jeu-hud">
-						<div class="score-display">Score: <span id="game-score">0</span></div>
 						<div class="lifebar"></div>
+						<div class="score-display">Score: <span id="game-score">0</span></div>
+						<div class="bonus-container"></div>
 					</div>
 				</article>
 				<article class="leaderboard">
@@ -143,28 +144,28 @@
 				</article>
 			</div>
 		</section>
-			<form id="popup">
-				<h1>Connexion</h1>
-				<input type="text" name="username" placeholder="pseudo">
+		<form id="popup">
+			<h1>Connexion</h1>
+			<input type="text" name="username" placeholder="pseudo">
 
-				<div class="avatar-choice">
+			<div class="avatar-choice">
 
 					<label>
 						<input type="radio" name="avatar" value="bleu" checked required>
 						<img src="/image/pedalBleu.gif" alt="avatar1">
 					</label>
 
-					<label>
-						<input type="radio" name="avatar" value="orange">
-						<img src="/image/pedalOrange.gif" alt="avatar2">
-					</label>
+				<label>
+					<input type="radio" name="avatar" value="orange">
+					<img src="/image/pedalOrange.gif" alt="avatar2">
+				</label>
 
-					<label>
-						<input type="radio" name="avatar" value="violet">
-						<img src="/image/pedalViolet.gif" alt="avatar3">
-					</label>
+				<label>
+					<input type="radio" name="avatar" value="violet">
+					<img src="/image/pedalViolet.gif" alt="avatar3">
+				</label>
 
-				</div>
+			</div>
 
 				<div class="deplacement-choice">
 					<span>Ce déplacer avec : </span>
@@ -185,7 +186,7 @@
 	</main>
   </section>
   <section class="loader active">
-	  <h1>⚠️ En raison d’une panne sur le réseau, l’accès à la page est momentanément interrompu.</h1>
+	  <h1>⚠️ En raison d’une panne sur le réseau, le trafique de la page est momentanément interrompu.</h1>
 	  <div class="animation"></div>
   </section>
 </body>

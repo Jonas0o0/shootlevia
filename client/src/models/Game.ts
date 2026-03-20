@@ -54,10 +54,12 @@ export default class Game {
 			this.socket.emit('shoot');
 		}, 500);
 
-		// Rejoindre la partie côté serveur
+		// Rejoindre la partie côté serveur avec la taille du canvas
 		this.socket.emit('join', {
 			username: this.joueur.getAccoutn().username,
 			avatar: this.joueur.getAccoutn().avatar,
+			canvasWidth: this.canvas.width,
+			canvasHeight: this.canvas.height
 		});
 
 		if (!this.souris) {
