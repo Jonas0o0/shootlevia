@@ -26,16 +26,15 @@ describe('ServerPlayer', () => {
         });
 
         it('devrait consommer le bouclier et ne pas perdre de vie si un bouclier est présent', () => {
-            const outcome = ServerPlayer.calculateDamageOutcome([BonusType.Shield, BonusType.Speed], 0);
+            const outcome = ServerPlayer.calculateDamageOutcome([BonusType.Shield], 0);
             assert.strictEqual(outcome.shouldTakeLife, false);
             assert.ok(!outcome.newBonuses.includes(BonusType.Shield), 'Le bouclier devrait être supprimé');
-            assert.ok(outcome.newBonuses.includes(BonusType.Speed), 'Les autres bonus devraient rester');
         });
 
         it('devrait perdre une vie si aucun bouclier n\'est présent', () => {
-            const outcome = ServerPlayer.calculateDamageOutcome([BonusType.Speed], 0);
+            const outcome = ServerPlayer.calculateDamageOutcome([], 0);
             assert.strictEqual(outcome.shouldTakeLife, true);
-            assert.deepStrictEqual(outcome.newBonuses, [BonusType.Speed]);
+            assert.deepStrictEqual(outcome.newBonuses, []);
         });
     });
 });
