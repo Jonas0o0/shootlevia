@@ -1,6 +1,7 @@
 import View from './View.ts';
 import type LoginServiceMemory from './services/LoginServiceMemory.ts';
 import { DeplacementType } from './models/DeplacementType.ts';
+import Router from './Router.ts';
 
 class PopupLoginView extends View {
 	loginButton: HTMLElement;
@@ -39,6 +40,9 @@ class PopupLoginView extends View {
 		} else {
 			this.loginButton.innerHTML = 'Connexion';
 			this.loginButton.classList.remove('logged-in');
+			if (Router.currentRoute.path === '/settings') {
+				Router.navigate('/');
+			}
 		}
 	}
 
