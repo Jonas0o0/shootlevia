@@ -5,15 +5,18 @@ import { DeplacementType } from './models/DeplacementType.ts';
 class PopupLoginView extends View {
 	loginButton: HTMLElement;
 	loginService: LoginServiceMemory;
+	onLoginChange?: () => void;
 
 	constructor(
 		element: HTMLElement,
 		loginButton: HTMLElement,
-		loginService: LoginServiceMemory
+		loginService: LoginServiceMemory,
+		onLoginChange?: () => void
 	) {
 		super(element);
 		this.loginButton = loginButton;
 		this.loginService = loginService;
+		this.onLoginChange = onLoginChange;
 
 		this.updateButton();
 
@@ -43,6 +46,7 @@ class PopupLoginView extends View {
 		if (this.loginService.isLoggedIn()) {
 			this.loginService.logout();
 			this.updateButton();
+			if (this.onLoginChange) this.onLoginChange();
 		} else {
 			this.show();
 		}
@@ -55,7 +59,6 @@ class PopupLoginView extends View {
 		const username = (formData.get('username') as string).trim();
 		const avatar = formData.get('avatar') as string;
 		const deplacement = formData.get('deplacement') as string;
-		console.log('Avatar sélectionné :', avatar);
 
 		if (username.length === 0) {
 			alert('Le pseudo est obligatoire.');
@@ -73,15 +76,7 @@ class PopupLoginView extends View {
 			return;
 		}
 
-		console.log(deplacement);
-		let deplacementType;
-		if (deplacement === 'mouse') {
-			deplacementType = DeplacementType.Mouse;
-		} else if (deplacement === 'keyboard') {
-			deplacementType = DeplacementType.Keyboard;
-		} else {
-			deplacementType = DeplacementType.Keyboard;
-		}
+		const deplacementType = deplacement === 'mouse' ? DeplacementType.Mouse : DeplacementType.Keyboard;
 
 		this.loginService.login({
 			username,
@@ -90,6 +85,7 @@ class PopupLoginView extends View {
 		});
 		this.hide();
 		this.updateButton();
+		if (this.onLoginChange) this.onLoginChange();
 	}
 }
 

@@ -1,20 +1,28 @@
 #popup{
     display: none;
 }
-
-#popup.active{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+#popup.active, .settings form {
     background: #545268;
     border: 2px solid #fff;
     border-radius: 10px;
     padding: 20px;
-    z-index: 1001;
     display: flex;
     flex-direction: column;
     gap: 20px;
+}
+
+#popup.active {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+}
+
+.settings form {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
 }
 
 /* Overlay sombre + flou quand la popup est active */

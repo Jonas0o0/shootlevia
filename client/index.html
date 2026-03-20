@@ -30,6 +30,7 @@
             <a href="/" class="homePage">Home</a>
             <a href="/leaderboard">Leaderboard</a>
             <a href="/credit">Crédit</a>
+            <a href="/settings" class="btn_parametres" style="display: none;">Paramètres</a>
             <a href="" class="btn_deconnexion"></a>
           </nav>
 		<section>
@@ -71,6 +72,38 @@
 							</tbody>
 						</table>
 					</div>
+				</article>
+				<article class="settings">
+					<form>
+						<h1>Paramètres</h1>
+						<input type="text" name="username" placeholder="pseudo">
+						<div class="avatar-choice">
+							<label>
+								<input type="radio" name="avatar" value="bleu" required>
+								<img src="/image/pedalBleu.gif" alt="avatar1">
+							</label>
+							<label>
+								<input type="radio" name="avatar" value="orange">
+								<img src="/image/pedalOrange.gif" alt="avatar2">
+							</label>
+							<label>
+								<input type="radio" name="avatar" value="violet">
+								<img src="/image/pedalViolet.gif" alt="avatar3">
+							</label>
+						</div>
+						<div class="deplacement-choice">
+							<span>Ce déplacer avec : </span>
+							<label>
+								<input type="radio" name="deplacement" value="mouse" required>
+								La souris
+							</label>
+							<label>
+								<input type="radio" name="deplacement" value="keyboard">
+								Le clavier
+							</label>
+						</div>
+						<input type="submit" value="Enregistrer">
+					</form>
 				</article>
 				<article class="credit">
 					<div class="credit-container">

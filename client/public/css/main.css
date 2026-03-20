@@ -73,7 +73,7 @@
   display: none;
 }
 
-.fenetre section article.active {
+.fenetre section article.active, .fenetre section article.settings.active {
   display: block;
   height: auto;
 }
