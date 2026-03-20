@@ -35,7 +35,7 @@ export class ServerPlayer {
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
 		this.life = new LifebarService();
-		this.arme = new Arme(10, [Direction.Right], 1, 10);
+		this.arme = new Arme(10, [Direction.Right], 1, /*10*/);
 	}
 
 	move(direction: Direction): void {
