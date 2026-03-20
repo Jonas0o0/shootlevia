@@ -2,6 +2,7 @@ import type { Account, PlayerData } from '../../common/types.ts';
 import { Direction } from '../../common/Direction.ts';
 import { BonusType } from '../../common/BonusType.ts';
 import { LifebarService } from '../../common/Service/LifebarService.ts';
+import { Arme } from './Arme.ts';
 
 export class ServerPlayer {
 	public id: string;
@@ -21,6 +22,7 @@ export class ServerPlayer {
 	private bonus: BonusType[];
 	private invincibilityTimer: number = 0;
 	private readonly INVINCIBILITY_DURATION: number = 60;
+	public arme: Arme;
 
 	constructor(id: string, account: Account, x: number, y: number, canvasWidth: number, canvasHeight: number) {
 		this.id = id;
@@ -33,6 +35,7 @@ export class ServerPlayer {
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
 		this.life = new LifebarService();
+		this.arme = new Arme(10, [Direction.Right], 1, 10);
 	}
 
 	move(direction: Direction): void {
@@ -96,6 +99,10 @@ export class ServerPlayer {
 
 	public getIsJumping(): boolean {
 		return this.jumping;
+	}
+
+	shoot(): void {
+		this.arme.shoot(this.id, this.x + this.width, this.y + this.height / 2);
 	}
 
 	toData(): PlayerData {
