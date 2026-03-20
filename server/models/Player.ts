@@ -3,8 +3,9 @@ import { Direction } from '../../common/Direction.ts';
 import { BonusType } from '../../common/BonusType.ts';
 import { LifebarService } from '../../common/Service/LifebarService.ts';
 import { Arme } from './Arme.ts';
+import type { HitBox } from '../../common/HitBox.ts';
 
-export class ServerPlayer {
+export class ServerPlayer implements HitBox {
 	public id: string;
 	private account: Account;
 
@@ -24,7 +25,14 @@ export class ServerPlayer {
 	private readonly INVINCIBILITY_DURATION: number = 60;
 	public arme: Arme;
 
-	constructor(id: string, account: Account, x: number, y: number, canvasWidth: number, canvasHeight: number) {
+	constructor(
+		id: string,
+		account: Account,
+		x: number,
+		y: number,
+		canvasWidth: number,
+		canvasHeight: number
+	) {
 		this.id = id;
 		this.account = account;
 		this.x = x;
@@ -36,6 +44,10 @@ export class ServerPlayer {
 		this.bonus = [];
 		this.life = new LifebarService();
 		this.arme = new Arme(10, [Direction.Right], 1, 500);
+	}
+
+	public static clamp(value: number, min: number, max: number): number {
+		return Math.max(min, Math.min(value, max));
 	}
 
 	move(direction: Direction): void {
@@ -54,8 +66,32 @@ export class ServerPlayer {
 				break;
 		}
 
-		this.x = Math.max(0, Math.min(this.x, this.canvasWidth - this.width));
-		this.y = Math.max((this.canvasHeight * 0.2) - 45, Math.min(this.y, this.canvasHeight - this.height));
+		this.x = ServerPlayer.clamp(this.x, 0, this.canvasWidth - this.width);
+		this.y = ServerPlayer.clamp(
+			this.y,
+			this.canvasHeight * 0.2 - 45,
+			this.canvasHeight - this.height
+		);
+	}
+
+	public static calculateDamageOutcome(
+		currentBonuses: BonusType[],
+		invincibilityTimer: number
+	): { shouldTakeLife: boolean; newBonuses: BonusType[] } {
+		if (invincibilityTimer > 0) {
+			return { shouldTakeLife: false, newBonuses: currentBonuses };
+		}
+
+		const hasShield = currentBonuses.includes(BonusType.Shield);
+
+		if (hasShield) {
+			return {
+				shouldTakeLife: false,
+				newBonuses: currentBonuses.filter(b => b !== BonusType.Shield),
+			};
+		}
+
+		return { shouldTakeLife: true, newBonuses: currentBonuses };
 	}
 
 	doJump(): void {
@@ -79,15 +115,16 @@ export class ServerPlayer {
 	}
 
 	takeDamage(): void {
-		if (this.invincibilityTimer > 0) return;
+		const { shouldTakeLife, newBonuses } = ServerPlayer.calculateDamageOutcome(
+			this.bonus,
+			this.invincibilityTimer
+		);
 
-		const hasShield = this.bonus.includes(BonusType.Shield);
+		this.bonus = newBonuses;
 
-		if (hasShield) {
-			this.bonus = this.bonus.filter(bonus => bonus !== BonusType.Shield);
-		} else {
-			this.life.removeLife(1);
-		}
+		if (!shouldTakeLife) return;
+
+		this.life.removeLife(1);
 
 		this.invincibilityTimer = this.INVINCIBILITY_DURATION;
 	}

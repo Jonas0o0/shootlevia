@@ -1,7 +1,8 @@
 import type { BonusType } from '../../common/BonusType.ts';
 import type { BonusData } from '../../common/types.ts';
+import type { HitBox } from '../../common/HitBox.ts';
 
-class ServerBonus {
+class ServerBonus implements HitBox {
 	public id: string;
 	public type: BonusType;
 	public x: number;
