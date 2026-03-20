@@ -1,22 +1,40 @@
 .jeu-hud {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 100;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
 }
 
-.jeu-hud .lifebar {
+.jeu-hud .lifebar, .jeu-hud .score-display, .jeu-hud .bonus-container {
     background: slategray;
     border-radius: 50px;
     width: fit-content;
-    height: fit-content;
+    height: auto;
     padding: 5px 12px;
     display: flex;
     align-items: center;
     border: solid 2px #000000;
-    position: absolute;
-    z-index: 100;
-    top: 15px;
-    left: 15px;
+    font-size: 1.65em;
+    color: black;
 }
 
 .jeu-hud .lifebar img {
     height: 40px;
+}
+
+.lifebar {
+    grid-area: 1 / 1 / 2 / 2;
+}
+
+.score-display {
+    grid-area: 1 / 2 / 2 / 3;
+}
+
+.bonus-container {
+    grid-area: 1 / 3 / 2 / 4;
 }
