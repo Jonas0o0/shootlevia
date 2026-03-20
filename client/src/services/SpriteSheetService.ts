@@ -8,7 +8,7 @@ import AssetLoaderService from './AssetLoaderService.ts';
 
 export default class SpriteSheetService {
 	private spriteSheet: SpriteSheetConfig;
-	private readonly img: HTMLImageElement;
+	private img: HTMLImageElement;
 
 	private frameX;
 	private frameY;
