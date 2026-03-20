@@ -5,7 +5,7 @@ import type { DeplacementType } from '../client/src/models/DeplacementType.ts';
 export interface Account {
 	username: string;
 	avatar: string;
-	deplacement: DeplacementType;
+	deplacement?: DeplacementType;
 }
 
 export interface PlayerData {
