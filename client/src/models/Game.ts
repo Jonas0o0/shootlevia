@@ -4,6 +4,7 @@ import Bullet from './Bullet.ts';
 import Enemy from './Enemy.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
+import type { GameStats } from '../types.ts';
 import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
 import { DeplacementType } from './DeplacementType.ts';
@@ -25,7 +26,7 @@ export default class Game {
 	private map: GameMap;
 	private souris: boolean;
 	private active: boolean = true;
-	private onGameOver: () => void;
+	private onGameOver: (stats: GameStats) => void;
 	private intervalId: number | null = null;
 	private keydownHandler?: (event: KeyboardEvent) => void;
 	private keyupHandler?: (event: KeyboardEvent) => void;
@@ -38,7 +39,7 @@ export default class Game {
 		joueurIdx: number,
 		canvas: HTMLCanvasElement,
 		ctx: CanvasRenderingContext2D,
-		onGameOver: () => void,
+		onGameOver: (stats: GameStats) => void,
 	) {
 		// Initialisation du jeu
 		this.socket = socket;
@@ -128,7 +129,11 @@ export default class Game {
 
 			if (!this.joueur.getLife().isAlive() && this.active) {
 				this.stop();
-				this.onGameOver();
+				this.onGameOver({
+					time: this.time,
+					score: this.score,
+					enemyCount: this.enemyCount,
+				});
 			}
 
 			// Supprimer les joueurs qui ont quitté

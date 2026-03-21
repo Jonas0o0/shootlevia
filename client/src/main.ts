@@ -1,6 +1,6 @@
 import Router from './Router.ts';
 import View from './View.ts';
-import type { Route } from './types.ts';
+import type { Route, GameStats } from './types.ts';
 import HomeView from './HomeView.ts';
 import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
@@ -154,7 +154,8 @@ async function init() {
 		socket.emit('reset');
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const joueur = new Player(loginService.accounts, 0, 0, hud);
-		game = new Game(socket, [joueur], 0, canvas, ctx, () => {
+		game = new Game(socket, [joueur], 0, canvas, ctx, (stats: GameStats) => {
+			popupGameOver.setStats(stats);
 			popupGameOver.show();
 		});
 

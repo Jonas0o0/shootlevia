@@ -68,8 +68,33 @@
 }
 
 .fenetre:has(.popupGameOver.active) > *:not(.popupGameOver) {
-    filter: blur(5px);
+    filter: blur(2px) grayscale(50%);
     pointer-events: none;
+    transition: 0.3s ease;
 }
 
+.popupGameOver .infos-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
+.popupGameOver .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5em;
+    font-family: 'Pixelify Sans', sans-serif;
+    color: #fff;
+    border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
+    padding-bottom: 5px;
+}
+
+.popupGameOver .stat-label {
+    font-weight: bold;
+}
+
+.popupGameOver .stat-value {
+    color: #FFD700;
+    font-weight: bold;
+}

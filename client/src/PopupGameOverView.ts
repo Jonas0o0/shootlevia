@@ -1,4 +1,5 @@
 import View from './View.ts';
+import type { GameStats } from './types.ts';
 
 export default class PopupGameOverView extends View {
 	replayBtn: HTMLButtonElement;
@@ -31,5 +32,29 @@ export default class PopupGameOverView extends View {
 		this.onReplay = onReplay;
 		this.onQuit = onQuit;
 	}
-}
 
+	setStats(stats: GameStats) {
+		const container = this.element.querySelector('.infos-container');
+		if (container) {
+			const totalSeconds = Math.floor(stats.time / 60);
+			const minutes = Math.floor(totalSeconds / 60);
+			const seconds = totalSeconds % 60;
+			const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+			container.innerHTML = `
+				<div class="stat-item">
+					<span class="stat-label">Temps:</span>
+					<span class="stat-value">${timeString}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Score:</span>
+					<span class="stat-value">${stats.score}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Ennemis tués:</span>
+					<span class="stat-value">${stats.enemyCount}</span>
+				</div>
+			`;
+		}
+	}
+}

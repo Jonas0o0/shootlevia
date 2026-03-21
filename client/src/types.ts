@@ -5,3 +5,9 @@ export interface Route {
 	view: View;
 	title: string;
 }
+
+export interface GameStats {
+	time: number;
+	score: number;
+	enemyCount: number;
+}
