@@ -48,7 +48,10 @@
 				<div class="bariere tertiary"></div>
 				<article class="home">
 					<img src="/image/pedalBleu.gif" alt="Gif d'une personne qui pedal sur un vélo">
-					<a class="playButton" href="/play">Jouer</a>
+					<div class="buttons-container">
+						<a class="playButton" href="/play">Solo</a>
+						<button id="multiBtn" class="playButton" style="background-color: #ff5722; cursor: pointer;">Multi</button>
+					</div>
 				</article>
 				<article class="play">
 					<canvas width="1920" height="1080" class="play_canvas">
@@ -194,6 +197,24 @@
 
 			<input type="submit" value="Se connecter">
 		</form>
+		<div id="lobbypopup">
+			<h2>Lobby Multijoueur</h2>
+			<div id="lobby-menu">
+				<button id="createLobbyBtn">Créer un lobby</button>
+				<p>- ou -</p>
+				<div>
+					<input type="text" id="lobbyCodeInput" placeholder="Code lobby" />
+					<button id="joinLobbyBtn">Rejoindre</button>
+				</div>
+			</div>
+			<div id="lobby-room" style="display: none;">
+				<h3>Code: <span id="lobbyCodeDisplay"></span></h3>
+				<ul id="lobbyPlayerList"></ul>
+				<button id="startGameBtn" style="display: none;">Lancer la partie</button>
+				<p id="waitingMessage">En attente...</p>
+			</div>
+			<button id="closeLobbyBtn">Fermer</button>
+		</div>
 	</main>
 </section>
 <section class="loader active">
