@@ -108,6 +108,14 @@ class Player implements HitBox {
 		}
 	}
 
+	isJumping(): boolean {
+		return this.jump.jumping;
+	}
+
+	getLife(): LifebarService {
+		return this.life;
+	}
+
 	getPostition(): HitBox {
 		return this;
 	}

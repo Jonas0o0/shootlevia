@@ -4,6 +4,7 @@ import Bullet from './Bullet.ts';
 import Enemy from './Enemy.ts';
 import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
+import type { GameStats } from '../types.ts';
 import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
 import { DeplacementType } from './DeplacementType.ts';
@@ -23,17 +24,26 @@ export default class Game {
 	private keysPressed: Set<string> = new Set();
 	private mousePosition: { x: number; y: number } | null = null;
 	private map: GameMap;
-	private readonly souris: boolean;
+	private souris: boolean;
+	private active: boolean = true;
+	private onGameOver: (stats: GameStats) => void;
+	private intervalId: number | null = null;
+	private keydownHandler?: (event: KeyboardEvent) => void;
+	private keyupHandler?: (event: KeyboardEvent) => void;
+	private mousemoveHandler?: (event: MouseEvent) => void;
+	private mouseoutHandler?: () => void;
 
 	constructor(
 		socket: Socket,
 		players: Player[],
 		joueurIdx: number,
 		canvas: HTMLCanvasElement,
-		ctx: CanvasRenderingContext2D
+		ctx: CanvasRenderingContext2D,
+		onGameOver: (stats: GameStats) => void,
 	) {
 		// Initialisation du jeu
 		this.socket = socket;
+		this.onGameOver = onGameOver;
 		this.time = 0;
 		this.score = 0;
 		this.enemyCount = 0;
@@ -60,30 +70,34 @@ export default class Game {
 		});
 
 		if (!this.souris) {
-			window.addEventListener('keydown', (event: KeyboardEvent) => {
+			this.keydownHandler = (event: KeyboardEvent) => {
 				const key = event.key.toUpperCase();
 				this.keysPressed.add(key);
 
 				if (key === ' ') {
 					this.socket.emit('jump');
 				}
-			});
+			};
+			window.addEventListener('keydown', this.keydownHandler);
 
-			window.addEventListener('keyup', (event: KeyboardEvent) => {
+			this.keyupHandler = (event: KeyboardEvent) => {
 				this.keysPressed.delete(event.key.toUpperCase());
-			});
+			};
+			window.addEventListener('keyup', this.keyupHandler);
 		} else {
-			window.addEventListener('mousemove', (event: MouseEvent) => {
+			this.mousemoveHandler = (event: MouseEvent) => {
 				const rect = this.canvas.getBoundingClientRect();
 				this.mousePosition = {
 					x: event.clientX - rect.left,
 					y: event.clientY - rect.top,
 				};
-			});
+			};
+			window.addEventListener('mousemove', this.mousemoveHandler);
 
-			window.addEventListener('mouseout', () => {
+			this.mouseoutHandler = () => {
 				this.mousePosition = null;
-			});
+			};
+			window.addEventListener('mouseout', this.mouseoutHandler);
 		}
 		// Synchronisation avec le serveur
 		this.socket.on('gameState', (state: GameState) => {
@@ -112,6 +126,15 @@ export default class Game {
 				}
 				p.updateFromData(playerData);
 			});
+
+			if (!this.joueur.getLife().isAlive() && this.active) {
+				this.stop();
+				this.onGameOver({
+					time: this.time,
+					score: this.score,
+					enemyCount: this.enemyCount,
+				});
+			}
 
 			// Supprimer les joueurs qui ont quitté
 			const currentIds = state.players.map(p => p.id);
@@ -180,7 +203,26 @@ export default class Game {
 		});
 	}
 
+	start(): void {
+		if (this.intervalId) return;
+		this.intervalId = setInterval(() => this.update(), 1000 / 60) as unknown as number;
+		this.draw();
+	}
+
+	stop(): void {
+		this.active = false;
+		if (this.intervalId) {
+			clearInterval(this.intervalId);
+			this.intervalId = null;
+		}
+		if (this.keydownHandler) window.removeEventListener('keydown', this.keydownHandler);
+		if (this.keyupHandler) window.removeEventListener('keyup', this.keyupHandler);
+		if (this.mousemoveHandler) window.removeEventListener('mousemove', this.mousemoveHandler);
+		if (this.mouseoutHandler) window.removeEventListener('mouseout', this.mouseoutHandler);
+	}
+
 	update(): void {
+		if (!this.active) return;
 		// Appelé par setInterval (60fps)
 		const directionsSet: Set<Direction> = new Set();
 
@@ -213,6 +255,7 @@ export default class Game {
 	}
 
 	draw = (): void => {
+		if (!this.active) return;
 		//appeller par requestanimationframe
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 

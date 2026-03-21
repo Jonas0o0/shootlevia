@@ -1,0 +1,60 @@
+import View from './View.ts';
+import type { GameStats } from './types.ts';
+
+export default class PopupGameOverView extends View {
+	replayBtn: HTMLButtonElement;
+	leaveBtn: HTMLButtonElement;
+	onReplay?: () => void;
+	onQuit?: () => void;
+
+	constructor(element: Element, onReplay?: () => void, onQuit?: () => void) {
+		super(element);
+		this.onReplay = onReplay;
+		this.onQuit = onQuit;
+
+		this.replayBtn = this.element.querySelector('.popupGameOver .replayBtn') as HTMLButtonElement;
+		this.leaveBtn = this.element.querySelector('.popupGameOver .leaveBtn') as HTMLButtonElement;
+
+		this.replayBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			this.hide();
+			if (this.onReplay) this.onReplay();
+		});
+
+		this.leaveBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			this.hide();
+			if (this.onQuit) this.onQuit();
+		});
+	}
+
+	setCallbacks(onReplay: () => void, onQuit: () => void) {
+		this.onReplay = onReplay;
+		this.onQuit = onQuit;
+	}
+
+	setStats(stats: GameStats) {
+		const container = this.element.querySelector('.infos-container');
+		if (container) {
+			const totalSeconds = Math.floor(stats.time / 60);
+			const minutes = Math.floor(totalSeconds / 60);
+			const seconds = totalSeconds % 60;
+			const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+			container.innerHTML = `
+				<div class="stat-item">
+					<span class="stat-label">Temps:</span>
+					<span class="stat-value">${timeString}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Score:</span>
+					<span class="stat-value">${stats.score}</span>
+				</div>
+				<div class="stat-item">
+					<span class="stat-label">Ennemis tués:</span>
+					<span class="stat-value">${stats.enemyCount}</span>
+				</div>
+			`;
+		}
+	}
+}

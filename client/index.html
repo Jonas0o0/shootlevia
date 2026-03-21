@@ -16,23 +16,24 @@
 	<link rel="stylesheet" href="/css/lifeBar.css" />
 	<link rel="stylesheet" href="/css/popup.css" />
 	<link rel="stylesheet" href="/css/loading.css" />
+	<link rel="stylesheet" href="/css/popupGameOver.css">
 	<title>Shootlevia</title>
 	<script type="module" src="./src/main.ts"></script>
 </head>
-  <body id="app">
-      <section class="borne-container">
-        <img src="/image/Borne.svg" alt="Borne" class="borne-svg" />
-        <main class="fenetre">
-          <nav>
-            <a href="/" class="logo_link">
-              <img class="ilevia" src="/image/ilevia_logo.png" alt="logo ilevia">
-            </a>
-            <a href="/" class="homePage">Home</a>
-            <a href="/leaderboard">Leaderboard</a>
-            <a href="/credit">Crédit</a>
-            <a href="/settings" class="btn_parametres" style="display: none;">Paramètres</a>
-            <a href="" class="btn_deconnexion"></a>
-          </nav>
+<body id="app">
+<section class="borne-container">
+	<img src="/image/Borne.svg" alt="Borne" class="borne-svg" />
+	<main class="fenetre">
+		<nav>
+			<a href="/" class="logo_link">
+				<img class="ilevia" src="/image/ilevia_logo.png" alt="logo ilevia">
+			</a>
+			<a href="/" class="homePage">Home</a>
+			<a href="/leaderboard">Leaderboard</a>
+			<a href="/credit">Crédit</a>
+			<a href="/settings" class="btn_parametres" style="display: none;">Paramètres</a>
+			<a href="" class="btn_deconnexion"></a>
+		</nav>
 		<section>
 			<div class="banner">
 				<h1 class="title"></h1>
@@ -145,16 +146,24 @@
 				</article>
 			</div>
 		</section>
+		<div class="popupGameOver">
+			<h1>Vous avez perdu</h1>
+			<div class="infos-container"></div>
+			<div class="btn-container">
+				<button class="replayBtn">Rejouer</button>
+				<button class="leaveBtn">Quitter</button>
+			</div>
+		</div>
 		<form id="popup">
 			<h1>Connexion</h1>
 			<input type="text" name="username" placeholder="pseudo">
 
 			<div class="avatar-choice">
 
-					<label>
-						<input type="radio" name="avatar" value="bleu" checked required>
-						<img src="/image/pedalBleu.gif" alt="avatar1">
-					</label>
+				<label>
+					<input type="radio" name="avatar" value="bleu" checked required>
+					<img src="/image/pedalBleu.gif" alt="avatar1">
+				</label>
 
 				<label>
 					<input type="radio" name="avatar" value="orange">
@@ -168,27 +177,27 @@
 
 			</div>
 
-				<div class="deplacement-choice">
-					<span>Ce déplacer avec : </span>
-					<label>
-						<input type="radio" name="deplacement" value="mouse" checked required>
-						La souris
-					</label>
+			<div class="deplacement-choice">
+				<span>Ce déplacer avec : </span>
+				<label>
+					<input type="radio" name="deplacement" value="mouse" checked required>
+					La souris
+				</label>
 
-					<label>
-						<input type="radio" name="deplacement" value="keyboard">
-						Le clavier
-					</label>
+				<label>
+					<input type="radio" name="deplacement" value="keyboard">
+					Le clavier
+				</label>
 
-				</div>
+			</div>
 
-				<input type="submit" value="Se connecter">
-			</form>
+			<input type="submit" value="Se connecter">
+		</form>
 	</main>
-  </section>
-  <section class="loader active">
-	  <h1>⚠️ En raison d’une panne sur le réseau, le trafique de la page est momentanément interrompu.</h1>
-	  <div class="animation"></div>
-  </section>
+</section>
+<section class="loader active">
+	<h1>⚠️ En raison d’une panne sur le réseau, le trafique de la page est momentanément interrompu.</h1>
+	<div class="animation"></div>
+</section>
 </body>
 </html>

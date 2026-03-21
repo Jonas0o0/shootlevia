@@ -1,9 +1,10 @@
 import Router from './Router.ts';
 import View from './View.ts';
-import type { Route } from './types.ts';
+import type { Route, GameStats } from './types.ts';
 import HomeView from './HomeView.ts';
 import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
+import PopupGameOverView from './PopupGameOverView.ts';
 import SettingsView from './SettingsView.ts';
 import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
@@ -100,6 +101,19 @@ async function init() {
 		() => updateSettingsButtonVisibility()
 	);
 
+	let game: Game | null = null;
+	const popupGameOver = new PopupGameOverView(
+		document.querySelector('.popupGameOver')!,
+		() => {
+			if (game) game.stop();
+			play.launchGameCallback!();
+		},
+		() => {
+			if (game) game.stop();
+			Router.navigate('/');
+		},
+	);
+
 	updateSettingsButtonVisibility();
 
 	loginButton.addEventListener('click', () => {
@@ -136,15 +150,16 @@ async function init() {
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);
 
 	play.launchGameCallback = () => {
+		if (game) game.stop();
 		socket.emit('reset');
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const joueur = new Player(loginService.accounts, 0, 0, hud);
-		const game = new Game(socket, [joueur], 0, canvas, ctx);
+		game = new Game(socket, [joueur], 0, canvas, ctx, (stats: GameStats) => {
+			popupGameOver.setStats(stats);
+			popupGameOver.show();
+		});
 
-		// On s'assure de n'avoir qu'une boucle à la fois
-		// Pour simplifier, on se contente du lancement ici
-		setInterval(() => game.update(), 1000 / 60);
-		game.draw();
+		game.start();
 	};
 }
 
