@@ -3,10 +3,7 @@ import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import {
-	AvatarRowMapping,
-	PlaySpriteSheet,
-} from '../../../common/SpriteSheetConfig.ts';
+import { AvatarRowMapping, PlaySpriteSheet } from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 import Bonus from './Bonus.ts';
 import type { BonusType } from '../../../common/BonusType.ts';
@@ -36,7 +33,7 @@ class Player implements HitBox {
 		joueur: Account | null,
 		x: number,
 		y: number,
-		element: Element | null = null
+		element: Element | null = null,
 	) {
 		if (joueur == null) {
 			joueur = {
@@ -98,11 +95,11 @@ class Player implements HitBox {
 			}
 		}
 		this.jump.jumping = data.isJumping;
+
 		if (this.life) {
 			if (data.life.life < this.life.life) {
 				this.life.removeLife(this.life.life - data.life.life);
-			}
-			if (data.life.life > this.life.life) {
+			} else if (data.life.life > this.life.life) {
 				this.life.addLife(data.life.life - this.life.life);
 			}
 		}
@@ -147,8 +144,10 @@ class Player implements HitBox {
 	draw(ctx: CanvasRenderingContext2D): void {
 		let frame: Frame = this.sprite.getFrame();
 
-		// Effet de clignotement transparent si invincible
-		if (this.isInvincible) {
+		// Effet de clignotement transparent si invincible et en spec
+		if (!this.life.isAlive()) {
+			ctx.globalAlpha = 0.3;
+		} else if (this.isInvincible) {
 			// On fait varier l'alpha toutes les 100ms
 			if (Math.floor(Date.now() / 100) % 2 === 0) {
 				ctx.globalAlpha = 0.5;
@@ -164,16 +163,18 @@ class Player implements HitBox {
 			this.x,
 			this.y,
 			frame.width,
-			frame.height
+			frame.height,
 		);
 
 		// On reset l'alpha pour ne pas impacter les autres dessins
 		ctx.globalAlpha = 1.0;
 
-		// Dessiner les effets des bonus sur le joueur
-		this.bonus.forEach(b => {
-			b.drawOnPlayer(ctx, this);
-		});
+		// Dessiner les effets des bonus sur le joueur seulement si vivant
+		if (this.life.isAlive()) {
+			this.bonus.forEach(b => {
+				b.drawOnPlayer(ctx, this);
+			});
+		}
 
 		this.updateHUD();
 	}

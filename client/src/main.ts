@@ -13,6 +13,7 @@ import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 import PlayView from './PlayView.ts';
 import Game from './models/Game.ts';
 import Player from './models/Player.ts';
+import PopupLobbyView from './PopupLobbyView.ts';
 
 const loader = new View(document.querySelector('section.loader')!);
 
@@ -100,6 +101,24 @@ async function init() {
 		loginService,
 		() => updateSettingsButtonVisibility(),
 	);
+
+	const popupLobby = new PopupLobbyView(
+		document.querySelector('#lobbypopup')!,
+		socket,
+	);
+
+	const multiBtn = document.querySelector('#multiBtn');
+	if (multiBtn) {
+		multiBtn.addEventListener('click', (e) => {
+			e.preventDefault();
+			if (!loginService.isLoggedIn()) {
+				alert('Veuillez vous connecter d\'abord !');
+				popup.oppenPopup();
+				return;
+			}
+			popupLobby.show();
+		});
+	}
 
 	let game: Game | null = null;
 	const popupGameOver = new PopupGameOverView(

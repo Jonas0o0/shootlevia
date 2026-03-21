@@ -118,6 +118,20 @@ export default class Game {
 
 			state.players.forEach(playerData => {
 				let p = this.players.get(playerData.id);
+
+				if (!p && playerData.id === this.socket.id) {
+					for (const [key, val] of this.players.entries()) {
+						if (val === this.joueur) {
+							this.players.delete(key);
+							break;
+						}
+					}
+					p = this.joueur;
+					p.id = playerData.id;
+					this.players.set(p.id, p);
+					console.log('[CLIENT] Local player re-bound to ID:', p.id);
+				}
+
 				if (!p) {
 					// Nouveau joueur connecté
 					p = new Player(playerData.account, playerData.x, playerData.y);
@@ -127,13 +141,21 @@ export default class Game {
 				p.updateFromData(playerData);
 			});
 
-			if (!this.joueur.getLife().isAlive() && this.active) {
+			// verif si tous les joueurs sont morts
+			const allPlayers = Array.from(this.players.values());
+			const livingPlayers = allPlayers.filter(p => !!p.getLife() && p.getLife().isAlive());
+			if (allPlayers.length > 0 && livingPlayers.length === 0 && this.active) {
 				this.stop();
 				this.onGameOver({
 					time: this.time,
 					score: this.score,
 					enemyCount: this.enemyCount,
 				});
+				return;
+			}
+
+			if (!this.joueur.getLife().isAlive() && this.active) {
+				// Individual player dead, but game continues (spectator) unless caught by above check
 			}
 
 			// Supprimer les joueurs qui ont quitté
@@ -223,6 +245,10 @@ export default class Game {
 
 	update(): void {
 		if (!this.active) return;
+
+		// pas d'input quand mode spectateur
+		if (!this.joueur.getLife().isAlive()) return;
+
 		// Appelé par setInterval (60fps)
 		const directionsSet: Set<Direction> = new Set();
 
@@ -281,6 +307,16 @@ export default class Game {
 		this.players.forEach(player => {
 			player.draw(this.ctx);
 		});
+
+		// afficher spectateur quand le joueur est mort
+		if (!this.joueur.getLife().isAlive()) {
+			this.ctx.save();
+			this.ctx.fillStyle = 'white';
+			this.ctx.font = '48px "Pixelify Sans"';
+			this.ctx.textAlign = 'center';
+			this.ctx.fillText('SPECTATEUR', this.canvas.width / 2, this.canvas.height - 50);
+			this.ctx.restore();
+		}
 
 		requestAnimationFrame(this.draw);
 	};
