@@ -6,6 +6,7 @@ import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
 import { BonusType } from '../../common/BonusType.ts';
 import { checkCollision, getCenter, getOverlap } from '../../common/HitBox.ts';
+import { Server } from 'socket.io';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -18,15 +19,24 @@ export class ServerGame {
 	private countPneu: number = 0;
 
 	private spawnEnemyService: SpawnEnemyService = new SpawnEnemyService();
+	private intervalId: NodeJS.Timeout;
+	private io: Server;
+	private roomId: string;
 
-	constructor() {
+	constructor(io: Server, roomId: string) {
+		this.io = io;
+		this.roomId = roomId;
 		// Boucle de jeu (60fps)
-		setInterval(() => this.update(), 1000 / 60);
+		this.intervalId = setInterval(() => this.update(), 1000 / 60);
+	}
+
+	stop() {
+		clearInterval(this.intervalId);
 	}
 
 	reset(): void {
 		console.log('reset la partie est cense fonctionne');
-		this.players.clear();
+		this.players.forEach(p => p.reset());
 		this.enemies = [];
 		this.bonuses = [];
 		this.time = 0;
@@ -49,21 +59,21 @@ export class ServerGame {
 
 	handlePlayerMove(id: string, directions: Direction[]): void {
 		const player = this.players.get(id);
-		if (player) {
+		if (player && player.isAlive()) {
 			directions.forEach(dir => player.move(dir));
 		}
 	}
 
 	handlePlayerJump(id: string): void {
 		const player = this.players.get(id);
-		if (player) {
+		if (player && player.isAlive()) {
 			player.doJump();
 		}
 	}
 
 	handlePlayerShoot(id: string): void {
 		const player = this.players.get(id);
-		if (player) {
+		if (player && player.isAlive()) {
 			player.shoot();
 		}
 	}
@@ -139,10 +149,14 @@ export class ServerGame {
 		this.enemies.forEach(enemy => enemy.update());
 		this.enemies = this.enemies.filter(e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
+
+		this.io.to(this.roomId).emit('gameState', this.getState());
 	}
 
 	private checkPlayerCollisions() {
 		this.players.forEach(player => {
+			if (!player.isAlive()) return;
+
 			this.bonuses = this.bonuses.filter(bonus => {
 				const isColliding = checkCollision(player, bonus);
 
@@ -195,7 +209,7 @@ export class ServerGame {
 			score: this.score,
 			enemyCount: this.enemyCount,
 			countDrone: this.countDrone,
-			countPneu: this.countPneu
+			countPneu: this.countPneu,
 		};
 	}
 }

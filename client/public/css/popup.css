@@ -1,7 +1,8 @@
-#popup{
+#popup, #lobbypopup {
     display: none;
 }
-#popup.active {
+
+#popup.active, #lobbypopup.active {
     background: #545268;
     border: 2px solid #fff;
     border-radius: 10px;
@@ -11,7 +12,7 @@
     gap: 20px;
 }
 
-#popup.active {
+#popup.active, #lobbypopup.active {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -19,8 +20,7 @@
     z-index: 1001;
 }
 
-/* Overlay sombre + flou quand la popup est active */
-.fenetre:has(#popup.active)::before {
+.fenetre:has(#popup.active)::before, .fenetre:has(#lobbypopup.active)::before {
     content: '';
     position: absolute;
     top: 0;
@@ -32,7 +32,7 @@
     border-radius: inherit;
 }
 
-.fenetre:has(#popup.active) > *:not(#popup) {
+.fenetre:has(#popup.active) > *:not(#popup), .fenetre:has(#lobbypopup.active) > *:not(#lobbypopup) {
     filter: blur(5px);
     pointer-events: none;
 }
@@ -92,4 +92,136 @@
 
 #popup input[type="text"]:hover{
     border: #4ca0af solid 2px;
+}
+
+/* === LOBBY POPUP STYLES === */
+
+#lobbypopup {
+    min-width: 400px;
+    text-align: center;
+    color: white;
+    font-family: 'Pixelify Sans', sans-serif;
+}
+
+#lobbypopup h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+#lobby-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+#lobby-menu button,
+#lobbypopup button {
+    background-color: #F70000;
+    color: white;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+#lobby-menu button:hover,
+#lobbypopup button:hover {
+    background-color: #c80000;
+}
+
+#lobby-menu div {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    justify-content: center;
+}
+
+#lobbyCodeInput {
+    padding: 10px;
+    border-radius: 10px;
+    border: #000 solid 2px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1rem;
+    flex: 1;
+}
+
+#joinLobbyBtn {
+    width: auto !important;
+}
+
+#lobbypopup p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+#lobby-room h3 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+#lobbyCodeDisplay {
+    color: #4ca0af;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+#lobbyPlayerList {
+    list-style: none;
+    margin: 20px 0;
+    text-align: left;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#lobbyPlayerList li {
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#lobbyPlayerList li:last-child {
+    border-bottom: none;
+}
+
+#closeLobbyBtn {
+    background-color: #555 !important;
+    margin-top: 10px;
+}
+
+#closeLobbyBtn:hover {
+    background-color: #333 !important;
+}
+
+#startGameBtn {
+    background-color: #4CAF50 !important;
+    font-size: 1.5rem !important;
+    margin-bottom: 15px;
+}
+
+#startGameBtn:hover {
+    background-color: #45a049 !important;
+}
+
+#waitingMessage {
+    font-style: italic;
+    color: #aaa;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.5;
+    }
 }

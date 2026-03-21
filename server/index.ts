@@ -22,41 +22,128 @@ app.use('/leaderboard', leaderboardRoutes);
 const server = http.createServer(app);
 const io = new IOServer(server, { cors: { origin: true } });
 
-const game = new ServerGame();
+const games = new Map<string, ServerGame>();
+const socketRoomMap = new Map<string, string>();
 
 io.on('connection', socket => {
 	console.log('Client connected:', socket.id);
 
-	socket.on('reset', () => {
-		game.reset();
+	socket.on('create_lobby', () => {
+		const roomId = Math.random().toString(36).substring(2, 7).toUpperCase();
+		const game = new ServerGame(io, roomId);
+		games.set(roomId, game);
+
+		joinRoom(socket, roomId);
+		socket.emit('lobby_created', roomId);
+		console.log(`Lobby Created: ${roomId} by ${socket.id}`);
 	});
-	// On pourrait recevoir les infos du joueur lors de la connexion
-socket.on('join', (data: { username: string; avatar: string; canvasWidth: number; canvasHeight: number }) => {
+
+	socket.on('join_lobby', (inputRoomId: string) => {
+		const roomId = inputRoomId.toUpperCase();
+		if (games.has(roomId)) {
+			joinRoom(socket, roomId);
+			socket.emit('lobby_joined', { success: true, roomId });
+			console.log(`Client ${socket.id} joined lobby ${roomId}`);
+		} else {
+			socket.emit('lobby_joined', { success: false, error: 'Lobby introuvable' });
+		}
+	});
+
+	function joinRoom(socket: any, roomId: string) {
+		const currentRoom = socketRoomMap.get(socket.id);
+		if (currentRoom) {
+			socket.leave(currentRoom);
+			const game = games.get(currentRoom);
+			if (game) game.removePlayer(socket.id);
+		}
+
+		socket.join(roomId);
+		socketRoomMap.set(socket.id, roomId);
+
+		updateLobbyList(roomId);
+	}
+
+	function updateLobbyList(roomId: string) {
+		const room = io.sockets.adapter.rooms.get(roomId);
+		if (room) {
+			io.to(roomId).emit('lobby_update', { count: room.size });
+		}
+	}
+
+	socket.on('start_match', () => {
+		const roomId = socketRoomMap.get(socket.id);
+		if (roomId) {
+			const game = games.get(roomId);
+			if (game) game.reset();
+
+			io.to(roomId).emit('match_started');
+		}
+	});
+
+	socket.on('reset', () => {
+		const game = getGame(socket.id);
+		if (game) game.reset();
+	});
+
+	socket.on('join', (data: { username: string; avatar: string; canvasWidth: number; canvasHeight: number }) => {
+		const game = getGame(socket.id);
+		if (game) {
 			game.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
-		});
+		} else {
+			const roomId = `SOLO_${socket.id}`;
+			const newGame = new ServerGame(io, roomId);
+			games.set(roomId, newGame);
+			joinRoom(socket, roomId);
+			newGame.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
+		}
+	});
 
 	socket.on('move', (directions: Direction[]) => {
-		game.handlePlayerMove(socket.id, directions);
+		const game = getGame(socket.id);
+		if (game) game.handlePlayerMove(socket.id, directions);
 	});
 
 	socket.on('jump', () => {
-		game.handlePlayerJump(socket.id);
+		const game = getGame(socket.id);
+		if (game) game.handlePlayerJump(socket.id);
 	});
 
 	socket.on('leave', () => {
-		game.removePlayer(socket.id);
+		const game = getGame(socket.id);
+		if (game) {
+			game.removePlayer(socket.id);
+			checkEmptyGame(socketRoomMap.get(socket.id)!);
+		}
 	});
 
 	socket.on('disconnect', () => {
 		console.log('Client disconnected:', socket.id);
-		game.removePlayer(socket.id);
+		const game = getGame(socket.id);
+		if (game) {
+			game.removePlayer(socket.id);
+			checkEmptyGame(socketRoomMap.get(socket.id)!);
+		}
+		socketRoomMap.delete(socket.id);
 	});
-});
 
-// Broadcast de l'état du jeu toutes les 16ms (~60fps)
-setInterval(() => {
-	io.emit('gameState', game.getState());
-}, 1000 / 60);
+	function getGame(socketId: string) {
+		const roomId = socketRoomMap.get(socketId);
+		if (roomId) return games.get(roomId);
+		return null;
+	}
+
+	function checkEmptyGame(roomId: string) {
+		const room = io.sockets.adapter.rooms.get(roomId);
+		if (!room || room.size === 0) {
+			const game = games.get(roomId);
+			if (game) {
+				game.stop();
+				games.delete(roomId);
+				console.log(`Lobby ${roomId} closed (empty)`);
+			}
+		}
+	}
+});
 
 // Lancement du serveur
 server.listen(port, () => {
