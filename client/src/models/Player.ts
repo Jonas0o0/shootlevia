@@ -3,7 +3,10 @@ import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import { AvatarRowMapping, PlaySpriteSheet, SpriteSheetConfigs } from '../../../common/SpriteSheetConfig.ts';
+import {
+	AvatarRowMapping,
+	PlaySpriteSheet,
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 import Bonus from './Bonus.ts';
 import type { BonusType } from '../../../common/BonusType.ts';
@@ -11,26 +14,29 @@ import { LifebarService } from '../../../common/Service/LifebarService.ts';
 import { LifebarComponent } from '../components/LifebarComponent.ts';
 import { DeplacementType } from './DeplacementType.ts';
 
-class Player {
-	private joueur: Account;
+class Player implements HitBox {
+	private readonly joueur: Account;
 	private jump: { jumping: boolean };
-	private hitbox: HitBox;
-	private weapons: Weapon[];
+	public x: number;
+	public y: number;
+	public width: number;
+	public height: number;
+	private readonly weapons: Weapon[];
 	private bonus: Bonus[];
-	private baseRow: number;
-	private velocity: number;
+	private readonly baseRow: number;
+	private readonly velocity: number;
 	private sprite: SpriteSheetService;
 	public id: string = '';
-	private hud: Element | null;
+	private readonly hud: Element | null;
 	private lastBonusList: string = '';
-	private life: LifebarService;
+	private readonly life: LifebarService;
 	private isInvincible: boolean;
 
 	constructor(
 		joueur: Account | null,
 		x: number,
 		y: number,
-		element: Element | null = null,
+		element: Element | null = null
 	) {
 		if (joueur == null) {
 			joueur = {
@@ -40,6 +46,8 @@ class Player {
 			};
 		}
 		this.joueur = joueur;
+		this.x = x;
+		this.y = y;
 		this.weapons = [
 			{ nom: 'attaque de base', degat: 2, tier: 1, tierMin: 1, tierMax: 5 },
 		];
@@ -58,17 +66,13 @@ class Player {
 			AvatarRowMapping[joueur.avatar] ?? AvatarRowMapping.pedalBleu;
 		this.sprite = new SpriteSheetService(PlaySpriteSheet.PLAYER, this.baseRow);
 
-		this.hitbox = {
-			x: x,
-			y: y,
-			width: this.sprite.getWidth(),
-			height: SpriteSheetConfigs.PLAYER.spriteHeight,
-		};
+		this.width = this.sprite.getWidth();
+		this.height = this.sprite.getHeight();
 	}
 
 	updateFromData(data: PlayerData): void {
-		this.hitbox.x = data.x;
-		this.hitbox.y = data.y;
+		this.x = data.x;
+		this.y = data.y;
 		this.isInvincible = data.isInvincible;
 
 		//Pour Optti on fait pas un bete remplacment, on compra les de liste por suprimer et ajputer les différence
@@ -104,12 +108,8 @@ class Player {
 		}
 	}
 
-	isJumping(): boolean {
-		return this.jump.jumping;
-	}
-
 	getPostition(): HitBox {
-		return this.hitbox;
+		return this;
 	}
 
 	getAccoutn(): Account {
@@ -123,16 +123,16 @@ class Player {
 	move(direction: Direction): void {
 		switch (direction) {
 			case Direction.Left:
-				this.hitbox.x -= this.velocity;
+				this.x -= this.velocity;
 				break;
 			case Direction.Right:
-				this.hitbox.x += this.velocity;
+				this.x += this.velocity;
 				break;
 			case Direction.Up:
-				this.hitbox.y -= this.velocity;
+				this.y -= this.velocity;
 				break;
 			case Direction.Down:
-				this.hitbox.y += this.velocity;
+				this.y += this.velocity;
 		}
 	}
 
@@ -153,10 +153,10 @@ class Player {
 			frame.y,
 			frame.width,
 			frame.height,
-			this.hitbox.x,
-			this.hitbox.y,
+			this.x,
+			this.y,
 			frame.width,
-			frame.height,
+			frame.height
 		);
 
 		// On reset l'alpha pour ne pas impacter les autres dessins
@@ -164,7 +164,7 @@ class Player {
 
 		// Dessiner les effets des bonus sur le joueur
 		this.bonus.forEach(b => {
-			b.drawOnPlayer(ctx, this.hitbox.x, this.hitbox.y);
+			b.drawOnPlayer(ctx, this);
 		});
 
 		this.updateHUD();

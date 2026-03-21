@@ -14,7 +14,7 @@ export default class Game {
 	private bullets: Map<string, Bullet> = new Map();
 	private enemies: Map<string, Enemy> = new Map();
 	private bonuses: Map<string, Bonus> = new Map();
-	private joueur: Player;
+	private readonly joueur: Player;
 	private time: number;
 	private score: number;
 	private enemyCount: number;
@@ -23,7 +23,7 @@ export default class Game {
 	private keysPressed: Set<string> = new Set();
 	private mousePosition: { x: number; y: number } | null = null;
 	private map: GameMap;
-	private souris: boolean;
+	private readonly souris: boolean;
 
 	constructor(
 		socket: Socket,
@@ -40,7 +40,7 @@ export default class Game {
 		this.canvas = canvas;
 		this.ctx = ctx;
 
-		//Iitialisation de la map
+		//Initialisation de la map
 		this.map = new GameMap();
 
 		// Initialisation du joueur local
@@ -51,13 +51,12 @@ export default class Game {
 		this.souris =
 			this.joueur.getAccoutn().deplacement === DeplacementType.Mouse;
 
-
 		// Rejoindre la partie côté serveur avec la taille du canvas
 		this.socket.emit('join', {
 			username: this.joueur.getAccoutn().username,
 			avatar: this.joueur.getAccoutn().avatar,
 			canvasWidth: this.canvas.width,
-			canvasHeight: this.canvas.height
+			canvasHeight: this.canvas.height,
 		});
 
 		if (!this.souris) {

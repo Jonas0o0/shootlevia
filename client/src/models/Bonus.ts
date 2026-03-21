@@ -2,18 +2,21 @@ import SpriteSheetService from '../services/SpriteSheetService.ts';
 import { type BonusType } from '../../../common/BonusType.ts';
 import type { Frame } from '../Frame.ts';
 import type { BonusData } from '../../../common/types.ts';
+import type { HitBox } from '../../../common/HitBox.ts';
 
-class Bonus {
+class Bonus implements HitBox {
 	id: string;
 	nom: string;
 	sprite: SpriteSheetService;
 	type: BonusType;
 	x: number = 0;
 	y: number = 0;
+	width: number;
+	height: number;
 
 	constructor(typeOrData: BonusType | BonusData) {
 		if ('id' in typeOrData) {
-			// C'est un BonusData (depuis le serveur)
+			// C'est un BonusData (depuis le serveur).
 			this.id = typeOrData.id;
 			this.type = typeOrData.type;
 			this.x = typeOrData.x;
@@ -25,6 +28,8 @@ class Bonus {
 		}
 		this.nom = this.type.nom;
 		this.sprite = new SpriteSheetService(this.type.sprite, 0);
+		this.width = this.type.sheetSize.MAP.width;
+		this.height = this.type.sheetSize.MAP.height;
 	}
 
 	updateFromData(data: BonusData): void {
@@ -62,12 +67,12 @@ class Bonus {
 		);
 	}
 
-	drawOnPlayer(ctx: CanvasRenderingContext2D, x: number, y: number): void {
-		console.log('je suis appeler');
+	drawOnPlayer(ctx: CanvasRenderingContext2D, target: HitBox): void {
 		this.sprite.setRow(this.type.rows.PLAYER);
 		const frame: Frame = this.sprite.getFrame();
+		let drawY = target.y;
 		if (this.type.sprite === 'PASS_PASS') {
-			y += 20;
+			drawY += 20;
 		}
 		ctx.drawImage(
 			frame.img,
@@ -75,8 +80,8 @@ class Bonus {
 			frame.y,
 			frame.width,
 			frame.height,
-			x,
-			y,
+			target.x,
+			drawY,
 			frame.width,
 			frame.height
 		);
