@@ -1,13 +1,13 @@
 import Router from './Router.ts';
 import View from './View.ts';
-import type { Route, GameStats } from './types.ts';
+import type { GameStats, Route } from './types.ts';
 import HomeView from './HomeView.ts';
 import LoginServiceMemory from './services/LoginServiceMemory.ts';
 import PopupLoginView from './PopupLoginView.ts';
 import PopupGameOverView from './PopupGameOverView.ts';
 import SettingsView from './SettingsView.ts';
-import { io } from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import AssetLoaderService from './services/AssetLoaderService.ts';
 import { SpriteSheetConfigs } from '../../common/SpriteSheetConfig.ts';
 import PlayView from './PlayView.ts';
@@ -53,28 +53,28 @@ async function init() {
 	const homeView = new HomeView(
 		document.querySelector('.fenetre .home')!,
 		background,
-		banner
+		banner,
 	);
 
 	const menuElement = document.querySelector('.fenetre nav')!;
 	const loginButton = menuElement.querySelector('.btn_deconnexion')!;
 	const settingsButton = menuElement.querySelector(
-		'.btn_parametres'
+		'.btn_parametres',
 	) as HTMLElement;
 	const loginService: LoginServiceMemory = new LoginServiceMemory();
 
 	const leaderboard = new View(
-		document.querySelector('.fenetre .leaderboard')!
+		document.querySelector('.fenetre .leaderboard')!,
 	);
 	const credit = new View(document.querySelector('.fenetre .credit')!);
 	const canvas: HTMLCanvasElement = document.querySelector(
-		'.fenetre .play .play_canvas'
+		'.fenetre .play .play_canvas',
 	)!;
 	const ctx = canvas.getContext('2d')!;
 	const play = new PlayView(
 		document.querySelector('.fenetre .play')!,
 		canvas,
-		ctx
+		ctx,
 	);
 
 	const updateSettingsButtonVisibility = () => {
@@ -91,14 +91,14 @@ async function init() {
 		() => {
 			popup.updateButton();
 			updateSettingsButtonVisibility();
-		}
+		},
 	);
 
 	const popup = new PopupLoginView(
 		document.querySelector('#popup')!,
 		loginButton as HTMLElement,
 		loginService,
-		() => updateSettingsButtonVisibility()
+		() => updateSettingsButtonVisibility(),
 	);
 
 	let game: Game | null = null;
@@ -145,6 +145,14 @@ async function init() {
 		}
 	});
 	Router.registerLinks(playButton);
+
+	const quitButton = document.querySelector('.quit-game-btn')!;
+	quitButton.addEventListener('click', (event) => {
+		event.preventDefault();
+		if (game) game.stop();
+		socket.emit('leave');
+		Router.navigate('/');
+	});
 
 	Router.navigate(window.location.pathname || '/', true);
 	window.onpopstate = () => Router.navigate(document.location.pathname, true);

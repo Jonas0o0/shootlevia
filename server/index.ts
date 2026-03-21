@@ -43,6 +43,10 @@ socket.on('join', (data: { username: string; avatar: string; canvasWidth: number
 		game.handlePlayerJump(socket.id);
 	});
 
+	socket.on('leave', () => {
+		game.removePlayer(socket.id);
+	});
+
 	socket.on('disconnect', () => {
 		console.log('Client disconnected:', socket.id);
 		game.removePlayer(socket.id);
