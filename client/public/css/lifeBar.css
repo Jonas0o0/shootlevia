@@ -7,7 +7,8 @@
     z-index: 100;
     padding: 20px;
     display: grid;
-    grid-template-columns: 1fr auto auto 1fr;
+    grid-template-columns: 1fr auto auto 1fr auto;
+    align-items: center;
     gap: 20px;
 }
 
@@ -46,4 +47,25 @@
 .nb-enemy {
     grid-column: 3;
     justify-self: center;
+}
+
+.quit-game-btn {
+    grid-column: 5;
+    justify-self: end;
+    background: #cc3333;
+    color: white;
+    border: 2px solid black;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-family: 'Pixelify Sans', sans-serif;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    pointer-events: auto; /* Ensure clickable */
+    z-index: 200;
+}
+
+.quit-game-btn:hover {
+    background: #aa0000;
+    transform: scale(1.05);
 }
