@@ -1,5 +1,6 @@
 import { Direction } from '../../common/Direction.ts';
 import { ServerBullet } from './Bullet.ts';
+import type { HitBox } from '../../common/HitBox.ts';
 
 export class Arme {
 	public vitesse: number;
@@ -16,15 +17,20 @@ export class Arme {
 		this.frequence = frequence;
 	}
 
-	shoot(ownerId: string, x: number, y: number): void {
-		const bullet = new ServerBullet(ownerId, x, y, this.vitesse);
+	shoot(ownerId: string, source: HitBox): void {
+		const bullet = new ServerBullet(
+			ownerId,
+			source.x + source.width,
+			source.y + source.height / 2,
+			this.vitesse,
+		);
 		this.bullets.push(bullet);
 	}
 
-	autoShoot(ownerId: string, x: number, y: number): void {
+	autoShoot(ownerId: string, source: HitBox): void {
 		const now = Date.now();
 		if (now - this.lastShotTime >= this.frequence) {
-			this.shoot(ownerId, x, y);
+			this.shoot(ownerId, source);
 			this.lastShotTime = now;
 		}
 	}

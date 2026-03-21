@@ -5,7 +5,7 @@ import { ServerEnemy } from './ServerEnemy.ts';
 import { SpawnEnemyService } from '../services/SpawnEnemyService.ts';
 import ServerBonus from './Bonus.ts';
 import { BonusType } from '../../common/BonusType.ts';
-import { checkCollision } from '../../common/HitBox.ts';
+import { checkCollision, getCenter, getOverlap } from '../../common/HitBox.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -22,6 +22,7 @@ export class ServerGame {
 	}
 
 	reset(): void {
+		console.log('reset la partie est cense fonctionne');
 		this.players.clear();
 		this.enemies = [];
 		this.bonuses = [];
@@ -30,26 +31,10 @@ export class ServerGame {
 		this.spawnEnemyService = new SpawnEnemyService();
 	}
 
-	addPlayer(
-		id: string,
-		username: string,
-		avatar: string,
-		canvasWidth: number,
-		canvasHeight: number
-	): void {
+	addPlayer(id: string, username: string, avatar: string, canvasWidth: number, canvasHeight: number): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
-		this.players.set(
-			id,
-			new ServerPlayer(
-				id,
-				{ username, avatar },
-				x,
-				y,
-				canvasWidth,
-				canvasHeight
-			)
-		);
+		this.players.set(id, new ServerPlayer(id, { username, avatar }, x, y, canvasWidth, canvasHeight));
 	}
 
 	removePlayer(id: string): void {
@@ -67,6 +52,13 @@ export class ServerGame {
 		const player = this.players.get(id);
 		if (player) {
 			player.doJump();
+		}
+	}
+
+	handlePlayerShoot(id: string): void {
+		const player = this.players.get(id);
+		if (player) {
+			player.shoot();
 		}
 	}
 
@@ -120,8 +112,9 @@ export class ServerGame {
 
 		this.checkPlayerCollisions();
 
+		// Nettoyage des balles (on utilise bulletsToRemove ici pour marquer l'impact)
 		this.players.forEach(player => {
-			player.arme.bullets = player.arme.bullets.filter(b => !bulletsToRemove.has(b.id));
+			player.arme.bullets = player.arme.bullets.filter(b => !bulletsToRemove.has(b.id) && b.x < 2000);
 		});
 
 		if (this.players.size > 0) {
@@ -134,9 +127,7 @@ export class ServerGame {
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(
-			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000
-		);
+		this.enemies = this.enemies.filter(e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 	}
 
@@ -162,23 +153,18 @@ export class ServerGame {
 					player.takeDamage();
 
 					// pour repousser le joueur bord à bord
-					const overlapX = Math.min(
-						player.x + player.width - enemy.x,
-						enemy.x + enemy.width - player.x
-					);
-					const overlapY = Math.min(
-						player.y + player.height - enemy.y,
-						enemy.y + enemy.height - player.y
-					);
+					const overlap = getOverlap(player, enemy);
+					const playerCenter = getCenter(player);
+					const enemyCenter = getCenter(enemy);
 
-					if (overlapX < overlapY) {
-						if (player.x + player.width / 2 < enemy.x + enemy.width / 2) {
+					if (overlap.x < overlap.y) {
+						if (playerCenter.x < enemyCenter.x) {
 							player.x = enemy.x - player.width;
 						} else {
 							player.x = enemy.x + enemy.width;
 						}
 					} else {
-						if (player.y + player.height / 2 < enemy.y + enemy.height / 2) {
+						if (playerCenter.y < enemyCenter.y) {
 							player.y = enemy.y - player.height;
 						} else {
 							player.y = enemy.y + enemy.height;

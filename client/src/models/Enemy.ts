@@ -8,16 +8,19 @@ import {
 } from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 
-export default class Enemy {
+export default class Enemy implements HitBox {
 	public id: string;
-	private hitbox: HitBox;
-	private velocity: number;
+	public x: number;
+	public y: number;
+	public width: number;
+	public height: number;
+	private readonly velocity: number;
 	private sprite: SpriteSheetService;
-	private direction: Direction;
+	private readonly direction: Direction;
 	private isDamaged: boolean = false;
 	private isDying: boolean = false;
 	public readyToRemove: boolean = false;
-	private spriteSheetType: PlaySpriteSheet;
+	private readonly spriteSheetType: PlaySpriteSheet;
 
 	constructor(data: EnemyData) {
 		this.id = data.id;
@@ -28,43 +31,35 @@ export default class Enemy {
 			data.type === 'PNEU' ? PlaySpriteSheet.PNEU : PlaySpriteSheet.DRONE;
 		this.sprite = new SpriteSheetService(this.spriteSheetType, 0);
 
-		this.hitbox = {
-			x: data.x,
-			y: data.y,
-			width: data.width || this.sprite.getWidth(),
-			height: data.height || this.sprite.getHeight(),
-		};
+		this.x = data.x;
+		this.y = data.y;
+		this.width = data.width || this.sprite.getWidth();
+		this.height = data.height || this.sprite.getHeight();
 	}
 
 	updateFromData(data: EnemyData): void {
-		this.hitbox.x = data.x;
-		this.hitbox.y = data.y;
-		if (data.width) this.hitbox.width = data.width;
-		if (data.height) this.hitbox.height = data.height;
+		this.x = data.x;
+		this.y = data.y;
+		if (data.width) this.width = data.width;
+		if (data.height) this.height = data.height;
 		this.isDamaged = data.isDamaged ?? false;
 	}
 
-	getPosition(): HitBox {
-		return this.hitbox;
-	}
-
 	move(): void {
-		//Deplacement des ennemis
-		this.velocity;
-		this.direction;
-	}
-
-	update(): void {
-		this.move();
+		if (this.direction === Direction.Left) {
+			this.x -= this.velocity;
+		}
 	}
 
 	die(): void {
-		if (this.isDying) return;
-		this.isDying = true;
-
-		if (this.spriteSheetType === PlaySpriteSheet.PNEU) {
-			const config = SpriteSheetConfigs.PNEU;
-			this.sprite.setAnimationParams(false, config.columns);
+		if (!this.isDying) {
+			this.isDying = true;
+			if (this.spriteSheetType === PlaySpriteSheet.PNEU) {
+				const config = SpriteSheetConfigs.PNEU;
+				this.sprite.setAnimationParams(false, config.columns);
+			} else {
+				this.readyToRemove = true;
+			}
 		} else {
 			this.readyToRemove = true;
 		}
@@ -88,8 +83,8 @@ export default class Enemy {
 			frame.y,
 			frame.width,
 			frame.height,
-			this.hitbox.x,
-			this.hitbox.y,
+			this.x,
+			this.y,
 			frame.width,
 			frame.height
 		);
