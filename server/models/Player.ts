@@ -43,7 +43,7 @@ export class ServerPlayer implements HitBox {
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
 		this.life = new LifebarService();
-		this.arme = new Arme(10, [Direction.Right], 1, 500);
+		this.arme = new Arme(10, [Direction.Right], 1, 1);
 	}
 
 	public static clamp(value: number, min: number, max: number): number {
@@ -75,19 +75,19 @@ export class ServerPlayer implements HitBox {
 	}
 
 	public static calculateDamageOutcome(
-		currentBonuses: BonusType[],
+		currentBonuses: any[],
 		invincibilityTimer: number
-	): { shouldTakeLife: boolean; newBonuses: BonusType[] } {
+	): { shouldTakeLife: boolean; newBonuses: any[] } {
 		if (invincibilityTimer > 0) {
 			return { shouldTakeLife: false, newBonuses: currentBonuses };
 		}
 
-		const hasShield = currentBonuses.includes(BonusType.Shield);
+		const hasShield = currentBonuses.some(b => b.nom === BonusType.Shield.nom);
 
 		if (hasShield) {
 			return {
 				shouldTakeLife: false,
-				newBonuses: currentBonuses.filter(b => b !== BonusType.Shield),
+				newBonuses: currentBonuses.filter(b => b.nom !== BonusType.Shield.nom),
 			};
 		}
 
@@ -102,6 +102,8 @@ export class ServerPlayer implements HitBox {
 	}
 
 	update(): void {
+		if (!this.life.isAlive()) return;
+
 		this.arme.autoShoot(this.id, this);
 		if (this.jumping) {
 			this.jumpTimer--;
@@ -115,6 +117,10 @@ export class ServerPlayer implements HitBox {
 	}
 
 	takeDamage(): void {
+		if (!this.life.isAlive()) return;
+
+		const previousBonusCount = this.bonus.length;
+
 		const { shouldTakeLife, newBonuses } = ServerPlayer.calculateDamageOutcome(
 			this.bonus,
 			this.invincibilityTimer
@@ -122,7 +128,12 @@ export class ServerPlayer implements HitBox {
 
 		this.bonus = newBonuses;
 
-		if (!shouldTakeLife) return;
+		if (!shouldTakeLife) {
+			if (this.bonus.length < previousBonusCount) {
+				this.invincibilityTimer = this.INVINCIBILITY_DURATION;
+			}
+			return;
+		}
 
 		this.life.removeLife(1);
 
@@ -139,7 +150,21 @@ export class ServerPlayer implements HitBox {
 		return this.jumping;
 	}
 
+	public isAlive(): boolean {
+		return this.life.isAlive();
+	}
+
+	public reset(): void {
+		this.life = new LifebarService();
+		this.bonus = [];
+		this.invincibilityTimer = 0;
+		this.x = 100;
+		this.y = 300;
+		this.arme.bullets = [];
+	}
+
 	shoot(): void {
+		if (!this.life.isAlive()) return;
 		this.arme.shoot(this.id, this);
 	}
 
@@ -155,7 +180,7 @@ export class ServerPlayer implements HitBox {
 			jumpTimer: this.jumpTimer,
 			jumpCooldown: this.jumpCooldown,
 			bonus: this.bonus,
-			life: this.life,
+			life: { life: this.life.life } as any,
 			isInvincible: this.invincibilityTimer > 0,
 		};
 	}
