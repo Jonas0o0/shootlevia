@@ -146,7 +146,7 @@
     padding: 10px;
     border-radius: 10px;
     border: #000 solid 2px;
-    font-family: 'Pixelify Sans', sans-serif;
+    font-family: Arial, serif;
     font-size: 1rem;
     flex: 1;
 }
@@ -166,6 +166,7 @@
 }
 
 #lobbyCodeDisplay {
+    font-family: Arial, serif;
     color: #4ca0af;
     font-weight: bold;
     letter-spacing: 2px;
