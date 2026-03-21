@@ -102,7 +102,7 @@ export class ServerPlayer implements HitBox {
 	}
 
 	update(): void {
-		this.arme.autoShoot(this.id, this.x + this.width, this.y + this.height / 2);
+		this.arme.autoShoot(this.id, this);
 		if (this.jumping) {
 			this.jumpTimer--;
 			if (this.jumpTimer <= 0) {
@@ -140,7 +140,7 @@ export class ServerPlayer implements HitBox {
 	}
 
 	shoot(): void {
-		this.arme.shoot(this.id, this.x + this.width, this.y + this.height / 2);
+		this.arme.shoot(this.id, this);
 	}
 
 	toData(): PlayerData {
