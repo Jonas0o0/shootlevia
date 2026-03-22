@@ -26,6 +26,7 @@ async function init() {
 		SpriteSheetConfigs.DRONE.path,
 		SpriteSheetConfigs.PNEU.path,
 		SpriteSheetConfigs.PASS_PASS.path,
+		SpriteSheetConfigs.POWER_UP.path,
 		// Ajoutez d'autres images si nécessaire
 	];
 

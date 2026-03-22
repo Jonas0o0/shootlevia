@@ -3,7 +3,7 @@ import { ServerEnemy } from '../models/ServerEnemy.ts';
 export class SpawnEnemyService {
 	private baseRespawnRate: number = 300;
 	private minRespawnRate: number = 30; //nombre minimum a la quelle les ennemis spawn
-	private difficultyCurve: number = 0.01;
+	private difficultyCurve: number = 0.1;
 	private enemySpawnCooldown: number = 0;
 
 	public calculateRespawnRate(time: number): number {
