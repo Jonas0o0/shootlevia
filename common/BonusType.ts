@@ -21,6 +21,26 @@ export const BonusType = {
 			},
 		},
 	},
+	WeaponUpgrade: {
+		nom: 'PowerUp',
+		bonusType: 'WEAPON_UPGRADE',
+		sprite: PlaySpriteSheet.POWER_UP,
+		rows: {
+			HUD: 0,
+			MAP: 0,
+			PLAYER: 0,
+		},
+		sheetSize: {
+			HUD: {
+				width: 28,
+				height: 28,
+			},
+			MAP: {
+				width: 28,
+				height: 28,
+			},
+		},
+	},
 } as const;
 
 export type BonusType = (typeof BonusType)[keyof typeof BonusType];
