@@ -7,6 +7,7 @@ import ServerBonus from './Bonus.ts';
 import { BonusType } from '../../common/BonusType.ts';
 import { checkCollision, getCenter, getOverlap } from '../../common/HitBox.ts';
 import { Server } from 'socket.io';
+import { leaderboardService } from '../services/LeaderboardService.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -174,7 +175,14 @@ export class ServerGame {
 						return;
 					}
 
-					player.takeDamage();
+					const died = player.takeDamage();
+					if (died) {
+						leaderboardService.addEntry({
+							joueur: player.getAccount().username,
+							score: this.score,
+							date: Date.now(),
+						});
+					}
 
 					// pour repousser le joueur bord à bord
 					const overlap = getOverlap(player, enemy);
