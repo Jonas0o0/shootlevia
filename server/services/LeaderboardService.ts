@@ -3,7 +3,11 @@ import path from 'path';
 import type { LeaderboardEntry } from '../../common/LeaderboardEntry.ts';
 
 export class LeaderboardService {
-	private readonly leaderboardPath = path.resolve('./server/ressources/leaderboard.json');
+	private readonly leaderboardPath: string;
+
+	constructor(customPath?: string) {
+		this.leaderboardPath = customPath ?? path.resolve('./server/ressources/leaderboard.json');
+	}
 
 	/**
 	 * Lit le fichier leaderboard.json et retourne son contenu.
