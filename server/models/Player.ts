@@ -142,8 +142,12 @@ export class ServerPlayer implements HitBox {
 	}
 
 	addBonus(bonus: BonusType): void {
-		if (!this.bonus.includes(bonus)) {
-			this.bonus.push(bonus);
+		if (bonus.nom === BonusType.WeaponUpgrade.nom) {
+			this.arme.levelUp();
+		} else {
+			if (!this.bonus.includes(bonus)) {
+				this.bonus.push(bonus);
+			}
 		}
 	}
 

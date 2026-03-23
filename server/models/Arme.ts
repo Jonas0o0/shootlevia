@@ -1,6 +1,7 @@
 import { Direction } from '../../common/Direction.ts';
 import { ServerBullet } from './Bullet.ts';
 import type { HitBox } from '../../common/HitBox.ts';
+import { WeaponLevel, WeaponUpgrades } from './WeaponUpgrades.ts';
 
 export class Arme {
 	public vitesse: number;
@@ -9,6 +10,7 @@ export class Arme {
 	public frequence: number;
 	public bullets: ServerBullet[] = [];
 	private lastShotTime: number = 0;
+	public level: number = WeaponLevel.LEVEL1;
 
 	constructor(vitesse: number, direction: Direction[], degat: number, frequence: number) {
 		this.vitesse = vitesse;
@@ -18,13 +20,16 @@ export class Arme {
 	}
 
 	shoot(ownerId: string, source: HitBox): void {
-		const bullet = new ServerBullet(
-			ownerId,
-			source.x + source.width,
-			source.y + source.height / 2,
-			this.vitesse,
-		);
-		this.bullets.push(bullet);
+		this.direction.forEach(dir => {
+			const bullet = new ServerBullet(
+				ownerId,
+				source.x + source.width,
+				source.y + source.height / 2,
+				this.vitesse,
+				dir
+			);
+			this.bullets.push(bullet);
+		});
 	}
 
 	autoShoot(ownerId: string, source: HitBox): void {
@@ -32,6 +37,17 @@ export class Arme {
 		if (now - this.lastShotTime >= this.frequence) {
 			this.shoot(ownerId, source);
 			this.lastShotTime = now;
+		}
+	}
+
+	levelUp(): void {
+		if (this.level < WeaponLevel.LEVEL5) {
+			this.level++;
+			const stats = WeaponUpgrades[this.level as WeaponLevel];
+			this.vitesse = stats.vitesse;
+			this.direction = stats.direction;
+			this.degat = stats.degat;
+			this.frequence = stats.frequence;
 		}
 	}
 
