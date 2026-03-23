@@ -210,6 +210,23 @@
 			<div id="lobby-room" style="display: none;">
 				<h3>Code: <span id="lobbyCodeDisplay"></span></h3>
 				<ul id="lobbyPlayerList"></ul>
+				<div class="difficulty-choice">
+					<span>Difficulté : </span>
+					<label>
+						<input type="radio" name="difficulty" value="facile" checked required>
+						Facile
+					</label>
+
+					<label>
+						<input type="radio" name="difficulty" value="moyen">
+						Moyen
+					</label>
+
+					<label>
+						<input type="radio" name="difficulty" value="difficile">
+						Difficile
+					</label>
+				</div>
 				<button id="startGameBtn" style="display: none;">Lancer la partie</button>
 				<p id="waitingMessage">En attente...</p>
 			</div>

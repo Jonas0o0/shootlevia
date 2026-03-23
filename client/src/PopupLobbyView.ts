@@ -13,6 +13,7 @@ export default class PopupLobbyView extends View {
 	codeDisplay: HTMLElement;
 	playersList: HTMLElement;
 	waitingMessage: HTMLElement;
+	difficulty: HTMLDivElement;
 	private socket: Socket;
 
 	constructor(element: HTMLElement, socket: Socket) {
@@ -29,6 +30,7 @@ export default class PopupLobbyView extends View {
 		this.codeDisplay = element.querySelector('#lobbyCodeDisplay')!;
 		this.playersList = element.querySelector('#lobbyPlayerList')!;
 		this.waitingMessage = element.querySelector('#waitingMessage')!;
+		this.difficulty = element.querySelector('.difficulty-choice')!;
 
 		this.setupListeners();
 		this.setupSocketListeners();
@@ -51,7 +53,6 @@ export default class PopupLobbyView extends View {
 		});
 
 		this.startGameBtn.addEventListener('click', () => {
-			this.socket.emit('request_start_game');
 			this.socket.emit('start_match');
 		});
 	}
@@ -61,13 +62,16 @@ export default class PopupLobbyView extends View {
 			this.showRoom(code, true);
 		});
 
-		this.socket.on('lobby_joined', (data: { success: boolean, roomId?: string, error?: string }) => {
-			if (data.success && data.roomId) {
-				this.showRoom(data.roomId, false);
-			} else {
-				alert(data.error || 'Erreur lors de la connexion au lobby');
+		this.socket.on(
+			'lobby_joined',
+			(data: { success: boolean; roomId?: string; error?: string }) => {
+				if (data.success && data.roomId) {
+					this.showRoom(data.roomId, false);
+				} else {
+					alert(data.error || 'Erreur lors de la connexion au lobby');
+				}
 			}
-		});
+		);
 
 		this.socket.on('lobby_update', (data: { count: number }) => {
 			this.updatePlayersList(data.count);
@@ -90,6 +94,7 @@ export default class PopupLobbyView extends View {
 		} else {
 			this.startGameBtn.style.display = 'none';
 			this.waitingMessage.style.display = 'block';
+			this.difficulty.style.display = 'none';
 		}
 	}
 
@@ -112,4 +117,3 @@ export default class PopupLobbyView extends View {
 		this.element.classList.remove('active');
 	}
 }
-
