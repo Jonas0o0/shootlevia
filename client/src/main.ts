@@ -55,28 +55,28 @@ async function init() {
 	const homeView = new HomeView(
 		document.querySelector('.fenetre .home')!,
 		background,
-		banner,
+		banner
 	);
 
 	const menuElement = document.querySelector('.fenetre nav')!;
 	const loginButton = menuElement.querySelector('.btn_deconnexion')!;
 	const settingsButton = menuElement.querySelector(
-		'.btn_parametres',
+		'.btn_parametres'
 	) as HTMLElement;
 	const loginService: LoginServiceMemory = new LoginServiceMemory();
 
 	const leaderboard = new View(
-		document.querySelector('.fenetre .leaderboard')!,
+		document.querySelector('.fenetre .leaderboard')!
 	);
 	const credit = new View(document.querySelector('.fenetre .credit')!);
 	const canvas: HTMLCanvasElement = document.querySelector(
-		'.fenetre .play .play_canvas',
+		'.fenetre .play .play_canvas'
 	)!;
 	const ctx = canvas.getContext('2d')!;
 	const play = new PlayView(
 		document.querySelector('.fenetre .play')!,
 		canvas,
-		ctx,
+		ctx
 	);
 
 	const updateSettingsButtonVisibility = () => {
@@ -93,27 +93,27 @@ async function init() {
 		() => {
 			popup.updateButton();
 			updateSettingsButtonVisibility();
-		},
+		}
 	);
 
 	const popup = new PopupLoginView(
 		document.querySelector('#popup')!,
 		loginButton as HTMLElement,
 		loginService,
-		() => updateSettingsButtonVisibility(),
+		() => updateSettingsButtonVisibility()
 	);
 
 	const popupLobby = new PopupLobbyView(
 		document.querySelector('#lobbypopup')!,
-		socket,
+		socket
 	);
 
 	const multiBtn = document.querySelector('#multiBtn');
 	if (multiBtn) {
-		multiBtn.addEventListener('click', (e) => {
+		multiBtn.addEventListener('click', e => {
 			e.preventDefault();
 			if (!loginService.isLoggedIn()) {
-				alert('Veuillez vous connecter d\'abord !');
+				alert("Veuillez vous connecter d'abord !");
 				popup.oppenPopup();
 				return;
 			}
@@ -131,7 +131,7 @@ async function init() {
 		() => {
 			if (game) game.stop();
 			Router.navigate('/');
-		},
+		}
 	);
 
 	updateSettingsButtonVisibility();
@@ -158,16 +158,18 @@ async function init() {
 		'.fenetre .home .playButton'
 	)!;
 	playButton.addEventListener('click', event => {
+		event.preventDefault();
 		if (!loginService.isLoggedIn()) {
-			event.preventDefault();
-			event.stopImmediatePropagation();
+			alert("Veuillez vous connecter d'abord !");
 			popup.show();
+			return;
 		}
+		popupLobby.show(true);
 	});
-	Router.registerLinks(playButton);
+	//Router.registerLinks(playButton);
 
 	const quitButton = document.querySelector('.quit-game-btn')!;
-	quitButton.addEventListener('click', (event) => {
+	quitButton.addEventListener('click', event => {
 		event.preventDefault();
 		if (game) game.stop();
 		socket.emit('leave');
@@ -182,10 +184,18 @@ async function init() {
 		socket.emit('reset');
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		const joueur = new Player(loginService.accounts, 0, 0, hud);
-		game = new Game(socket, [joueur], 0, canvas, ctx, (stats: GameStats) => {
-			popupGameOver.setStats(stats);
-			popupGameOver.show();
-		});
+		game = new Game(
+			socket,
+			[joueur],
+			0,
+			canvas,
+			ctx,
+			popupLobby.getDifficulty(),
+			(stats: GameStats) => {
+				popupGameOver.setStats(stats);
+				popupGameOver.show();
+			}
+		);
 
 		game.start();
 	};

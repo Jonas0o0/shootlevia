@@ -16,6 +16,7 @@ export default class PopupLobbyView extends View {
 	waitingMessage: HTMLElement;
 	difficulty: HTMLElement;
 	private socket: Socket;
+	private solo: boolean = false;
 
 	constructor(element: HTMLElement, socket: Socket) {
 		super(element);
@@ -37,23 +38,23 @@ export default class PopupLobbyView extends View {
 		this.setupSocketListeners();
 	}
 
-	private setupListeners() {
-		let difficulty: Difficulty;
-		switch (
-			new FormData(this.difficulty as HTMLFormElement).get('difficulty')
-		) {
-			case 'facile':
-				difficulty = Difficulty.Facile;
-				break;
+	public getDifficulty(): Difficulty {
+		const formData = new FormData(this.difficulty as HTMLFormElement);
+		const diffValue = formData.get('difficulty');
+		switch (diffValue) {
 			case 'moyen':
-				difficulty = Difficulty.Moyen;
-				break;
+				return Difficulty.Moyen;
 			case 'difficile':
-				difficulty = Difficulty.Difficile;
-				break;
+				return Difficulty.Difficile;
+			case 'facile':
+			default:
+				return Difficulty.Facile;
 		}
+	}
+
+	private setupListeners() {
 		this.createBtn.addEventListener('click', () => {
-			this.socket.emit('create_lobby', difficulty);
+			this.socket.emit('create_lobby', this.getDifficulty());
 		});
 
 		this.joinBtn.addEventListener('click', () => {
@@ -68,7 +69,12 @@ export default class PopupLobbyView extends View {
 		});
 
 		this.startGameBtn.addEventListener('click', () => {
-			this.socket.emit('start_match');
+			if (this.solo) {
+				this.hide();
+				Router.navigate('/play');
+			} else {
+				this.socket.emit('start_match');
+			}
 		});
 	}
 
@@ -102,10 +108,12 @@ export default class PopupLobbyView extends View {
 		this.menuDiv.style.display = 'none';
 		this.roomDiv.style.display = 'block';
 		this.codeDisplay.textContent = code;
+		this.codeDisplay.parentElement!.style.display = 'block';
 
 		if (isHost) {
 			this.startGameBtn.style.display = 'inline-block';
 			this.waitingMessage.style.display = 'none';
+			this.difficulty.style.display = 'block';
 		} else {
 			this.startGameBtn.style.display = 'none';
 			this.waitingMessage.style.display = 'block';
@@ -120,11 +128,24 @@ export default class PopupLobbyView extends View {
 		this.playersList.appendChild(li);
 	}
 
-	show() {
+	show(solo: boolean = false) {
 		super.show();
-		this.menuDiv.style.display = 'block';
-		this.roomDiv.style.display = 'none';
-		this.element.classList.add('active');
+		this.solo = solo;
+		if (!solo) {
+			this.menuDiv.style.display = 'block';
+			this.roomDiv.style.display = 'none';
+			this.element.classList.add('active');
+			this.codeDisplay.parentElement!.style.display = 'block';
+			this.playersList.style.display = 'block';
+		} else {
+			this.menuDiv.style.display = 'none';
+			this.roomDiv.style.display = 'block';
+			this.codeDisplay.parentElement!.style.display = 'none';
+			this.startGameBtn.style.display = 'inline-block';
+			this.difficulty.style.display = 'block';
+			this.waitingMessage.style.display = 'none';
+			this.playersList.style.display = 'none';
+		}
 	}
 
 	hide() {
