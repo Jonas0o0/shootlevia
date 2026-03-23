@@ -8,6 +8,7 @@ import type { GameStats } from '../types.ts';
 import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
 import { DeplacementType } from './DeplacementType.ts';
+import type { Difficulty } from '../../../common/Difficulty.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -32,6 +33,7 @@ export default class Game {
 	private keyupHandler?: (event: KeyboardEvent) => void;
 	private mousemoveHandler?: (event: MouseEvent) => void;
 	private mouseoutHandler?: () => void;
+	private readonly difficulty: Difficulty;
 
 	constructor(
 		socket: Socket,
@@ -39,7 +41,8 @@ export default class Game {
 		joueurIdx: number,
 		canvas: HTMLCanvasElement,
 		ctx: CanvasRenderingContext2D,
-		onGameOver: (stats: GameStats) => void,
+		difficulty: Difficulty,
+		onGameOver: (stats: GameStats) => void
 	) {
 		// Initialisation du jeu
 		this.socket = socket;
@@ -49,7 +52,7 @@ export default class Game {
 		this.enemyCount = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
-
+		this.difficulty = difficulty;
 		//Initialisation de la map
 		this.map = new GameMap();
 
@@ -67,6 +70,7 @@ export default class Game {
 			avatar: this.joueur.getAccoutn().avatar,
 			canvasWidth: this.canvas.width,
 			canvasHeight: this.canvas.height,
+			difficulty: this.difficulty,
 		});
 
 		if (!this.souris) {
@@ -143,7 +147,9 @@ export default class Game {
 
 			// verif si tous les joueurs sont morts
 			const allPlayers = Array.from(this.players.values());
-			const livingPlayers = allPlayers.filter(p => !!p.getLife() && p.getLife().isAlive());
+			const livingPlayers = allPlayers.filter(
+				p => !!p.getLife() && p.getLife().isAlive()
+			);
 			if (allPlayers.length > 0 && livingPlayers.length === 0 && this.active) {
 				this.stop();
 				this.onGameOver({
@@ -227,7 +233,10 @@ export default class Game {
 
 	start(): void {
 		if (this.intervalId) return;
-		this.intervalId = setInterval(() => this.update(), 1000 / 60) as unknown as number;
+		this.intervalId = setInterval(
+			() => this.update(),
+			1000 / 60
+		) as unknown as number;
 		this.draw();
 	}
 
@@ -237,10 +246,14 @@ export default class Game {
 			clearInterval(this.intervalId);
 			this.intervalId = null;
 		}
-		if (this.keydownHandler) window.removeEventListener('keydown', this.keydownHandler);
-		if (this.keyupHandler) window.removeEventListener('keyup', this.keyupHandler);
-		if (this.mousemoveHandler) window.removeEventListener('mousemove', this.mousemoveHandler);
-		if (this.mouseoutHandler) window.removeEventListener('mouseout', this.mouseoutHandler);
+		if (this.keydownHandler)
+			window.removeEventListener('keydown', this.keydownHandler);
+		if (this.keyupHandler)
+			window.removeEventListener('keyup', this.keyupHandler);
+		if (this.mousemoveHandler)
+			window.removeEventListener('mousemove', this.mousemoveHandler);
+		if (this.mouseoutHandler)
+			window.removeEventListener('mouseout', this.mouseoutHandler);
 	}
 
 	update(): void {
@@ -314,7 +327,11 @@ export default class Game {
 			this.ctx.fillStyle = 'white';
 			this.ctx.font = '48px "Pixelify Sans"';
 			this.ctx.textAlign = 'center';
-			this.ctx.fillText('SPECTATEUR', this.canvas.width / 2, this.canvas.height - 50);
+			this.ctx.fillText(
+				'SPECTATEUR',
+				this.canvas.width / 2,
+				this.canvas.height - 50
+			);
 			this.ctx.restore();
 		}
 

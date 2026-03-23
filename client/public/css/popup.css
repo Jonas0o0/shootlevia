@@ -165,6 +165,10 @@
     margin-bottom: 15px;
 }
 
+#lobby-room .difficulty-choice {
+    margin-bottom: 15px;
+}
+
 #lobbyCodeDisplay {
     font-family: Arial, serif;
     color: #4ca0af;

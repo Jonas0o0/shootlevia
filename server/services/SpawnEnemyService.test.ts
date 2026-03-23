@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import { SpawnEnemyService } from './SpawnEnemyService.ts';
 
 describe('SpawnEnemyService', () => {
-    const service = new SpawnEnemyService();
+    const service = new SpawnEnemyService(0.1);
 
     describe('calculateRespawnRate', () => {
         it('devrait retourner le taux de base au début (time = 0)', () => {

@@ -1,6 +1,7 @@
 import View from './View.ts';
 import type { Socket } from 'socket.io-client';
 import Router from './Router.ts';
+import { Difficulty } from '../../common/Difficulty.ts';
 
 export default class PopupLobbyView extends View {
 	createBtn: HTMLButtonElement;
@@ -13,7 +14,9 @@ export default class PopupLobbyView extends View {
 	codeDisplay: HTMLElement;
 	playersList: HTMLElement;
 	waitingMessage: HTMLElement;
+	difficulty: HTMLElement;
 	private socket: Socket;
+	private solo: boolean = false;
 
 	constructor(element: HTMLElement, socket: Socket) {
 		super(element);
@@ -29,14 +32,29 @@ export default class PopupLobbyView extends View {
 		this.codeDisplay = element.querySelector('#lobbyCodeDisplay')!;
 		this.playersList = element.querySelector('#lobbyPlayerList')!;
 		this.waitingMessage = element.querySelector('#waitingMessage')!;
+		this.difficulty = element.querySelector('.difficulty-choice')!;
 
 		this.setupListeners();
 		this.setupSocketListeners();
 	}
 
+	public getDifficulty(): Difficulty {
+		const formData = new FormData(this.difficulty as HTMLFormElement);
+		const diffValue = formData.get('difficulty');
+		switch (diffValue) {
+			case 'moyen':
+				return Difficulty.Moyen;
+			case 'difficile':
+				return Difficulty.Difficile;
+			case 'facile':
+			default:
+				return Difficulty.Facile;
+		}
+	}
+
 	private setupListeners() {
 		this.createBtn.addEventListener('click', () => {
-			this.socket.emit('create_lobby');
+			this.socket.emit('create_lobby', this.getDifficulty());
 		});
 
 		this.joinBtn.addEventListener('click', () => {
@@ -51,8 +69,12 @@ export default class PopupLobbyView extends View {
 		});
 
 		this.startGameBtn.addEventListener('click', () => {
-			this.socket.emit('request_start_game');
-			this.socket.emit('start_match');
+			if (this.solo) {
+				this.hide();
+				Router.navigate('/play');
+			} else {
+				this.socket.emit('start_match');
+			}
 		});
 	}
 
@@ -61,13 +83,16 @@ export default class PopupLobbyView extends View {
 			this.showRoom(code, true);
 		});
 
-		this.socket.on('lobby_joined', (data: { success: boolean, roomId?: string, error?: string }) => {
-			if (data.success && data.roomId) {
-				this.showRoom(data.roomId, false);
-			} else {
-				alert(data.error || 'Erreur lors de la connexion au lobby');
+		this.socket.on(
+			'lobby_joined',
+			(data: { success: boolean; roomId?: string; error?: string }) => {
+				if (data.success && data.roomId) {
+					this.showRoom(data.roomId, false);
+				} else {
+					alert(data.error || 'Erreur lors de la connexion au lobby');
+				}
 			}
-		});
+		);
 
 		this.socket.on('lobby_update', (data: { count: number }) => {
 			this.updatePlayersList(data.count);
@@ -83,13 +108,16 @@ export default class PopupLobbyView extends View {
 		this.menuDiv.style.display = 'none';
 		this.roomDiv.style.display = 'block';
 		this.codeDisplay.textContent = code;
+		this.codeDisplay.parentElement!.style.display = 'block';
 
 		if (isHost) {
 			this.startGameBtn.style.display = 'inline-block';
 			this.waitingMessage.style.display = 'none';
+			this.difficulty.style.display = 'block';
 		} else {
 			this.startGameBtn.style.display = 'none';
 			this.waitingMessage.style.display = 'block';
+			this.difficulty.style.display = 'none';
 		}
 	}
 
@@ -100,11 +128,24 @@ export default class PopupLobbyView extends View {
 		this.playersList.appendChild(li);
 	}
 
-	show() {
+	show(solo: boolean = false) {
 		super.show();
-		this.menuDiv.style.display = 'block';
-		this.roomDiv.style.display = 'none';
-		this.element.classList.add('active');
+		this.solo = solo;
+		if (!solo) {
+			this.menuDiv.style.display = 'block';
+			this.roomDiv.style.display = 'none';
+			this.element.classList.add('active');
+			this.codeDisplay.parentElement!.style.display = 'block';
+			this.playersList.style.display = 'block';
+		} else {
+			this.menuDiv.style.display = 'none';
+			this.roomDiv.style.display = 'block';
+			this.codeDisplay.parentElement!.style.display = 'none';
+			this.startGameBtn.style.display = 'inline-block';
+			this.difficulty.style.display = 'block';
+			this.waitingMessage.style.display = 'none';
+			this.playersList.style.display = 'none';
+		}
 	}
 
 	hide() {
@@ -112,4 +153,3 @@ export default class PopupLobbyView extends View {
 		this.element.classList.remove('active');
 	}
 }
-

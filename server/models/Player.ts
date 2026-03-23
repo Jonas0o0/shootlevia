@@ -30,6 +30,7 @@ export class ServerPlayer implements HitBox {
 		account: Account,
 		x: number,
 		y: number,
+		life: number,
 		canvasWidth: number,
 		canvasHeight: number
 	) {
@@ -42,7 +43,7 @@ export class ServerPlayer implements HitBox {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
-		this.life = new LifebarService();
+		this.life = new LifebarService(life);
 		this.arme = new Arme(10, [Direction.Right], 1, 1);
 	}
 
@@ -141,8 +142,12 @@ export class ServerPlayer implements HitBox {
 	}
 
 	addBonus(bonus: BonusType): void {
-		if (!this.bonus.includes(bonus)) {
-			this.bonus.push(bonus);
+		if (bonus.nom === BonusType.WeaponUpgrade.nom) {
+			this.arme.levelUp();
+		} else {
+			if (!this.bonus.includes(bonus)) {
+				this.bonus.push(bonus);
+			}
 		}
 	}
 

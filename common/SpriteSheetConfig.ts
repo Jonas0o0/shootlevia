@@ -1,10 +1,11 @@
-export type PlaySpriteSheet = 'PLAYER' | 'DRONE' | 'PNEU' | 'PASS_PASS';
+export type PlaySpriteSheet = 'PLAYER' | 'DRONE' | 'PNEU' | 'PASS_PASS' | 'POWER_UP';
 
 export const PlaySpriteSheet = {
 	PLAYER: 'PLAYER' as PlaySpriteSheet,
 	DRONE: 'DRONE' as PlaySpriteSheet,
 	PNEU: 'PNEU' as PlaySpriteSheet,
 	PASS_PASS: 'PASS_PASS' as PlaySpriteSheet,
+	POWER_UP: 'POWER_UP' as PlaySpriteSheet,
 };
 
 export type SpriteSheetConfig = {
@@ -50,6 +51,15 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		spriteWidth: 63,
 		spriteHeight: 54,
 		columnsFrameMax: 6,
+	},
+	POWER_UP: {
+		path: '/assets/PowerUp.png',
+		columns: 1,
+		rows: 1,
+		spriteWidth: 28,
+		spriteHeight: 28,
+		columnsFrameMax: 1,
+		isStatic: true,
 	},
 };
 
