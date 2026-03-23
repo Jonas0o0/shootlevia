@@ -6,9 +6,8 @@ export class LifebarService {
 	/**
 	 * Nombre de vies maximum
 	 * @type {number}
-	 * @private
 	 */
-	private maxLife: number;
+	public maxLife: number;
 
 	/**
 	 * Nombre de vies restantes au joueur

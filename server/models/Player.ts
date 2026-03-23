@@ -185,7 +185,7 @@ export class ServerPlayer implements HitBox {
 			jumpTimer: this.jumpTimer,
 			jumpCooldown: this.jumpCooldown,
 			bonus: this.bonus,
-			life: { life: this.life.life } as any,
+			life: { life: this.life.life, maxLife: this.life.getMaxLife() } as any,
 			isInvincible: this.invincibilityTimer > 0,
 		};
 	}
