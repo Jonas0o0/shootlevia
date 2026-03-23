@@ -3,7 +3,10 @@ import type { HitBox } from '../../../common/HitBox.ts';
 import type { Weapon } from '../Weapon.ts';
 import { Direction } from '../../../common/Direction.ts';
 import SpriteSheetService from '../services/SpriteSheetService.ts';
-import { AvatarRowMapping, PlaySpriteSheet } from '../../../common/SpriteSheetConfig.ts';
+import {
+	AvatarRowMapping,
+	PlaySpriteSheet,
+} from '../../../common/SpriteSheetConfig.ts';
 import type { Frame } from '../Frame.ts';
 import Bonus from './Bonus.ts';
 import type { BonusType } from '../../../common/BonusType.ts';
@@ -33,7 +36,7 @@ class Player implements HitBox {
 		joueur: Account | null,
 		x: number,
 		y: number,
-		element: Element | null = null,
+		element: Element | null = null
 	) {
 		if (joueur == null) {
 			joueur = {
@@ -95,6 +98,7 @@ class Player implements HitBox {
 			}
 		}
 		this.jump.jumping = data.isJumping;
+		this.life.setMaxLife(data.life.maxLife);
 
 		if (this.life) {
 			if (data.life.life < this.life.life) {
@@ -163,7 +167,7 @@ class Player implements HitBox {
 			this.x,
 			this.y,
 			frame.width,
-			frame.height,
+			frame.height
 		);
 
 		// On reset l'alpha pour ne pas impacter les autres dessins
