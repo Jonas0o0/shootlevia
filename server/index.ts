@@ -16,7 +16,10 @@ const port = process.env.PORT || 8080;
 // Middlewares
 app.use((req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');
-	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept'
+	);
 	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
 	if (req.method === 'OPTIONS') {
@@ -134,9 +137,15 @@ io.on('connection', socket => {
 		}
 	);
 
-	socket.on('move', (directions: Direction[]) => {
+	socket.on('move', (data: Direction[] | { x: number; y: number }) => {
 		const game = getGame(socket.id);
-		if (game) game.handlePlayerMove(socket.id, directions);
+		if (game) {
+			if (Array.isArray(data)) {
+				game.handlePlayerMove(socket.id, data);
+			} else {
+				game.handlePlayerMoveVector(socket.id, data.x, data.y);
+			}
+		}
 	});
 
 	socket.on('jump', () => {

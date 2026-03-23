@@ -90,6 +90,13 @@ export class ServerGame {
 		}
 	}
 
+	handlePlayerMoveVector(id: string, vx: number, vy: number): void {
+		const player = this.players.get(id);
+		if (player && player.isAlive()) {
+			player.moveByVector(vx, vy);
+		}
+	}
+
 	handlePlayerJump(id: string): void {
 		const player = this.players.get(id);
 		if (player && player.isAlive()) {

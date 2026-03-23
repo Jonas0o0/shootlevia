@@ -79,6 +79,18 @@ export class ServerPlayer implements HitBox {
 		);
 	}
 
+	moveByVector(vx: number, vy: number): void {
+		this.x += vx;
+		this.y += vy;
+
+		this.x = ServerPlayer.clamp(this.x, 0, this.canvasWidth - this.width);
+		this.y = ServerPlayer.clamp(
+			this.y,
+			this.canvasHeight * 0.2 - 45,
+			this.canvasHeight - this.height
+		);
+	}
+
 	public static calculateDamageOutcome(
 		currentBonuses: any[],
 		invincibilityTimer: number

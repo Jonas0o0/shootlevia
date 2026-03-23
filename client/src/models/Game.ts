@@ -34,6 +34,11 @@ export default class Game {
 	private mousemoveHandler?: (event: MouseEvent) => void;
 	private mouseoutHandler?: () => void;
 	private readonly difficulty: Difficulty;
+	private currentVelocityX: number = 0;
+	private currentVelocityY: number = 0;
+	private readonly ACCELERATION: number = 0.5;
+	private readonly FRICTION: number = 0.85;
+	private readonly MAX_SPEED: number = 5;
 
 	constructor(
 		socket: Socket,
@@ -260,37 +265,84 @@ export default class Game {
 		if (!this.active) return;
 
 		// pas d'input quand mode spectateur
-		if (!this.joueur.getLife().isAlive()) return;
-
-		// Appelé par setInterval (60fps)
-		const directionsSet: Set<Direction> = new Set();
-
-		if (this.keysPressed.has('Z')) directionsSet.add(Direction.Up);
-		if (this.keysPressed.has('S')) directionsSet.add(Direction.Down);
-		if (this.keysPressed.has('Q')) directionsSet.add(Direction.Left);
-		if (this.keysPressed.has('D')) directionsSet.add(Direction.Right);
-
-		if (this.mousePosition) {
-			const playerPos = this.joueur.getPostition();
-			const playerCenterX = playerPos.x + playerPos.width / 2;
-			const playerCenterY = playerPos.y + playerPos.height / 2;
-
-			const threshold = 20; //pour éviter le jitter
-
-			if (this.mousePosition.x < playerCenterX - threshold)
-				directionsSet.add(Direction.Left);
-			if (this.mousePosition.x > playerCenterX + threshold)
-				directionsSet.add(Direction.Right);
-			if (this.mousePosition.y < playerCenterY - threshold)
-				directionsSet.add(Direction.Up);
-			if (this.mousePosition.y > playerCenterY + threshold)
-				directionsSet.add(Direction.Down);
+		if (!this.joueur.getLife().isAlive()) {
+			this.currentVelocityX = 0;
+			this.currentVelocityY = 0;
+			return;
 		}
 
-		if (directionsSet.size > 0) {
-			this.socket.emit('move', Array.from(directionsSet));
+		let targetVx = 0;
+		let targetVy = 0;
+
+		if (!this.souris) {
+			// Mode Clavier : Calcul de la direction cible
+			if (this.keysPressed.has('Z')) targetVy -= 1;
+			if (this.keysPressed.has('S')) targetVy += 1;
+			if (this.keysPressed.has('Q')) targetVx -= 1;
+			if (this.keysPressed.has('D')) targetVx += 1;
+
+			// Normalisation pour les diagonales
+			if (targetVx !== 0 && targetVy !== 0) {
+				const length = Math.sqrt(targetVx * targetVx + targetVy * targetVy);
+				targetVx /= length;
+				targetVy /= length;
+			}
+
+			targetVx *= this.MAX_SPEED;
+			targetVy *= this.MAX_SPEED;
+
+			// Application de l'accélération (Inertie)
+			if (targetVx !== 0) {
+				this.currentVelocityX +=
+					(targetVx - this.currentVelocityX) * this.ACCELERATION;
+			} else {
+				this.currentVelocityX *= this.FRICTION;
+			}
+
+			if (targetVy !== 0) {
+				this.currentVelocityY +=
+					(targetVy - this.currentVelocityY) * this.ACCELERATION;
+			} else {
+				this.currentVelocityY *= this.FRICTION;
+			}
+		} else {
+			// Mode Souris : 360° et Vitesse proportionnelle
+			if (this.mousePosition) {
+				const playerPos = this.joueur.getPostition();
+				const playerCenterX = playerPos.x + playerPos.width / 2;
+				const playerCenterY = playerPos.y + playerPos.height / 2;
+
+				const dx = this.mousePosition.x - playerCenterX;
+				const dy = this.mousePosition.y - playerCenterY;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+
+				const threshold = 10;
+				if (distance > threshold) {
+					// Vitesse proportionnelle à la distance (max à 200px)
+					const speed = Math.min(this.MAX_SPEED, (distance - threshold) / 20);
+					this.currentVelocityX = (dx / distance) * speed;
+					this.currentVelocityY = (dy / distance) * speed;
+				} else {
+					this.currentVelocityX *= this.FRICTION;
+					this.currentVelocityY *= this.FRICTION;
+				}
+			} else {
+				this.currentVelocityX *= this.FRICTION;
+				this.currentVelocityY *= this.FRICTION;
+			}
 		}
-		this.time;
+
+		// Arrêt complet si très lent
+		if (Math.abs(this.currentVelocityX) < 0.1) this.currentVelocityX = 0;
+		if (Math.abs(this.currentVelocityY) < 0.1) this.currentVelocityY = 0;
+
+		// Envoi au serveur si mouvement
+		if (this.currentVelocityX !== 0 || this.currentVelocityY !== 0) {
+			this.socket.emit('move', {
+				x: this.currentVelocityX,
+				y: this.currentVelocityY,
+			});
+		}
 	}
 
 	draw = (): void => {
