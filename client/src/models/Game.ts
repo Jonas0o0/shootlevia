@@ -2,7 +2,6 @@ import type { Socket } from 'socket.io-client';
 import Player from './Player.ts';
 import Bullet from './Bullet.ts';
 import Enemy from './Enemy.ts';
-import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import type { GameStats } from '../types.ts';
 import GameMap from './GameMap.ts';
