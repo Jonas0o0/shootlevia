@@ -1,5 +1,5 @@
 import type { LeaderboardEntry } from '../../../common/LeaderboardEntry.ts';
-import type LeaderboardServiceMemory from '../services/LeaderboardServiceMemory.ts';
+import type { LeaderboardServiceInterface } from '../services/LeaderboardServiceInterface.ts';
 
 /**
  * Classe qui permet de générer au format html le tableau du leaderboard
@@ -15,10 +15,14 @@ export class LeaderboardComponent {
 	 * Service observé pour mettre à jour le rendu
 	 * @private
 	 */
-	private leaderboardService: LeaderboardServiceMemory;
+	private leaderboardService: LeaderboardServiceInterface;
 
-	constructor(leaderboardService: LeaderboardServiceMemory, leaderboardElement: string) {
-		this.leaderboardElement = document.querySelector(leaderboardElement)!;
+	constructor(leaderboardService: LeaderboardServiceInterface, leaderboardElement: string | HTMLElement) {
+		if (typeof leaderboardElement === 'string') {
+			this.leaderboardElement = document.querySelector(leaderboardElement)!;
+		} else {
+			this.leaderboardElement = leaderboardElement;
+		}
 		this.leaderboardService = leaderboardService;
 		this.leaderboardService.onEntryChange((entries: LeaderboardEntry[]) => this.render(entries));
 		this.render(this.leaderboardService.getEntries());

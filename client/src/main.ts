@@ -14,6 +14,8 @@ import PlayView from './PlayView.ts';
 import Game from './models/Game.ts';
 import Player from './models/Player.ts';
 import PopupLobbyView from './PopupLobbyView.ts';
+import LeaderboardServiceApi from './services/LeaderboardServiceApi.ts';
+import { LeaderboardComponent } from './components/LeaderboardComponent.ts';
 
 const loader = new View(document.querySelector('section.loader')!);
 
@@ -68,6 +70,13 @@ async function init() {
 	const leaderboard = new View(
 		document.querySelector('.fenetre .leaderboard')!
 	);
+	const leaderboardService = new LeaderboardServiceApi();
+	new LeaderboardComponent(leaderboardService, '.fenetre .leaderboard tbody');
+	document.querySelector('a[href=\'/leaderboard\']')?.addEventListener('click', event => {
+		event.preventDefault();
+		leaderboardService.refresh();
+	});
+
 	const credit = new View(document.querySelector('.fenetre .credit')!);
 	const canvas: HTMLCanvasElement = document.querySelector(
 		'.fenetre .play .play_canvas'
@@ -155,7 +164,7 @@ async function init() {
 	Router.setMenuElement(menuElement);
 
 	const playButton = document.querySelector<HTMLAnchorElement>(
-		'.fenetre .home .playButton'
+		'.fenetre .home .playButton',
 	)!;
 	playButton.addEventListener('click', event => {
 		event.preventDefault();
