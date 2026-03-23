@@ -5,6 +5,7 @@ import { loadEnvFile } from 'node:process';
 import leaderboardRoutes from './routes/leaderboardRoutes.ts';
 import { ServerGame } from './models/Game.ts';
 import { Direction } from '../common/Direction.ts';
+import type { Difficulty } from '../common/Difficulty.ts';
 
 // Chargement des variables d'environnement
 loadEnvFile('.env');
@@ -28,9 +29,9 @@ const socketRoomMap = new Map<string, string>();
 io.on('connection', socket => {
 	console.log('Client connected:', socket.id);
 
-	socket.on('create_lobby', () => {
+	socket.on('create_lobby', (difficulty: Difficulty) => {
 		const roomId = Math.random().toString(36).substring(2, 7).toUpperCase();
-		const game = new ServerGame(io, roomId);
+		const game = new ServerGame(io, roomId, difficulty);
 		games.set(roomId, game);
 
 		joinRoom(socket, roomId);
@@ -45,7 +46,10 @@ io.on('connection', socket => {
 			socket.emit('lobby_joined', { success: true, roomId });
 			console.log(`Client ${socket.id} joined lobby ${roomId}`);
 		} else {
-			socket.emit('lobby_joined', { success: false, error: 'Lobby introuvable' });
+			socket.emit('lobby_joined', {
+				success: false,
+				error: 'Lobby introuvable',
+			});
 		}
 	});
 
@@ -85,18 +89,39 @@ io.on('connection', socket => {
 		if (game) game.reset();
 	});
 
-	socket.on('join', (data: { username: string; avatar: string; canvasWidth: number; canvasHeight: number }) => {
-		const game = getGame(socket.id);
-		if (game) {
-			game.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
-		} else {
-			const roomId = `SOLO_${socket.id}`;
-			const newGame = new ServerGame(io, roomId);
-			games.set(roomId, newGame);
-			joinRoom(socket, roomId);
-			newGame.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
+	socket.on(
+		'join',
+		(data: {
+			username: string;
+			avatar: string;
+			canvasWidth: number;
+			canvasHeight: number;
+			difficulty: Difficulty;
+		}) => {
+			const game = getGame(socket.id);
+			if (game) {
+				game.addPlayer(
+					socket.id,
+					data.username,
+					data.avatar,
+					data.canvasWidth,
+					data.canvasHeight
+				);
+			} else {
+				const roomId = `SOLO_${socket.id}`;
+				const newGame = new ServerGame(io, roomId, data.difficulty);
+				games.set(roomId, newGame);
+				joinRoom(socket, roomId);
+				newGame.addPlayer(
+					socket.id,
+					data.username,
+					data.avatar,
+					data.canvasWidth,
+					data.canvasHeight
+				);
+			}
 		}
-	});
+	);
 
 	socket.on('move', (directions: Direction[]) => {
 		const game = getGame(socket.id);

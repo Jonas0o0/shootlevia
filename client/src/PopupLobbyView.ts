@@ -1,6 +1,7 @@
 import View from './View.ts';
 import type { Socket } from 'socket.io-client';
 import Router from './Router.ts';
+import { Difficulty } from '../../common/Difficulty.ts';
 
 export default class PopupLobbyView extends View {
 	createBtn: HTMLButtonElement;
@@ -13,7 +14,7 @@ export default class PopupLobbyView extends View {
 	codeDisplay: HTMLElement;
 	playersList: HTMLElement;
 	waitingMessage: HTMLElement;
-	difficulty: HTMLDivElement;
+	difficulty: HTMLElement;
 	private socket: Socket;
 
 	constructor(element: HTMLElement, socket: Socket) {
@@ -37,8 +38,22 @@ export default class PopupLobbyView extends View {
 	}
 
 	private setupListeners() {
+		let difficulty: Difficulty;
+		switch (
+			new FormData(this.difficulty as HTMLFormElement).get('difficulty')
+		) {
+			case 'facile':
+				difficulty = Difficulty.Facile;
+				break;
+			case 'moyen':
+				difficulty = Difficulty.Moyen;
+				break;
+			case 'difficile':
+				difficulty = Difficulty.Difficile;
+				break;
+		}
 		this.createBtn.addEventListener('click', () => {
-			this.socket.emit('create_lobby');
+			this.socket.emit('create_lobby', difficulty);
 		});
 
 		this.joinBtn.addEventListener('click', () => {
