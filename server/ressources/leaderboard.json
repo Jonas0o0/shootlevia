@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "date": "2024-12-12",
+    "joueur": "test",
+    "score": 100
+  },
+  {
+    "date": "2024-12-12",
+    "joueur": "enzo",
+    "score": 100000
+  },
+  {
+    "date": "2024-12-12",
+    "joueur": "teeaeaet",
+    "score": 100
+  }
+]
