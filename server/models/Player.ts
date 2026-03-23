@@ -43,7 +43,7 @@ export class ServerPlayer implements HitBox {
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
 		this.life = new LifebarService();
-		this.arme = new Arme(10, [Direction.Right], 1, 1);
+		this.arme = new Arme(5, 10, 10);
 	}
 
 	public static clamp(value: number, min: number, max: number): number {

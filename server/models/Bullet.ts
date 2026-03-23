@@ -1,6 +1,5 @@
 import type { BulletData } from '../../common/types.ts';
 import type { HitBox } from '../../common/HitBox.ts';
-import { Direction } from '../../common/Direction.ts';
 
 /**
  * Représente une balle tirée par un joueur côté serveur
@@ -16,20 +15,11 @@ export class ServerBullet implements HitBox {
 	public dx: number;
 	public dy: number;
 
-	constructor(ownerId: string, x: number, y: number, speed: number, direction: Direction = Direction.Right) {
+	constructor(ownerId: string, x: number, y: number, speed: number, angle: number = 0) {
 		this.id = crypto.randomUUID();
 		this.ownerId = ownerId;
 		this.x = x;
 		this.y = y;
-		
-		let angle = 0;
-		if (direction === Direction.UR20) angle = -20 * (Math.PI / 180);
-		if (direction === Direction.DR20) angle = 20 * (Math.PI / 180);
-		if (direction === Direction.UR35) angle = -35 * (Math.PI / 180);
-		if (direction === Direction.DR35) angle = 35 * (Math.PI / 180);
-		if (direction === Direction.Up) angle = -90 * (Math.PI / 180);
-		if (direction === Direction.Down) angle = 90 * (Math.PI / 180);
-		if (direction === Direction.Left) angle = 180 * (Math.PI / 180);
 		
 		this.dx = speed * Math.cos(angle);
 		this.dy = speed * Math.sin(angle);
