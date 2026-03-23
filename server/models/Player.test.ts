@@ -37,4 +37,35 @@ describe('ServerPlayer', () => {
             assert.deepStrictEqual(outcome.newBonuses, []);
         });
     });
+
+    describe('movements', () => {
+        const canvasWidth = 800;
+        const canvasHeight = 600;
+        const createPlayer = () => new ServerPlayer('1', { username: 'test', avatar: 'bleu' }, 100, 300, 3, canvasWidth, canvasHeight);
+
+        it('devrait se déplacer par vecteur correctement', () => {
+            const player = createPlayer();
+            player.moveByVector(10, -5);
+            assert.strictEqual(player.x, 110);
+            assert.strictEqual(player.y, 295);
+        });
+
+        it('devrait être limité par les bords du canvas (X)', () => {
+            const player = createPlayer();
+            player.moveByVector(-1000, 0);
+            assert.strictEqual(player.x, 0);
+            player.moveByVector(2000, 0);
+            assert.strictEqual(player.x, canvasWidth - player.width);
+        });
+
+        it('devrait être limité par les bords du canvas (Y)', () => {
+            const player = createPlayer();
+            // Limite haute : canvasHeight * 0.2 - 45
+            player.moveByVector(0, -1000);
+            assert.strictEqual(player.y, canvasHeight * 0.2 - 45);
+            
+            player.moveByVector(0, 2000);
+            assert.strictEqual(player.y, canvasHeight - player.height);
+        });
+    });
 });
