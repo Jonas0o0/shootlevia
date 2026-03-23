@@ -1,13 +1,13 @@
-import type { LeaderboardService } from './LeaderboardService.ts';
+import type { LeaderboardServiceInterface } from './LeaderboardServiceInterface.ts';
 import type { LeaderboardEntry } from '../../../common/LeaderboardEntry.ts';
 
 /**
  * Cette classe permet de stoker des entrées du leaderboard en mémoire
  * @class {LeaderboardServiceMemory}
  *
- * @implements {LeaderboardService}
+ * @implements {LeaderboardServiceInterface}
  */
-class LeaderboardServiceMemory implements LeaderboardService {
+class LeaderboardServiceMemory implements LeaderboardServiceInterface {
 	/**
 	 * Tableau dans lequel sont stockées les entrées
 	 */

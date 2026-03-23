@@ -47,6 +47,10 @@ export class ServerPlayer implements HitBox {
 		this.arme = new Arme(10, [Direction.Right], 1, 1);
 	}
 
+	public getAccount(): Account {
+		return this.account;
+	}
+
 	public static clamp(value: number, min: number, max: number): number {
 		return Math.max(min, Math.min(value, max));
 	}
@@ -117,8 +121,8 @@ export class ServerPlayer implements HitBox {
 		}
 	}
 
-	takeDamage(): void {
-		if (!this.life.isAlive()) return;
+	takeDamage(): boolean {
+		if (!this.life.isAlive()) return false;
 
 		const previousBonusCount = this.bonus.length;
 
@@ -133,12 +137,13 @@ export class ServerPlayer implements HitBox {
 			if (this.bonus.length < previousBonusCount) {
 				this.invincibilityTimer = this.INVINCIBILITY_DURATION;
 			}
-			return;
+			return false;
 		}
 
 		this.life.removeLife(1);
 
 		this.invincibilityTimer = this.INVINCIBILITY_DURATION;
+		return !this.life.isAlive();
 	}
 
 	addBonus(bonus: BonusType): void {
