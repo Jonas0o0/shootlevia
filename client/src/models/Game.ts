@@ -96,9 +96,12 @@ export default class Game {
 		} else {
 			this.mousemoveHandler = (event: MouseEvent) => {
 				const rect = this.canvas.getBoundingClientRect();
+				// Map mouse coordinates to internal 1920x1080 resolution
+				const scaleX = this.canvas.width / rect.width;
+				const scaleY = this.canvas.height / rect.height;
 				this.mousePosition = {
-					x: event.clientX - rect.left,
-					y: event.clientY - rect.top,
+					x: (event.clientX - rect.left) * scaleX,
+					y: (event.clientY - rect.top) * scaleY,
 				};
 			};
 			window.addEventListener('mousemove', this.mousemoveHandler);

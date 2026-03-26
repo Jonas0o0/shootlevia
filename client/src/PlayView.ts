@@ -30,9 +30,33 @@ export default class PlayView extends View {
 	}
 
 	resizeCanvas = () => {
-		this.canvas.width = 1920;
-		this.canvas.height = 1080;
-		this.canvas.style.width = window.innerWidth + 'px';
-		this.canvas.style.height = window.innerHeight + 'px';
+		const targetWidth = 1920;
+		const targetHeight = 1080;
+		const targetRatio = targetWidth / targetHeight;
+
+		const windowWidth = window.innerWidth;
+		const windowHeight = window.innerHeight;
+		const windowRatio = windowWidth / windowHeight;
+
+		let newWidth, newHeight;
+
+		if (windowRatio > targetRatio) {
+			// Window is wider than canvas ratio (pillarbox)
+			newHeight = windowHeight;
+			newWidth = newHeight * targetRatio;
+		} else {
+			// Window is taller than canvas ratio (letterbox)
+			newWidth = windowWidth;
+			newHeight = newWidth / targetRatio;
+		}
+
+		this.canvas.style.width = newWidth + 'px';
+		this.canvas.style.height = newHeight + 'px';
+		this.canvas.style.left = (windowWidth - newWidth) / 2 + 'px';
+		this.canvas.style.top = (windowHeight - newHeight) / 2 + 'px';
+		
+		// Internal resolution remains constant
+		this.canvas.width = targetWidth;
+		this.canvas.height = targetHeight;
 	};
 }
