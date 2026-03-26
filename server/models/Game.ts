@@ -211,14 +211,14 @@ export class ServerGame {
 			this.spawnEnemyService.reset();
 		}
 
-		this.enemies.forEach(enemy => {
+		for (const enemy of this.enemies) {
 			enemy.update();
 			
 			// Trouver le joueur le plus proche pour viser
 			let nearestPlayer: ServerPlayer | null = null;
 			let minDistance = Infinity;
 			
-			this.players.forEach(player => {
+			for (const player of this.players.values()) {
 				if (player.isAlive()) {
 					const dx = player.x - enemy.x;
 					const dy = player.y - enemy.y;
@@ -228,7 +228,7 @@ export class ServerGame {
 						nearestPlayer = player;
 					}
 				}
-			});
+			}
 
 			const bullet = nearestPlayer 
 				? enemy.shoot(nearestPlayer.x + nearestPlayer.width/2, nearestPlayer.y + nearestPlayer.height/2)
@@ -237,7 +237,7 @@ export class ServerGame {
 			if (bullet) {
 				this.enemyBullets.push(bullet);
 			}
-		});
+		}
 		this.enemies = this.enemies.filter(
 			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000,
 		);
