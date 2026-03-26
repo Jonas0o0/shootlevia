@@ -56,7 +56,7 @@ export default class PopupGameOverView extends View {
 				</div>
 			`;
 
-			if (stats.leaderboard && stats.leaderboard.length > 0) {
+			if (stats.leaderboard && stats.leaderboard.length > 1) {
 				statsHtml += `
 					<div class="leaderboard-section">
 						<h3>Classement Joueurs</h3>
