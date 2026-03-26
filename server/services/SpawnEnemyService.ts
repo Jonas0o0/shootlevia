@@ -1,4 +1,5 @@
 import { ServerEnemy } from '../models/ServerEnemy.ts';
+import { EnemyConfigs, type EnemyType } from '../../common/EnemyType.ts';
 
 export class SpawnEnemyService {
 	private baseRespawnRate: number = 300;
@@ -6,13 +7,8 @@ export class SpawnEnemyService {
 	private difficultyCurve: number = 0.1;
 	private enemySpawnCooldown: number = 0;
 
-	// Coefficients de progression (ajustés pour difficultyCurve entre 0.3 et 0.5)
-	private readonly BASE_DRONE_HEALTH: number = 30;
-	private readonly BASE_PNEU_HEALTH: number = 160;
+	// Coefficients de progression
 	private readonly MAX_SPEED_MULTIPLIER: number = 3.0;
-
-	// Ces facteurs sont multipliés par (time * difficultyCurve)
-	// Ils permettent de doser l'impact de la courbe sur chaque statistique
 	private readonly SPEED_SCALING_FACTOR: number = 0.001;
 	private readonly HEALTH_SCALING_FACTOR: number = 0.05;
 
@@ -43,17 +39,26 @@ export class SpawnEnemyService {
 		);
 	}
 
-	private calculateHealth(time: number, type: 'PNEU' | 'DRONE'): number {
-		const baseHealth =
-			type === 'PNEU' ? this.BASE_PNEU_HEALTH : this.BASE_DRONE_HEALTH;
+	private calculateHealth(time: number, type: EnemyType): number {
+		const config = EnemyConfigs[type];
 		return (
-			baseHealth +
+			config.baseHealth +
 			Math.floor(this.getProgression(time) * this.HEALTH_SCALING_FACTOR)
 		);
 	}
 
-	public getEnemyType(randomValue: number): 'PNEU' | 'DRONE' {
-		return randomValue < 0.3 ? 'PNEU' : 'DRONE';
+	public getEnemyType(randomValue: number): EnemyType {
+		let cumulativeProbability = 0;
+		const configs = Object.values(EnemyConfigs);
+
+		for (const config of configs) {
+			cumulativeProbability += config.spawnProbability;
+			if (randomValue < cumulativeProbability) {
+				return config.type;
+			}
+		}
+
+		return configs[configs.length - 1].type;
 	}
 
 	public update(
@@ -78,7 +83,14 @@ export class SpawnEnemyService {
 
 	private generateEnemy(time: number): ServerEnemy {
 		const id = Math.random().toString(36).substring(7);
-		const type = this.getEnemyType(Math.random());
+
+		// Somme des probabilités pour un random normalisé
+		const totalProb = Object.values(EnemyConfigs).reduce(
+			(sum, c) => sum + c.spawnProbability,
+			0
+		);
+		const type = this.getEnemyType(Math.random() * totalProb);
+
 		const speedMult = this.calculateSpeedMultiplier(time);
 		const health = this.calculateHealth(time, type);
 
