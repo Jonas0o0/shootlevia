@@ -25,6 +25,8 @@ export class ServerPlayer implements HitBox {
 	private readonly INVINCIBILITY_DURATION: number = 60;
 	public arme: Arme;
 	public score: number = 0;
+	public isGhost: boolean = false;
+	public reviveProgress: number = 0;
 
 	constructor(
 		id: string,
@@ -185,10 +187,20 @@ export class ServerPlayer implements HitBox {
 		this.x = 100;
 		this.y = 300;
 		this.arme.bullets = [];
+		this.isGhost = false;
+		this.reviveProgress = 0;
+	}
+
+	public revive(): void {
+		this.isGhost = false;
+		this.reviveProgress = 0;
+		this.life = new LifebarService(Math.max(1, Math.floor(this.life.getMaxLife() / 2)));
+		this.invincibilityTimer = this.INVINCIBILITY_DURATION * 2;
 	}
 
 	shoot(): void {
 		if (!this.life.isAlive()) return;
+		if (this.isGhost) return;
 		this.arme.shoot(this.id, this);
 	}
 
@@ -207,6 +219,8 @@ export class ServerPlayer implements HitBox {
 			life: { life: this.life.life, maxLife: this.life.getMaxLife() } as any,
 			isInvincible: this.invincibilityTimer > 0,
 			score: this.score,
+			isGhost: this.isGhost,
+			reviveProgress: this.reviveProgress,
 		};
 	}
 }

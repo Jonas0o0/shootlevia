@@ -86,28 +86,28 @@ export class ServerGame {
 
 	handlePlayerMove(id: string, directions: Direction[]): void {
 		const player = this.players.get(id);
-		if (player && player.isAlive()) {
+		if (player && (player.isAlive() || player.isGhost)) {
 			directions.forEach(dir => player.move(dir));
 		}
 	}
 
 	handlePlayerMoveVector(id: string, vx: number, vy: number): void {
 		const player = this.players.get(id);
-		if (player && player.isAlive()) {
+		if (player && (player.isAlive() || player.isGhost)) {
 			player.moveByVector(vx, vy);
 		}
 	}
 
 	handlePlayerJump(id: string): void {
 		const player = this.players.get(id);
-		if (player && player.isAlive()) {
+		if (player && (player.isAlive() || player.isGhost)) {
 			player.doJump();
 		}
 	}
 
 	handlePlayerShoot(id: string): void {
 		const player = this.players.get(id);
-		if (player && player.isAlive()) {
+		if (player && player.isAlive() && !player.isGhost) {
 			player.shoot();
 		}
 	}
@@ -126,6 +126,43 @@ export class ServerGame {
 
 	update(): void {
 		this.time++;
+
+		// Logique de réanimation
+		if (this.players.size > 1) {
+			const playersArray = Array.from(this.players.values());
+			const alivePlayers = playersArray.filter(p => p.isAlive() && !p.isGhost);
+			const ghostPlayers = playersArray.filter(p => !p.isAlive() && p.isGhost);
+
+			if (alivePlayers.length > 0) {
+				ghostPlayers.forEach(ghost => {
+					let beingRevived = false;
+					alivePlayers.forEach(alive => {
+						const ghostCenter = { x: ghost.x + ghost.width / 2, y: ghost.y + ghost.height / 2 };
+						const aliveCenter = { x: alive.x + alive.width / 2, y: alive.y + alive.height / 2 };
+						const dx = ghostCenter.x - aliveCenter.x;
+						const dy = ghostCenter.y - aliveCenter.y;
+						const distance = Math.sqrt(dx * dx + dy * dy);
+
+						if (distance < 150) {
+							beingRevived = true;
+						}
+					});
+
+					if (beingRevived) {
+						ghost.reviveProgress += 1;
+						// temps de revive 3s
+						if (ghost.reviveProgress >= 180) {
+							ghost.revive();
+						}
+					} else {
+						ghost.reviveProgress = 0;
+					}
+				});
+			} else {
+				ghostPlayers.forEach(ghost => ghost.isGhost = false);
+			}
+		}
+
 		this.players.forEach(player => player.update());
 		this.players.forEach(player => player.arme.updateBullets());
 		this.bonuses.forEach(bonus => bonus.update());
@@ -221,6 +258,13 @@ export class ServerGame {
 
 					const died = player.takeDamage();
 					if (died) {
+						if (this.players.size > 1) {
+							const aliveOthers = Array.from(this.players.values()).filter(p => p.id !== player.id && p.isAlive() && !p.isGhost);
+							if (aliveOthers.length > 0) {
+								player.isGhost = true;
+							}
+						}
+
 						leaderboardService.addEntry({
 							joueur: player.getAccount().username,
 							score: this.score,

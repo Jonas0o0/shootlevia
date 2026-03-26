@@ -31,6 +31,8 @@ class Player implements HitBox {
 	private lastBonusList: string = '';
 	private readonly life: LifebarService;
 	private isInvincible: boolean;
+	public isGhost: boolean = false;
+	public reviveProgress: number = 0;
 
 	constructor(
 		joueur: Account | null,
@@ -74,8 +76,10 @@ class Player implements HitBox {
 		this.x = data.x;
 		this.y = data.y;
 		this.isInvincible = data.isInvincible;
+		this.isGhost = data.isGhost || false;
+		this.reviveProgress = data.reviveProgress || 0;
 
-		//Pour Optti on fait pas un bete remplacment, on compra les de liste por suprimer et ajputer les différence
+		//Pour Optti on fait pas un bete remplacment, on compra les de liste por suprimer et ajputer les diffrence
 		const dataSet = new Set(data.bonus);
 		const currentSet = new Set(this.bonus.map(b => b.type));
 
@@ -149,7 +153,9 @@ class Player implements HitBox {
 		let frame: Frame = this.sprite.getFrame();
 
 		// Effet de clignotement transparent si invincible et en spec
-		if (!this.life.isAlive()) {
+		if (this.isGhost) {
+			ctx.globalAlpha = 0.4;
+		} else if (!this.life.isAlive()) {
 			ctx.globalAlpha = 0.3;
 		} else if (this.isInvincible) {
 			// On fait varier l'alpha toutes les 100ms
@@ -170,11 +176,28 @@ class Player implements HitBox {
 			frame.height
 		);
 
+		// barre de réanimation
+		if (this.isGhost && this.reviveProgress > 0) {
+			const barWidth = 60;
+			const barHeight = 8;
+			const barX = this.x + (this.width - barWidth) / 2;
+			const barY = this.y - 15;
+			const progress = Math.min(1, this.reviveProgress / 180);
+
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+			ctx.fillRect(barX, barY, barWidth, barHeight);
+			ctx.fillStyle = '#00ff00';
+			ctx.fillRect(barX, barY, barWidth * progress, barHeight);
+			ctx.strokeStyle = '#fff';
+			ctx.lineWidth = 1;
+			ctx.strokeRect(barX, barY, barWidth, barHeight);
+		}
+
 		// On reset l'alpha pour ne pas impacter les autres dessins
 		ctx.globalAlpha = 1.0;
 
 		// Dessiner les effets des bonus sur le joueur seulement si vivant
-		if (this.life.isAlive()) {
+		if (this.life.isAlive() && !this.isGhost) {
 			this.bonus.forEach(b => {
 				b.drawOnPlayer(ctx, this);
 			});
