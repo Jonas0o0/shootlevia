@@ -10,11 +10,13 @@ import { Server } from 'socket.io';
 import type { Difficulty } from '../../common/Difficulty.ts';
 import { leaderboardService } from '../services/LeaderboardService.ts';
 import { EnemyConfigs, type EnemyType } from '../../common/EnemyType.ts';
+import { ServerBullet } from './Bullet.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
 	private enemies: ServerEnemy[] = [];
 	private bonuses: ServerBonus[] = [];
+	private enemyBullets: ServerBullet[] = [];
 	private time: number = 0;
 	private score: number = 0;
 	private enemyCount: number = 0;
@@ -32,7 +34,7 @@ export class ServerGame {
 		this.roomId = roomId;
 		this.difficulty = difficulty;
 		this.spawnEnemyService = new SpawnEnemyService(
-			this.difficulty.difficultyCurve,
+			this.difficulty.difficultyCurve
 		);
 		// Boucle de jeu (60fps)
 		this.intervalId = setInterval(() => this.update(), 1000 / 60);
@@ -47,22 +49,21 @@ export class ServerGame {
 		this.players.forEach(p => p.reset());
 		this.enemies = [];
 		this.bonuses = [];
+		this.enemyBullets = [];
 		this.time = 0;
 		this.score = 0;
 		this.enemyCount = 0;
 		this.countDrone = 0;
 		this.countPneu = 0;
 		this.spawnEnemyService = new SpawnEnemyService(
-			this.difficulty.difficultyCurve,
+			this.difficulty.difficultyCurve
 		);
 	}
 
 	addPlayer(
 		id: string,
 		username: string,
-		avatar: string,
-		canvasWidth: number,
-		canvasHeight: number,
+		avatar: string
 	): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
@@ -73,10 +74,8 @@ export class ServerGame {
 				{ username, avatar },
 				x,
 				y,
-				this.difficulty.life,
-				canvasWidth,
-				canvasHeight,
-			),
+				this.difficulty.life
+			)
 		);
 	}
 
@@ -129,16 +128,19 @@ export class ServerGame {
 		this.players.forEach(player => player.update());
 		this.players.forEach(player => player.arme.updateBullets());
 		this.bonuses.forEach(bonus => bonus.update());
+		this.enemyBullets.forEach(bullet => bullet.update());
 
 		// Détruire des drones avec les balles
 		const bulletsToRemove = new Set<string>();
 		const enemiesToRemove = new Set<string>();
+		const enemyBulletsToRemove = new Set<string>();
 
 		const allBullets = Array.from(this.players.values()).flatMap(
-			p => p.arme.bullets,
+			p => p.arme.bullets
 		);
 
 		allBullets.forEach(bullet => {
+			// Collision balles joueur -> ennemis
 			this.enemies.forEach(enemy => {
 				if (checkCollision(bullet, enemy)) {
 					const player = this.players.get(bullet.ownerId);
@@ -169,16 +171,34 @@ export class ServerGame {
 					}
 				}
 			});
+
+			// Collision balles joueur -> balles ennemis
+			this.enemyBullets.forEach(enemyBullet => {
+				if (checkCollision(bullet, enemyBullet)) {
+					bulletsToRemove.add(bullet.id);
+					enemyBulletsToRemove.add(enemyBullet.id);
+				}
+			});
 		});
 
-		this.checkPlayerCollisions();
+		this.checkPlayerCollisions(enemyBulletsToRemove);
 
 		// Nettoyage des balles (on utilise bulletsToRemove ici pour marquer l'impact)
 		this.players.forEach(player => {
 			player.arme.bullets = player.arme.bullets.filter(
-				b => !bulletsToRemove.has(b.id) && b.x < 2000,
+				b => !bulletsToRemove.has(b.id) && b.x < 2000
 			);
 		});
+
+		// Nettoyage des balles ennemis hors de l'écran ou touchées (limites larges pour drones spawns)
+		this.enemyBullets = this.enemyBullets.filter(
+			b =>
+				!enemyBulletsToRemove.has(b.id) &&
+				b.x > -100 &&
+				b.x < 2020 &&
+				b.y > -100 &&
+				b.y < 1180
+		);
 
 		if (this.players.size > 0) {
 			this.spawnEnemyService.update(this.time, true, this.enemies);
@@ -186,21 +206,70 @@ export class ServerGame {
 			this.time = 0;
 			this.enemies = [];
 			this.bonuses = [];
+			this.enemyBullets = [];
 			this.spawnEnemyService.reset();
 		}
 
-		this.enemies.forEach(enemy => enemy.update());
+		this.enemies.forEach(enemy => {
+			enemy.update();
+
+			// Trouver le joueur le plus proche pour viser
+			let nearestPlayer: ServerPlayer | null = null;
+			let minDistance = Infinity;
+
+			for (const player of this.players.values()) {
+				if (player.isAlive()) {
+					const dx = player.x - enemy.x;
+					const dy = player.y - enemy.y;
+					const dist = Math.sqrt(dx * dx + dy * dy);
+					if (dist < minDistance) {
+						minDistance = dist;
+						nearestPlayer = player;
+					}
+				}
+			}
+
+			const bullet = nearestPlayer
+				? enemy.shoot(
+						nearestPlayer.x + nearestPlayer.width / 2,
+						nearestPlayer.y + nearestPlayer.height / 2
+					)
+				: enemy.shoot();
+
+			if (bullet) {
+				this.enemyBullets.push(bullet);
+			}
+		});
+
+		// Suppression des ennemis hors champ (avec une marge pour le spawn)
 		this.enemies = this.enemies.filter(
-			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000,
+			e => !enemiesToRemove.has(e.id) && 
+				 e.x > -500 && e.x < 2500 && 
+				 e.y > -500 && e.y < 1500
 		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 
 		this.io.to(this.roomId).emit('gameState', this.getState());
 	}
 
-	private checkPlayerCollisions() {
+	private checkPlayerCollisions(enemyBulletsToRemove: Set<string>) {
 		this.players.forEach(player => {
 			if (!player.isAlive()) return;
+
+			// Collision avec balles ennemis
+			this.enemyBullets.forEach(bullet => {
+				if (checkCollision(player, bullet)) {
+					const died = player.takeDamage();
+					enemyBulletsToRemove.add(bullet.id);
+					if (died) {
+						leaderboardService.addEntry({
+							joueur: player.getAccount().username,
+							score: this.score,
+							date: Date.now(),
+						});
+					}
+				}
+			});
 
 			this.bonuses = this.bonuses.filter(bonus => {
 				const isColliding = checkCollision(player, bonus);
@@ -254,9 +323,12 @@ export class ServerGame {
 	getState(): GameState {
 		return {
 			players: Array.from(this.players.values()).map(p => p.toData()),
-			bullets: Array.from(this.players.values()).flatMap(p =>
-				p.arme.bullets.map(b => b.toData()),
-			),
+			bullets: [
+				...Array.from(this.players.values()).flatMap(p =>
+					p.arme.bullets.map(b => b.toData())
+				),
+				...this.enemyBullets.map(b => b.toData()),
+			],
 			enemies: this.enemies.map(e => e.toData()),
 			bonuses: this.bonuses.map(b => b.toData()),
 			time: this.time,
