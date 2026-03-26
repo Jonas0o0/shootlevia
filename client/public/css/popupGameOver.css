@@ -98,3 +98,50 @@
     color: #FFD700;
     font-weight: bold;
 }
+
+.popupGameOver .leaderboard-section {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.popupGameOver .leaderboard-section h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #fff;
+    font-size: 1.5em; /* Maintain consistency */
+}
+
+.popupGameOver .leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: #fff;
+    font-family: 'Pixelify Sans', sans-serif;
+}
+
+.popupGameOver .leaderboard-table thead tr {
+    border-bottom: 2px solid #fff;
+}
+
+.popupGameOver .leaderboard-table th {
+    padding: 5px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.popupGameOver .leaderboard-table th:last-child {
+    text-align: right;
+}
+
+.popupGameOver .leaderboard-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.popupGameOver .leaderboard-table td {
+    padding: 5px;
+    font-size: 1.2em;
+}
+
+.popupGameOver .leaderboard-table td:last-child {
+    text-align: right;
+    color: #FFD700;
+}
