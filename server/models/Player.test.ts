@@ -48,8 +48,8 @@ describe('ServerPlayer', () => {
 	});
 
 	describe('movements', () => {
-		const canvasWidth = 800;
-		const canvasHeight = 600;
+		const canvasWidth = 1920;
+		const canvasHeight = 1080;
 		const createPlayer = () =>
 			new ServerPlayer('1', { username: 'test', avatar: 'bleu' }, 100, 300, 3);
 
