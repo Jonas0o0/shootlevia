@@ -141,17 +141,28 @@ export class ServerGame {
 		allBullets.forEach(bullet => {
 			this.enemies.forEach(enemy => {
 				if (checkCollision(bullet, enemy)) {
-					const config = EnemyConfigs[enemy.type as EnemyType];
-					if (config) {
-						enemy.takeDamage(bullet.degat);
+					const player = this.players.get(bullet.ownerId);
+					if (enemy.type === 'DRONE') {
+						enemy.takeDamage(16);
 						bulletsToRemove.add(bullet.id);
 
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
 							this.score += config.scoreValue;
 							this.enemyCount++;
-							if (enemy.type === 'DRONE') this.countDrone++;
-							if (enemy.type === 'PNEU') this.countPneu++;
+							this.countDrone++;
+							if (player) player.score += 20;
+							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+						}
+					} else if (enemy.type === 'PNEU') {
+						enemy.takeDamage(11);
+						bulletsToRemove.add(bullet.id);
+						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
+							enemiesToRemove.add(enemy.id);
+							this.score += 10;
+							this.enemyCount++;
+							this.countPneu++;
+							if (player) player.score += 10;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					}

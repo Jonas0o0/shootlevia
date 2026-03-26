@@ -46,6 +46,7 @@ export class ServerPlayer implements HitBox {
 		this.bonus = [];
 		this.arme = new Arme(5, 10, 10);
 		this.life = new LifebarService(life);
+		this.score = 0;
 	}
 
 	public getAccount(): Account {
