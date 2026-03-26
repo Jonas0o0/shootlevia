@@ -143,7 +143,7 @@ export class ServerGame {
 				if (checkCollision(bullet, enemy)) {
 					const config = EnemyConfigs[enemy.type as EnemyType];
 					if (config) {
-						enemy.takeDamage(config.damageOnHit);
+						enemy.takeDamage(bullet.degat);
 						bulletsToRemove.add(bullet.id);
 
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {

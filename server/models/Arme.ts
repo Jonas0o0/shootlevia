@@ -43,7 +43,8 @@ export class Arme {
 				source.x + source.width,
 				source.y + source.height / 2,
 				this.vitesse,
-				angleRad
+				angleRad,
+				this.degat
 			);
 			this.bullets.push(bullet);
 		}

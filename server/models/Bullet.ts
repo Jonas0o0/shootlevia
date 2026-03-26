@@ -11,15 +11,17 @@ export class ServerBullet implements HitBox {
 	public width: number = 10;
 	public height: number = 5;
 	public ownerId: string;
+	public degat: number = 10;
 	
 	public dx: number;
 	public dy: number;
 
-	constructor(ownerId: string, x: number, y: number, speed: number, angle: number = 0) {
+	constructor(ownerId: string, x: number, y: number, speed: number, angle: number = 0, degat: number = 10) {
 		this.id = crypto.randomUUID();
 		this.ownerId = ownerId;
 		this.x = x;
 		this.y = y;
+		this.degat = degat;
 		
 		this.dx = speed * Math.cos(angle);
 		this.dy = speed * Math.sin(angle);
