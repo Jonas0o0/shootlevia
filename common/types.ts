@@ -20,6 +20,7 @@ export interface PlayerData {
 	bonus: BonusType[];
 	life: { life: number; maxLife: number };
 	isInvincible: boolean;
+	score: number;
 }
 
 export interface BulletData {

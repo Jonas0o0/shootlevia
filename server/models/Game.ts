@@ -31,7 +31,7 @@ export class ServerGame {
 		this.roomId = roomId;
 		this.difficulty = difficulty;
 		this.spawnEnemyService = new SpawnEnemyService(
-			this.difficulty.difficultyCurve
+			this.difficulty.difficultyCurve,
 		);
 		// Boucle de jeu (60fps)
 		this.intervalId = setInterval(() => this.update(), 1000 / 60);
@@ -52,7 +52,7 @@ export class ServerGame {
 		this.countDrone = 0;
 		this.countPneu = 0;
 		this.spawnEnemyService = new SpawnEnemyService(
-			this.difficulty.difficultyCurve
+			this.difficulty.difficultyCurve,
 		);
 	}
 
@@ -61,7 +61,7 @@ export class ServerGame {
 		username: string,
 		avatar: string,
 		canvasWidth: number,
-		canvasHeight: number
+		canvasHeight: number,
 	): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
@@ -74,8 +74,8 @@ export class ServerGame {
 				y,
 				this.difficulty.life,
 				canvasWidth,
-				canvasHeight
-			)
+				canvasHeight,
+			),
 		);
 	}
 
@@ -134,12 +134,13 @@ export class ServerGame {
 		const enemiesToRemove = new Set<string>();
 
 		const allBullets = Array.from(this.players.values()).flatMap(
-			p => p.arme.bullets
+			p => p.arme.bullets,
 		);
 
 		allBullets.forEach(bullet => {
 			this.enemies.forEach(enemy => {
 				if (checkCollision(bullet, enemy)) {
+					const player = this.players.get(bullet.ownerId);
 					if (enemy.type === 'DRONE') {
 						enemy.takeDamage(16);
 						bulletsToRemove.add(bullet.id);
@@ -148,6 +149,7 @@ export class ServerGame {
 							this.score += 20;
 							this.enemyCount++;
 							this.countDrone++;
+							if (player) player.score += 20;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					} else if (enemy.type === 'PNEU') {
@@ -158,6 +160,7 @@ export class ServerGame {
 							this.score += 10;
 							this.enemyCount++;
 							this.countPneu++;
+							if (player) player.score += 10;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					}
@@ -170,7 +173,7 @@ export class ServerGame {
 		// Nettoyage des balles (on utilise bulletsToRemove ici pour marquer l'impact)
 		this.players.forEach(player => {
 			player.arme.bullets = player.arme.bullets.filter(
-				b => !bulletsToRemove.has(b.id) && b.x < 2000
+				b => !bulletsToRemove.has(b.id) && b.x < 2000,
 			);
 		});
 
@@ -185,7 +188,7 @@ export class ServerGame {
 
 		this.enemies.forEach(enemy => enemy.update());
 		this.enemies = this.enemies.filter(
-			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000
+			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000,
 		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 
@@ -249,7 +252,7 @@ export class ServerGame {
 		return {
 			players: Array.from(this.players.values()).map(p => p.toData()),
 			bullets: Array.from(this.players.values()).flatMap(p =>
-				p.arme.bullets.map(b => b.toData())
+				p.arme.bullets.map(b => b.toData()),
 			),
 			enemies: this.enemies.map(e => e.toData()),
 			bonuses: this.bonuses.map(b => b.toData()),

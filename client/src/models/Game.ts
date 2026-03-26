@@ -156,10 +156,18 @@ export default class Game {
 			);
 			if (allPlayers.length > 0 && livingPlayers.length === 0 && this.active) {
 				this.stop();
+				const leaderboard = state.players
+					.map(p => ({
+						username: p.account.username,
+						score: p.score || 0,
+					}))
+					.sort((a, b) => b.score - a.score);
+
 				this.onGameOver({
 					time: this.time,
 					score: this.score,
 					enemyCount: this.enemyCount,
+					leaderboard: leaderboard,
 				});
 				return;
 			}
