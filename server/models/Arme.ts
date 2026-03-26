@@ -69,6 +69,10 @@ export class Arme {
 		this.frequence = Math.max(50, 500 - reductionFrequence);
 	}
 
+	levelHalf(): void {
+		this.level = Math.floor(this.level / 2);
+	}
+	
 	updateBullets(): void {
 		this.bullets.forEach(bullet => bullet.update());
 		this.bullets = this.bullets.filter(b => b.x < 2000);

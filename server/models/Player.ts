@@ -154,6 +154,7 @@ export class ServerPlayer implements HitBox {
 			return false;
 		}
 
+		this.arme.levelHalf();
 		this.life.removeLife(1);
 
 		this.invincibilityTimer = this.INVINCIBILITY_DURATION;
