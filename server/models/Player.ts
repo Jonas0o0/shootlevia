@@ -44,7 +44,7 @@ export class ServerPlayer implements HitBox {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
-		this.arme = new Arme(5, 10, 10);
+		this.arme = new Arme(5, 10, 500);
 		this.life = new LifebarService(life);
 		this.score = 0;
 	}
