@@ -10,7 +10,7 @@ export interface EnemyConfig {
 export const EnemyConfigs: Record<EnemyType, EnemyConfig> = {
 	PNEU: {
 		type: 'PNEU',
-		baseHealth: 160,
+		baseHealth: 100,
 		spawnProbability: 0.3,
 		scoreValue: 10,
 	},

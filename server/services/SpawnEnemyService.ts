@@ -1,9 +1,13 @@
 import { ServerEnemy } from '../models/ServerEnemy.ts';
-import { EnemyConfigs, type EnemyType } from '../../common/EnemyType.ts';
+import {
+	EnemyConfigs,
+	type EnemyType,
+	type EnemyConfig,
+} from '../../common/EnemyType.ts';
 
 export class SpawnEnemyService {
 	private baseRespawnRate: number = 300;
-	private minRespawnRate: number = 30;
+	private minRespawnRate: number = 10; // Permet jusqu'à 6 ennemis par seconde
 	private difficultyCurve: number = 0.1;
 	private enemySpawnCooldown: number = 0;
 
@@ -11,6 +15,7 @@ export class SpawnEnemyService {
 	private readonly MAX_SPEED_MULTIPLIER: number = 3.0;
 	private readonly SPEED_SCALING_FACTOR: number = 0.001;
 	private readonly HEALTH_SCALING_FACTOR: number = 0.05;
+	private readonly SPAWN_SCALING_FACTOR: number = 1;
 
 	constructor(difficultyCurve: number) {
 		this.difficultyCurve = difficultyCurve;
@@ -18,18 +23,19 @@ export class SpawnEnemyService {
 
 	/**
 	 * Calcule le facteur de progression global basé sur le temps et la courbe.
-	 * Tout le scaling du jeu dépend de ce facteur unique.
 	 */
 	private getProgression(time: number): number {
 		return time * this.difficultyCurve;
 	}
 
 	public calculateRespawnRate(time: number): number {
-		// Le spawn rate suit la courbe linéairement
-		return Math.max(
-			this.minRespawnRate,
-			Math.floor(this.baseRespawnRate - this.getProgression(time))
-		);
+		// Formule non-linéaire : le taux de spawn diminue de plus en plus
+		// Plus le SPAWN_SCALING_FACTOR est élevé, plus le nombre d'ennemis explose vite
+		const scaledRate =
+			this.baseRespawnRate /
+			(1 + this.getProgression(time) * this.SPAWN_SCALING_FACTOR);
+
+		return Math.max(this.minRespawnRate, Math.floor(scaledRate));
 	}
 
 	private calculateSpeedMultiplier(time: number): number {
@@ -84,9 +90,10 @@ export class SpawnEnemyService {
 	private generateEnemy(time: number): ServerEnemy {
 		const id = Math.random().toString(36).substring(7);
 
+		const configs = Object.values(EnemyConfigs);
 		// Somme des probabilités pour un random normalisé
-		const totalProb = Object.values(EnemyConfigs).reduce(
-			(sum, c) => sum + c.spawnProbability,
+		const totalProb = configs.reduce(
+			(sum: number, c: EnemyConfig) => sum + c.spawnProbability,
 			0
 		);
 		const type = this.getEnemyType(Math.random() * totalProb);
