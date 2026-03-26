@@ -9,6 +9,7 @@ import { checkCollision, getCenter, getOverlap } from '../../common/HitBox.ts';
 import { Server } from 'socket.io';
 import type { Difficulty } from '../../common/Difficulty.ts';
 import { leaderboardService } from '../services/LeaderboardService.ts';
+import { EnemyConfigs, type EnemyType } from '../../common/EnemyType.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -140,24 +141,17 @@ export class ServerGame {
 		allBullets.forEach(bullet => {
 			this.enemies.forEach(enemy => {
 				if (checkCollision(bullet, enemy)) {
-					if (enemy.type === 'DRONE') {
-						enemy.takeDamage(16);
+					const config = EnemyConfigs[enemy.type as EnemyType];
+					if (config) {
+						enemy.takeDamage(bullet.degat);
 						bulletsToRemove.add(bullet.id);
+
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
-							this.score += 20;
+							this.score += config.scoreValue;
 							this.enemyCount++;
-							this.countDrone++;
-							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
-						}
-					} else if (enemy.type === 'PNEU') {
-						enemy.takeDamage(11);
-						bulletsToRemove.add(bullet.id);
-						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
-							enemiesToRemove.add(enemy.id);
-							this.score += 10;
-							this.enemyCount++;
-							this.countPneu++;
+							if (enemy.type === 'DRONE') this.countDrone++;
+							if (enemy.type === 'PNEU') this.countPneu++;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 						}
 					}
