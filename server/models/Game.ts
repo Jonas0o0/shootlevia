@@ -63,9 +63,7 @@ export class ServerGame {
 	addPlayer(
 		id: string,
 		username: string,
-		avatar: string,
-		canvasWidth: number,
-		canvasHeight: number
+		avatar: string
 	): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
@@ -76,9 +74,7 @@ export class ServerGame {
 				{ username, avatar },
 				x,
 				y,
-				this.difficulty.life,
-				canvasWidth,
-				canvasHeight
+				this.difficulty.life
 			)
 		);
 	}
@@ -198,10 +194,10 @@ export class ServerGame {
 		this.enemyBullets = this.enemyBullets.filter(
 			b =>
 				!enemyBulletsToRemove.has(b.id) &&
-				b.x > -500 &&
-				b.x < 3000 &&
-				b.y > -500 &&
-				b.y < 2000
+				b.x > -100 &&
+				b.x < 2020 &&
+				b.y > -100 &&
+				b.y < 1180
 		);
 
 		if (this.players.size > 0) {
@@ -245,8 +241,11 @@ export class ServerGame {
 			}
 		});
 
+		// Suppression des ennemis hors champ (avec une marge pour le spawn)
 		this.enemies = this.enemies.filter(
-			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000
+			e => !enemiesToRemove.has(e.id) && 
+				 e.x > -500 && e.x < 2500 && 
+				 e.y > -500 && e.y < 1500
 		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 

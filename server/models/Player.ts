@@ -31,9 +31,7 @@ export class ServerPlayer implements HitBox {
 		account: Account,
 		x: number,
 		y: number,
-		life: number,
-		canvasWidth: number,
-		canvasHeight: number
+		life: number
 	) {
 		this.id = id;
 		this.account = account;
@@ -41,8 +39,8 @@ export class ServerPlayer implements HitBox {
 		this.y = y;
 		this.width = 74;
 		this.height = 100;
-		this.canvasWidth = canvasWidth;
-		this.canvasHeight = canvasHeight;
+		this.canvasWidth = 1920;
+		this.canvasHeight = 1080;
 		this.bonus = [];
 		this.arme = new Arme(5, 10, 500);
 		this.life = new LifebarService(life);
