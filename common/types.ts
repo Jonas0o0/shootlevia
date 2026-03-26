@@ -21,6 +21,8 @@ export interface PlayerData {
 	life: { life: number; maxLife: number };
 	isInvincible: boolean;
 	score: number;
+	isGhost?: boolean;
+	reviveProgress?: number;
 }
 
 export interface BulletData {
@@ -30,6 +32,7 @@ export interface BulletData {
 	width: number;
 	height: number;
 	ownerId: string;
+	type?: 'player' | 'enemy';
 }
 
 export interface EnemyData {

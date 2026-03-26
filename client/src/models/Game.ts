@@ -41,6 +41,15 @@ export default class Game {
 	private readonly FRICTION: number = 0.85;
 	private readonly MAX_SPEED: number = 5;
 
+	private getDisplayParams() {
+		const targetW = 1920;
+		const targetH = 1080;
+		const scale = Math.min(this.canvas.width / targetW, this.canvas.height / targetH);
+		const offsetX = (this.canvas.width - targetW * scale) / 2;
+		const offsetY = (this.canvas.height - targetH * scale) / 2;
+		return { scale, offsetX, offsetY };
+	}
+
 	constructor(
 		socket: Socket,
 		players: Player[],
@@ -70,12 +79,10 @@ export default class Game {
 		this.souris =
 			this.joueur.getAccoutn().deplacement === DeplacementType.Mouse;
 
-		// Rejoindre la partie côté serveur avec la taille du canvas
+		// Rejoindre la partie côté serveur
 		this.socket.emit('join', {
 			username: this.joueur.getAccoutn().username,
 			avatar: this.joueur.getAccoutn().avatar,
-			canvasWidth: this.canvas.width,
-			canvasHeight: this.canvas.height,
 			difficulty: this.difficulty,
 		});
 
@@ -97,9 +104,12 @@ export default class Game {
 		} else {
 			this.mousemoveHandler = (event: MouseEvent) => {
 				const rect = this.canvas.getBoundingClientRect();
+				const { scale, offsetX, offsetY } = this.getDisplayParams();
+
+				// Mapper les coordonnées en retirant l'offset et en divisant par le scale
 				this.mousePosition = {
-					x: event.clientX - rect.left,
-					y: event.clientY - rect.top,
+					x: (event.clientX - rect.left - offsetX) / scale,
+					y: (event.clientY - rect.top - offsetY) / scale,
 				};
 			};
 			window.addEventListener('mousemove', this.mousemoveHandler);
@@ -372,11 +382,19 @@ export default class Game {
 
 	draw = (): void => {
 		if (!this.active) return;
-		//appeller par requestanimationframe
+		const { scale, offsetX, offsetY } = this.getDisplayParams();
+
+		// On nettoie tout le canvas physique
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		//Dessiner la map
+		// 1. DESSIN DU FOND (Il prend TOUT l'écran, sans scale ni offset)
 		this.map.draw(this.canvas, this.ctx);
+
+		// 2. DESSIN DES OBJETS DE JEU (Centrés et zoomés)
+		this.ctx.save();
+		// On applique la transformation pour passer du monde virtuel (1920x1080) à l'écran réel
+		this.ctx.translate(offsetX, offsetY);
+		this.ctx.scale(scale, scale);
 
 		// Dessiner toutes les balles
 		this.bullets.forEach(bullet => {
@@ -406,11 +424,13 @@ export default class Game {
 			this.ctx.textAlign = 'center';
 			this.ctx.fillText(
 				'SPECTATEUR',
-				this.canvas.width / 2,
-				this.canvas.height - 50
+				1920 / 2, // Toujours au milieu du monde virtuel
+				1080 - 50
 			);
 			this.ctx.restore();
 		}
+
+		this.ctx.restore();
 
 		requestAnimationFrame(this.draw);
 	};

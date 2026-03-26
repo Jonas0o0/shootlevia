@@ -25,15 +25,15 @@ export class ServerPlayer implements HitBox {
 	private readonly INVINCIBILITY_DURATION: number = 60;
 	public arme: Arme;
 	public score: number = 0;
+	public isGhost: boolean = false;
+	public reviveProgress: number = 0;
 
 	constructor(
 		id: string,
 		account: Account,
 		x: number,
 		y: number,
-		life: number,
-		canvasWidth: number,
-		canvasHeight: number
+		life: number
 	) {
 		this.id = id;
 		this.account = account;
@@ -41,8 +41,8 @@ export class ServerPlayer implements HitBox {
 		this.y = y;
 		this.width = 74;
 		this.height = 100;
-		this.canvasWidth = canvasWidth;
-		this.canvasHeight = canvasHeight;
+		this.canvasWidth = 1920;
+		this.canvasHeight = 1080;
 		this.bonus = [];
 		this.arme = new Arme(5, 10, 500);
 		this.life = new LifebarService(life);
@@ -192,10 +192,20 @@ addBonus(bonus: BonusType): boolean {
 		this.x = 100;
 		this.y = 300;
 		this.arme.bullets = [];
+		this.isGhost = false;
+		this.reviveProgress = 0;
+	}
+
+	public revive(): void {
+		this.isGhost = false;
+		this.reviveProgress = 0;
+		this.life = new LifebarService(Math.max(1, Math.floor(this.life.getMaxLife() / 2)));
+		this.invincibilityTimer = this.INVINCIBILITY_DURATION * 2;
 	}
 
 	shoot(): void {
 		if (!this.life.isAlive()) return;
+		if (this.isGhost) return;
 		this.arme.shoot(this.id, this);
 	}
 
@@ -214,6 +224,8 @@ addBonus(bonus: BonusType): boolean {
 			life: { life: this.life.life, maxLife: this.life.getMaxLife() } as any,
 			isInvincible: this.invincibilityTimer > 0,
 			score: this.score,
+			isGhost: this.isGhost,
+			reviveProgress: this.reviveProgress,
 		};
 	}
 }

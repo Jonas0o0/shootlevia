@@ -7,7 +7,7 @@
 	"scripts": {
 		"test": "node --test",
 		"test:watch": "node --test --watch",
-		"client:start": "vite --port=8000 client",
+		"client:start": "vite --port=8000 client --host 0.0.0.0",
 		"client:build": "tsc && vite build client",
 		"client:preview": "vite preview client",
 		"server": "node .",
