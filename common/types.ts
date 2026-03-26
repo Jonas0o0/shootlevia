@@ -21,6 +21,8 @@ export interface PlayerData {
 	life: { life: number; maxLife: number };
 	isInvincible: boolean;
 	score: number;
+	isGhost?: boolean;
+	reviveProgress?: number;
 }
 
 export interface BulletData {
