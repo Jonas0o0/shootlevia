@@ -99,8 +99,10 @@ export class ServerGame {
 
 	handlePlayerJump(id: string): void {
 		const player = this.players.get(id);
+
 		if (player && (player.isAlive() || player.isGhost)) {
 			player.doJump();
+			this.io.to(this.roomId).emit('playSound', 'jump');
 		}
 	}
 
@@ -108,6 +110,7 @@ export class ServerGame {
 		const player = this.players.get(id);
 		if (player && player.isAlive() && !player.isGhost) {
 			player.shoot();
+			this.io.to(this.roomId).emit('playSound', 'shoot');
 		}
 	}
 
@@ -162,7 +165,12 @@ export class ServerGame {
 			}
 		}
 
-		this.players.forEach(player => player.update());
+		this.players.forEach(player => {
+			const { shot } = player.update();
+			if (shot) {
+				this.io.to(this.roomId).emit('playSound', 'shoot');
+			}
+		});
 		this.players.forEach(player => player.arme.updateBullets());
 		this.bonuses.forEach(bonus => bonus.update());
 		this.enemyBullets.forEach(bullet => bullet.update());
@@ -193,6 +201,7 @@ export class ServerGame {
 							this.countDrone++;
 							if (player) player.score += 20;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+							this.io.to(this.roomId).emit('playSound', 'drone_destroyed');
 						}
 					} else if (enemy.type === 'PNEU') {
 						enemy.takeDamage(11);
@@ -204,6 +213,7 @@ export class ServerGame {
 							this.countPneu++;
 							if (player) player.score += 10;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+							this.io.to(this.roomId).emit('playSound', 'pneu_detruit');
 						}
 					}
 				}
@@ -312,7 +322,10 @@ export class ServerGame {
 				const isColliding = checkCollision(player, bonus);
 
 				if (isColliding) {
-					player.addBonus(bonus.type);
+					const leveledUp = player.addBonus(bonus.type);
+					if (leveledUp) {
+						this.io.to(this.roomId).emit('playSound', 'levelup');
+					}
 					return false; //pour le suprimer de la liste
 				}
 				return true;
@@ -327,13 +340,13 @@ export class ServerGame {
 
 					const died = player.takeDamage();
 					if (died) {
+						this.io.to(this.roomId).emit('playSound', 'vousetesmort');
 						if (this.players.size > 1) {
 							const aliveOthers = Array.from(this.players.values()).filter(p => p.id !== player.id && p.isAlive() && !p.isGhost);
 							if (aliveOthers.length > 0) {
 								player.isGhost = true;
 							}
 						}
-
 						leaderboardService.addEntry({
 							joueur: player.getAccount().username,
 							score: this.score,

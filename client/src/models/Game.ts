@@ -8,6 +8,7 @@ import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
 import { DeplacementType } from './DeplacementType.ts';
 import type { Difficulty } from '../../../common/Difficulty.ts';
+import AssetLoaderService from '../services/AssetLoaderService.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -126,6 +127,12 @@ export default class Game {
 			};
 			window.addEventListener('mouseout', this.mouseoutHandler);
 		}
+		
+		// Gestion des sons
+		this.socket.on('playSound', (soundName: string) => {
+			AssetLoaderService.playAudio(`/assets/son/${soundName}.m4a`);
+		});
+
 		// Synchronisation avec le serveur
 		this.socket.on('gameState', (state: GameState) => {
 			//temps

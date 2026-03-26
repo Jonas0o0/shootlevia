@@ -32,8 +32,19 @@ async function init() {
 		// Ajoutez d'autres images si nécessaire
 	];
 
+	const audiosToPreload = [
+		'/assets/son/drone_destroyed.m4a',
+		'/assets/son/jump.m4a',
+		'/assets/son/shoot.m4a',
+		'/assets/son/pneu_detruit.m4a',
+		'/assets/son/levelup.m4a',
+		'/assets/son/vousetesmort.m4a',
+		// Ajoutez d'autres sons si nécessaire
+	];
+
 	try {
 		await AssetLoaderService.loadAll(imagesToPreload);
+		await AssetLoaderService.loadAllAudios(audiosToPreload);
 		console.log('Tous les assets ont été chargés');
 	} catch (error) {
 		console.error('Erreur lors du chargement des assets', error);
