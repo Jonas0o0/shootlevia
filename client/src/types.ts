@@ -6,8 +6,14 @@ export interface Route {
 	title: string;
 }
 
+export interface PlayerScore {
+	username: string;
+	score: number;
+}
+
 export interface GameStats {
 	time: number;
 	score: number;
 	enemyCount: number;
+	leaderboard?: PlayerScore[];
 }

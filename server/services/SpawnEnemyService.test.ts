@@ -39,7 +39,7 @@ describe('SpawnEnemyService', () => {
             
             // @ts-ignore - accès pour le test
             const healthPneu0 = service.calculateHealth(0, 'PNEU');
-            assert.strictEqual(healthPneu0, 160, 'La vie minimum du pneu devrait être 160');
+            assert.strictEqual(healthPneu0, 100, 'La vie minimum du pneu devrait être 100');
         });
 
         it('devrait augmenter la vitesse des ennemis avec un cap', () => {

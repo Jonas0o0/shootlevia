@@ -24,6 +24,7 @@ export class ServerPlayer implements HitBox {
 	private invincibilityTimer: number = 0;
 	private readonly INVINCIBILITY_DURATION: number = 60;
 	public arme: Arme;
+	public score: number = 0;
 
 	constructor(
 		id: string,
@@ -45,6 +46,7 @@ export class ServerPlayer implements HitBox {
 		this.bonus = [];
 		this.arme = new Arme(5, 10, 10);
 		this.life = new LifebarService(life);
+		this.score = 0;
 	}
 
 	public getAccount(): Account {
@@ -204,6 +206,7 @@ export class ServerPlayer implements HitBox {
 			bonus: this.bonus,
 			life: { life: this.life.life, maxLife: this.life.getMaxLife() } as any,
 			isInvincible: this.invincibilityTimer > 0,
+			score: this.score,
 		};
 	}
 }

@@ -7,7 +7,7 @@ import {
 
 export class SpawnEnemyService {
 	private baseRespawnRate: number = 300;
-	private minRespawnRate: number = 10; // Permet jusqu'à 6 ennemis par seconde
+	private minRespawnRate: number = 30; // Permet jusqu'à 2 ennemis par seconde
 	private difficultyCurve: number = 0.1;
 	private enemySpawnCooldown: number = 0;
 
@@ -15,7 +15,7 @@ export class SpawnEnemyService {
 	private readonly MAX_SPEED_MULTIPLIER: number = 3.0;
 	private readonly SPEED_SCALING_FACTOR: number = 0.001;
 	private readonly HEALTH_SCALING_FACTOR: number = 0.05;
-	private readonly SPAWN_SCALING_FACTOR: number = 1;
+	private readonly SPAWN_SCALING_FACTOR: number = 0.005;
 
 	constructor(difficultyCurve: number) {
 		this.difficultyCurve = difficultyCurve;

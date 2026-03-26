@@ -41,13 +41,13 @@ export default class PopupGameOverView extends View {
 			const seconds = totalSeconds % 60;
 			const timeString = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-			container.innerHTML = `
+			let statsHtml = `
 				<div class="stat-item">
 					<span class="stat-label">Temps:</span>
 					<span class="stat-value">${timeString}</span>
 				</div>
 				<div class="stat-item">
-					<span class="stat-label">Score:</span>
+					<span class="stat-label">Score équipe:</span>
 					<span class="stat-value">${stats.score}</span>
 				</div>
 				<div class="stat-item">
@@ -55,6 +55,38 @@ export default class PopupGameOverView extends View {
 					<span class="stat-value">${stats.enemyCount}</span>
 				</div>
 			`;
+
+			if (stats.leaderboard && stats.leaderboard.length > 1) {
+				statsHtml += `
+					<div class="leaderboard-section">
+						<h3>Classement Joueurs</h3>
+						<table class="leaderboard-table">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Joueur</th>
+									<th>Score</th>
+								</tr>
+							</thead>
+							<tbody>
+								${stats.leaderboard
+					.map(
+						(entry, index) => `
+									<tr>
+										<td>${index + 1}</td>
+										<td>${entry.username}</td>
+										<td>${entry.score}</td>
+									</tr>
+								`,
+					)
+					.join('')}
+							</tbody>
+						</table>
+					</div>
+				`;
+			}
+
+			container.innerHTML = statsHtml;
 		}
 	}
 }
