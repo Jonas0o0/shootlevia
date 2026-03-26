@@ -180,6 +180,20 @@ class Player implements HitBox {
 			});
 		}
 
+		// Affichage du pseudo sous le joueur
+		ctx.save();
+		ctx.fillStyle = 'white';
+		ctx.strokeStyle = 'black';
+		ctx.lineWidth = 3;
+		ctx.font = 'bold 16px "Pixelify Sans", sans-serif';
+		ctx.textAlign = 'center';
+		ctx.textBaseline = 'top';
+		const centerX = this.x + this.width / 2;
+		const bottomY = this.y + this.height + 5;
+		ctx.strokeText(this.joueur.username, centerX, bottomY);
+		ctx.fillText(this.joueur.username, centerX, bottomY);
+		ctx.restore();
+
 		this.updateHUD();
 	}
 
