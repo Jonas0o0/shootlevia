@@ -154,6 +154,7 @@ export class ServerGame {
 							this.countDrone++;
 							if (player) player.score += 20;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+							this.io.to(this.roomId).emit('playSound', 'drone_destroyed');
 						}
 					} else if (enemy.type === 'PNEU') {
 						enemy.takeDamage(11);
