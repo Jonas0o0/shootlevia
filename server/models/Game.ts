@@ -34,7 +34,7 @@ export class ServerGame {
 		this.roomId = roomId;
 		this.difficulty = difficulty;
 		this.spawnEnemyService = new SpawnEnemyService(
-			this.difficulty.difficultyCurve,
+			this.difficulty.difficultyCurve
 		);
 		// Boucle de jeu (60fps)
 		this.intervalId = setInterval(() => this.update(), 1000 / 60);
@@ -56,7 +56,7 @@ export class ServerGame {
 		this.countDrone = 0;
 		this.countPneu = 0;
 		this.spawnEnemyService = new SpawnEnemyService(
-			this.difficulty.difficultyCurve,
+			this.difficulty.difficultyCurve
 		);
 	}
 
@@ -65,7 +65,7 @@ export class ServerGame {
 		username: string,
 		avatar: string,
 		canvasWidth: number,
-		canvasHeight: number,
+		canvasHeight: number
 	): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
@@ -78,8 +78,8 @@ export class ServerGame {
 				y,
 				this.difficulty.life,
 				canvasWidth,
-				canvasHeight,
-			),
+				canvasHeight
+			)
 		);
 	}
 
@@ -140,7 +140,7 @@ export class ServerGame {
 		const enemyBulletsToRemove = new Set<string>();
 
 		const allBullets = Array.from(this.players.values()).flatMap(
-			p => p.arme.bullets,
+			p => p.arme.bullets
 		);
 
 		allBullets.forEach(bullet => {
@@ -190,15 +190,18 @@ export class ServerGame {
 		// Nettoyage des balles (on utilise bulletsToRemove ici pour marquer l'impact)
 		this.players.forEach(player => {
 			player.arme.bullets = player.arme.bullets.filter(
-				b => !bulletsToRemove.has(b.id) && b.x < 2000,
+				b => !bulletsToRemove.has(b.id) && b.x < 2000
 			);
 		});
 
 		// Nettoyage des balles ennemis hors de l'écran ou touchées (limites larges pour drones spawns)
 		this.enemyBullets = this.enemyBullets.filter(
-			b => !enemyBulletsToRemove.has(b.id) && 
-				 b.x > -500 && b.x < 3000 && 
-				 b.y > -500 && b.y < 2000,
+			b =>
+				!enemyBulletsToRemove.has(b.id) &&
+				b.x > -500 &&
+				b.x < 3000 &&
+				b.y > -500 &&
+				b.y < 2000
 		);
 
 		if (this.players.size > 0) {
@@ -211,13 +214,13 @@ export class ServerGame {
 			this.spawnEnemyService.reset();
 		}
 
-		for (const enemy of this.enemies) {
+		this.enemies.forEach(enemy => {
 			enemy.update();
-			
+
 			// Trouver le joueur le plus proche pour viser
 			let nearestPlayer: ServerPlayer | null = null;
 			let minDistance = Infinity;
-			
+
 			for (const player of this.players.values()) {
 				if (player.isAlive()) {
 					const dx = player.x - enemy.x;
@@ -230,16 +233,20 @@ export class ServerGame {
 				}
 			}
 
-			const bullet = nearestPlayer 
-				? enemy.shoot(nearestPlayer.x + nearestPlayer.width/2, nearestPlayer.y + nearestPlayer.height/2)
+			const bullet = nearestPlayer
+				? enemy.shoot(
+						nearestPlayer.x + nearestPlayer.width / 2,
+						nearestPlayer.y + nearestPlayer.height / 2
+					)
 				: enemy.shoot();
-				
+
 			if (bullet) {
 				this.enemyBullets.push(bullet);
 			}
-		}
+		});
+
 		this.enemies = this.enemies.filter(
-			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000,
+			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000
 		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 
@@ -319,7 +326,7 @@ export class ServerGame {
 			players: Array.from(this.players.values()).map(p => p.toData()),
 			bullets: [
 				...Array.from(this.players.values()).flatMap(p =>
-					p.arme.bullets.map(b => b.toData()),
+					p.arme.bullets.map(b => b.toData())
 				),
 				...this.enemyBullets.map(b => b.toData()),
 			],
