@@ -16,7 +16,7 @@ export class ServerEnemy implements HitBox {
 	private damageTimer: number = 0;
 	private readonly DAMAGE_FEEDBACK_DURATION: number = 10;
 	
-	private shootCooldown: number = 300; // Valeur de base (5s)
+	private shootCooldown: number = 300; // Valeur de base (2s)
 	private lastShotTime: number = 0;
 
 	constructor(
@@ -42,7 +42,7 @@ export class ServerEnemy implements HitBox {
 	}
 
 	private resetShootCooldown(): void {
-		// Intervalle irrégulier entre 3s et 8s (180 à 480 frames)
+		// Intervalle irrégulier entre 1s et 3s (60 à 180 frames)
 		this.shootCooldown = 180 + Math.random() * 300;
 	}
 

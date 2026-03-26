@@ -125,17 +125,16 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
-  background-color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .fenetre section article.play.active .play_canvas {
   position: absolute;
-  /* Top and Left are calculated by JS */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: block;
-  image-rendering: pixelated; /* Optional: for sharper pixel art */
+  object-fit: cover;
   z-index: 1;
 }
 
