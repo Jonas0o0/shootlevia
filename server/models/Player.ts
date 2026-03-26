@@ -43,8 +43,8 @@ export class ServerPlayer implements HitBox {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
+		this.arme = new Arme(5, 10, 10);
 		this.life = new LifebarService(life);
-		this.arme = new Arme(10, [Direction.Right], 1, 1);
 	}
 
 	public getAccount(): Account {
