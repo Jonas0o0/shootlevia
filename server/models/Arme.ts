@@ -50,12 +50,14 @@ export class Arme {
 		}
 	}
 
-	autoShoot(ownerId: string, source: HitBox): void {
+	autoShoot(ownerId: string, source: HitBox): boolean {
 		const now = Date.now();
 		if (now - this.lastShotTime >= this.frequence) {
 			this.shoot(ownerId, source);
 			this.lastShotTime = now;
+			return true;
 		}
+		return false;
 	}
 
 	levelUp(): void {

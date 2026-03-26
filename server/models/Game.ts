@@ -101,7 +101,10 @@ export class ServerGame {
 	handlePlayerJump(id: string): void {
 		const player = this.players.get(id);
 		if (player && player.isAlive()) {
-			player.doJump();
+			const jumped = player.doJump();
+			if (jumped) {
+				this.io.to(this.roomId).emit('playSound', 'jump');
+			}
 		}
 	}
 
@@ -109,6 +112,7 @@ export class ServerGame {
 		const player = this.players.get(id);
 		if (player && player.isAlive()) {
 			player.shoot();
+			this.io.to(this.roomId).emit('playSound', 'shoot');
 		}
 	}
 
@@ -126,7 +130,12 @@ export class ServerGame {
 
 	update(): void {
 		this.time++;
-		this.players.forEach(player => player.update());
+		this.players.forEach(player => {
+			const { shot } = player.update();
+			if (shot) {
+				this.io.to(this.roomId).emit('playSound', 'shoot');
+			}
+		});
 		this.players.forEach(player => player.arme.updateBullets());
 		this.bonuses.forEach(bonus => bonus.update());
 
@@ -166,6 +175,7 @@ export class ServerGame {
 							this.countPneu++;
 							if (player) player.score += 10;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
+							this.io.to(this.roomId).emit('playSound', 'pneu_detruit');
 						}
 					}
 				}
@@ -207,7 +217,10 @@ export class ServerGame {
 				const isColliding = checkCollision(player, bonus);
 
 				if (isColliding) {
-					player.addBonus(bonus.type);
+					const leveledUp = player.addBonus(bonus.type);
+					if (leveledUp) {
+						this.io.to(this.roomId).emit('playSound', 'levelup');
+					}
 					return false; //pour le suprimer de la liste
 				}
 				return true;
@@ -222,6 +235,7 @@ export class ServerGame {
 
 					const died = player.takeDamage();
 					if (died) {
+						this.io.to(this.roomId).emit('playSound', 'vousetesmort');
 						leaderboardService.addEntry({
 							joueur: player.getAccount().username,
 							score: this.score,

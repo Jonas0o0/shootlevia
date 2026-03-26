@@ -44,7 +44,7 @@ export class ServerPlayer implements HitBox {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
-		this.arme = new Arme(5, 10, 10);
+		this.arme = new Arme(5, 10, 500);
 		this.life = new LifebarService(life);
 		this.score = 0;
 	}
@@ -113,17 +113,20 @@ export class ServerPlayer implements HitBox {
 		return { shouldTakeLife: true, newBonuses: currentBonuses };
 	}
 
-	doJump(): void {
+	doJump(): boolean {
 		if (!this.jumping && this.jumpTimer <= 0) {
 			this.jumping = true;
 			this.jumpTimer = this.jumpCooldown;
+			return true;
 		}
+		return false;
 	}
 
-	update(): void {
-		if (!this.life.isAlive()) return;
+	update(): { shot: boolean } {
+		let shot = false;
+		if (!this.life.isAlive()) return { shot };
 
-		this.arme.autoShoot(this.id, this);
+		shot = this.arme.autoShoot(this.id, this);
 		if (this.jumping) {
 			this.jumpTimer--;
 			if (this.jumpTimer <= 0) {
@@ -133,6 +136,7 @@ export class ServerPlayer implements HitBox {
 		if (this.invincibilityTimer > 0) {
 			this.invincibilityTimer--;
 		}
+		return { shot };
 	}
 
 	takeDamage(): boolean {
@@ -161,13 +165,15 @@ export class ServerPlayer implements HitBox {
 		return !this.life.isAlive();
 	}
 
-	addBonus(bonus: BonusType): void {
+addBonus(bonus: BonusType): boolean {
 		if (bonus.nom === BonusType.WeaponUpgrade.nom) {
 			this.arme.levelUp();
+			return true;
 		} else {
 			if (!this.bonus.includes(bonus)) {
 				this.bonus.push(bonus);
 			}
+			return false;
 		}
 	}
 

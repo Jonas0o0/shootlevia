@@ -34,6 +34,11 @@ async function init() {
 
 	const audiosToPreload = [
 		'/assets/son/drone_destroyed.m4a',
+		'/assets/son/jump.m4a',
+		'/assets/son/shoot.m4a',
+		'/assets/son/pneu_detruit.m4a',
+		'/assets/son/levelup.m4a',
+		'/assets/son/vousetesmort.m4a',
 		// Ajoutez d'autres sons si nécessaire
 	];
 
