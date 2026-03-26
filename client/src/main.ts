@@ -72,10 +72,12 @@ async function init() {
 	);
 	const leaderboardService = new LeaderboardServiceApi();
 	new LeaderboardComponent(leaderboardService, '.fenetre .leaderboard tbody');
-	document.querySelector('a[href=\'/leaderboard\']')?.addEventListener('click', event => {
-		event.preventDefault();
-		leaderboardService.refresh();
-	});
+	document
+		.querySelector("a[href='/leaderboard']")
+		?.addEventListener('click', event => {
+			event.preventDefault();
+			leaderboardService.refresh();
+		});
 
 	const credit = new View(document.querySelector('.fenetre .credit')!);
 	const canvas: HTMLCanvasElement = document.querySelector(
@@ -153,7 +155,7 @@ async function init() {
 
 	const routes: Route[] = [
 		{ path: '/', view: homeView, title: 'ShootLévia' },
-		{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoar' },
+		{ path: '/leaderboard', view: leaderboard, title: 'LeaderBoard' },
 		{ path: '/credit', view: credit, title: 'Crédit' },
 		{ path: '/play', view: play, title: '' },
 		{ path: '/settings', view: settings, title: 'Paramètres' },
@@ -164,7 +166,7 @@ async function init() {
 	Router.setMenuElement(menuElement);
 
 	const playButton = document.querySelector<HTMLAnchorElement>(
-		'.fenetre .home .playButton',
+		'.fenetre .home .playButton'
 	)!;
 	playButton.addEventListener('click', event => {
 		event.preventDefault();

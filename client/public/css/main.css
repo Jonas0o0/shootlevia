@@ -125,16 +125,20 @@
   padding: 0;
   margin: 0;
   overflow: hidden;
+  background: radial-gradient(circle, #3a3d52 0%, #1a1b26 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .fenetre section article.play.active .play_canvas {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100vh;
   display: block;
-  object-fit: cover;
+  image-rendering: pixelated;
   z-index: 1;
 }
 

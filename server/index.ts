@@ -108,8 +108,6 @@ io.on('connection', socket => {
 		(data: {
 			username: string;
 			avatar: string;
-			canvasWidth: number;
-			canvasHeight: number;
 			difficulty: Difficulty;
 		}) => {
 			const game = getGame(socket.id);
@@ -117,9 +115,7 @@ io.on('connection', socket => {
 				game.addPlayer(
 					socket.id,
 					data.username,
-					data.avatar,
-					data.canvasWidth,
-					data.canvasHeight
+					data.avatar
 				);
 			} else {
 				const roomId = `SOLO_${socket.id}`;
@@ -129,9 +125,7 @@ io.on('connection', socket => {
 				newGame.addPlayer(
 					socket.id,
 					data.username,
-					data.avatar,
-					data.canvasWidth,
-					data.canvasHeight
+					data.avatar
 				);
 			}
 		}
