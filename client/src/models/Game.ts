@@ -31,6 +31,7 @@ export default class Game {
 	private keydownHandler?: (event: KeyboardEvent) => void;
 	private keyupHandler?: (event: KeyboardEvent) => void;
 	private mousemoveHandler?: (event: MouseEvent) => void;
+	private mousedownHandler?: (event: MouseEvent) => void;
 	private mouseoutHandler?: () => void;
 	private readonly difficulty: Difficulty;
 	private currentVelocityX: number = 0;
@@ -101,6 +102,14 @@ export default class Game {
 				};
 			};
 			window.addEventListener('mousemove', this.mousemoveHandler);
+
+			this.mousedownHandler = (event: MouseEvent) => {
+				if (event.button === 0) {
+					event.preventDefault();
+					this.socket.emit('jump');
+				}
+			};
+			this.canvas.addEventListener('mousedown', this.mousedownHandler);
 
 			this.mouseoutHandler = () => {
 				this.mousePosition = null;
@@ -264,6 +273,8 @@ export default class Game {
 			window.removeEventListener('keyup', this.keyupHandler);
 		if (this.mousemoveHandler)
 			window.removeEventListener('mousemove', this.mousemoveHandler);
+		if (this.mousedownHandler)
+			this.canvas.removeEventListener('mousedown', this.mousedownHandler);
 		if (this.mouseoutHandler)
 			window.removeEventListener('mouseout', this.mouseoutHandler);
 	}
