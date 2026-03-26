@@ -3,13 +3,11 @@
  * @class {LifebarService}
  */
 export class LifebarService {
-
 	/**
 	 * Nombre de vies maximum
 	 * @type {number}
-	 * @private
 	 */
-	private readonly maxLife: number;
+	public maxLife: number;
 
 	/**
 	 * Nombre de vies restantes au joueur
@@ -80,4 +78,11 @@ export class LifebarService {
 		this.onChangeListeners.forEach(callBack => callBack(this.life));
 	}
 
+	public setMaxLife(amount: number): void {
+		this.maxLife = amount;
+	}
+
+	public getMaxLife() {
+		return this.maxLife;
+	}
 }

@@ -2,12 +2,12 @@ import type { Socket } from 'socket.io-client';
 import Player from './Player.ts';
 import Bullet from './Bullet.ts';
 import Enemy from './Enemy.ts';
-import { Direction } from '../../../common/Direction.ts';
 import type { GameState } from '../../../common/types.ts';
 import type { GameStats } from '../types.ts';
 import GameMap from './GameMap.ts';
 import Bonus from './Bonus.ts';
 import { DeplacementType } from './DeplacementType.ts';
+import type { Difficulty } from '../../../common/Difficulty.ts';
 
 export default class Game {
 	private socket: Socket;
@@ -32,6 +32,12 @@ export default class Game {
 	private keyupHandler?: (event: KeyboardEvent) => void;
 	private mousemoveHandler?: (event: MouseEvent) => void;
 	private mouseoutHandler?: () => void;
+	private readonly difficulty: Difficulty;
+	private currentVelocityX: number = 0;
+	private currentVelocityY: number = 0;
+	private readonly ACCELERATION: number = 0.5;
+	private readonly FRICTION: number = 0.85;
+	private readonly MAX_SPEED: number = 5;
 
 	constructor(
 		socket: Socket,
@@ -39,7 +45,8 @@ export default class Game {
 		joueurIdx: number,
 		canvas: HTMLCanvasElement,
 		ctx: CanvasRenderingContext2D,
-		onGameOver: (stats: GameStats) => void,
+		difficulty: Difficulty,
+		onGameOver: (stats: GameStats) => void
 	) {
 		// Initialisation du jeu
 		this.socket = socket;
@@ -49,7 +56,7 @@ export default class Game {
 		this.enemyCount = 0;
 		this.canvas = canvas;
 		this.ctx = ctx;
-
+		this.difficulty = difficulty;
 		//Initialisation de la map
 		this.map = new GameMap();
 
@@ -67,6 +74,7 @@ export default class Game {
 			avatar: this.joueur.getAccoutn().avatar,
 			canvasWidth: this.canvas.width,
 			canvasHeight: this.canvas.height,
+			difficulty: this.difficulty,
 		});
 
 		if (!this.souris) {
@@ -143,7 +151,9 @@ export default class Game {
 
 			// verif si tous les joueurs sont morts
 			const allPlayers = Array.from(this.players.values());
-			const livingPlayers = allPlayers.filter(p => !!p.getLife() && p.getLife().isAlive());
+			const livingPlayers = allPlayers.filter(
+				p => !!p.getLife() && p.getLife().isAlive()
+			);
 			if (allPlayers.length > 0 && livingPlayers.length === 0 && this.active) {
 				this.stop();
 				this.onGameOver({
@@ -227,7 +237,10 @@ export default class Game {
 
 	start(): void {
 		if (this.intervalId) return;
-		this.intervalId = setInterval(() => this.update(), 1000 / 60) as unknown as number;
+		this.intervalId = setInterval(
+			() => this.update(),
+			1000 / 60
+		) as unknown as number;
 		this.draw();
 	}
 
@@ -237,47 +250,98 @@ export default class Game {
 			clearInterval(this.intervalId);
 			this.intervalId = null;
 		}
-		if (this.keydownHandler) window.removeEventListener('keydown', this.keydownHandler);
-		if (this.keyupHandler) window.removeEventListener('keyup', this.keyupHandler);
-		if (this.mousemoveHandler) window.removeEventListener('mousemove', this.mousemoveHandler);
-		if (this.mouseoutHandler) window.removeEventListener('mouseout', this.mouseoutHandler);
+		if (this.keydownHandler)
+			window.removeEventListener('keydown', this.keydownHandler);
+		if (this.keyupHandler)
+			window.removeEventListener('keyup', this.keyupHandler);
+		if (this.mousemoveHandler)
+			window.removeEventListener('mousemove', this.mousemoveHandler);
+		if (this.mouseoutHandler)
+			window.removeEventListener('mouseout', this.mouseoutHandler);
 	}
 
 	update(): void {
 		if (!this.active) return;
 
 		// pas d'input quand mode spectateur
-		if (!this.joueur.getLife().isAlive()) return;
-
-		// Appelé par setInterval (60fps)
-		const directionsSet: Set<Direction> = new Set();
-
-		if (this.keysPressed.has('Z')) directionsSet.add(Direction.Up);
-		if (this.keysPressed.has('S')) directionsSet.add(Direction.Down);
-		if (this.keysPressed.has('Q')) directionsSet.add(Direction.Left);
-		if (this.keysPressed.has('D')) directionsSet.add(Direction.Right);
-
-		if (this.mousePosition) {
-			const playerPos = this.joueur.getPostition();
-			const playerCenterX = playerPos.x + playerPos.width / 2;
-			const playerCenterY = playerPos.y + playerPos.height / 2;
-
-			const threshold = 20; //pour éviter le jitter
-
-			if (this.mousePosition.x < playerCenterX - threshold)
-				directionsSet.add(Direction.Left);
-			if (this.mousePosition.x > playerCenterX + threshold)
-				directionsSet.add(Direction.Right);
-			if (this.mousePosition.y < playerCenterY - threshold)
-				directionsSet.add(Direction.Up);
-			if (this.mousePosition.y > playerCenterY + threshold)
-				directionsSet.add(Direction.Down);
+		if (!this.joueur.getLife().isAlive()) {
+			this.currentVelocityX = 0;
+			this.currentVelocityY = 0;
+			return;
 		}
 
-		if (directionsSet.size > 0) {
-			this.socket.emit('move', Array.from(directionsSet));
+		let targetVx = 0;
+		let targetVy = 0;
+
+		if (!this.souris) {
+			// Mode Clavier : Calcul de la direction cible
+			if (this.keysPressed.has('Z')) targetVy -= 1;
+			if (this.keysPressed.has('S')) targetVy += 1;
+			if (this.keysPressed.has('Q')) targetVx -= 1;
+			if (this.keysPressed.has('D')) targetVx += 1;
+
+			// Normalisation pour les diagonales
+			if (targetVx !== 0 && targetVy !== 0) {
+				const length = Math.sqrt(targetVx * targetVx + targetVy * targetVy);
+				targetVx /= length;
+				targetVy /= length;
+			}
+
+			targetVx *= this.MAX_SPEED;
+			targetVy *= this.MAX_SPEED;
+
+			// Application de l'accélération (Inertie)
+			if (targetVx !== 0) {
+				this.currentVelocityX +=
+					(targetVx - this.currentVelocityX) * this.ACCELERATION;
+			} else {
+				this.currentVelocityX *= this.FRICTION;
+			}
+
+			if (targetVy !== 0) {
+				this.currentVelocityY +=
+					(targetVy - this.currentVelocityY) * this.ACCELERATION;
+			} else {
+				this.currentVelocityY *= this.FRICTION;
+			}
+		} else {
+			// Mode Souris : 360° et Vitesse proportionnelle
+			if (this.mousePosition) {
+				const playerPos = this.joueur.getPostition();
+				const playerCenterX = playerPos.x + playerPos.width / 2;
+				const playerCenterY = playerPos.y + playerPos.height / 2;
+
+				const dx = this.mousePosition.x - playerCenterX;
+				const dy = this.mousePosition.y - playerCenterY;
+				const distance = Math.sqrt(dx * dx + dy * dy);
+
+				const threshold = 10;
+				if (distance > threshold) {
+					// Vitesse proportionnelle à la distance (max à 200px)
+					const speed = Math.min(this.MAX_SPEED, (distance - threshold) / 20);
+					this.currentVelocityX = (dx / distance) * speed;
+					this.currentVelocityY = (dy / distance) * speed;
+				} else {
+					this.currentVelocityX *= this.FRICTION;
+					this.currentVelocityY *= this.FRICTION;
+				}
+			} else {
+				this.currentVelocityX *= this.FRICTION;
+				this.currentVelocityY *= this.FRICTION;
+			}
 		}
-		this.time;
+
+		// Arrêt complet si très lent
+		if (Math.abs(this.currentVelocityX) < 0.1) this.currentVelocityX = 0;
+		if (Math.abs(this.currentVelocityY) < 0.1) this.currentVelocityY = 0;
+
+		// Envoi au serveur si mouvement
+		if (this.currentVelocityX !== 0 || this.currentVelocityY !== 0) {
+			this.socket.emit('move', {
+				x: this.currentVelocityX,
+				y: this.currentVelocityY,
+			});
+		}
 	}
 
 	draw = (): void => {
@@ -314,7 +378,11 @@ export default class Game {
 			this.ctx.fillStyle = 'white';
 			this.ctx.font = '48px "Pixelify Sans"';
 			this.ctx.textAlign = 'center';
-			this.ctx.fillText('SPECTATEUR', this.canvas.width / 2, this.canvas.height - 50);
+			this.ctx.fillText(
+				'SPECTATEUR',
+				this.canvas.width / 2,
+				this.canvas.height - 50
+			);
 			this.ctx.restore();
 		}
 

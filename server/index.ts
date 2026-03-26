@@ -5,6 +5,7 @@ import { loadEnvFile } from 'node:process';
 import leaderboardRoutes from './routes/leaderboardRoutes.ts';
 import { ServerGame } from './models/Game.ts';
 import { Direction } from '../common/Direction.ts';
+import type { Difficulty } from '../common/Difficulty.ts';
 
 // Chargement des variables d'environnement
 loadEnvFile('.env');
@@ -13,6 +14,20 @@ const app = express();
 const port = process.env.PORT || 8080;
 
 // Middlewares
+app.use((req, res, next) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header(
+		'Access-Control-Allow-Headers',
+		'Origin, X-Requested-With, Content-Type, Accept'
+	);
+	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+	if (req.method === 'OPTIONS') {
+		res.sendStatus(200);
+	} else {
+		next();
+	}
+});
 app.use(express.json());
 
 // Routes
@@ -28,9 +43,9 @@ const socketRoomMap = new Map<string, string>();
 io.on('connection', socket => {
 	console.log('Client connected:', socket.id);
 
-	socket.on('create_lobby', () => {
+	socket.on('create_lobby', (difficulty: Difficulty) => {
 		const roomId = Math.random().toString(36).substring(2, 7).toUpperCase();
-		const game = new ServerGame(io, roomId);
+		const game = new ServerGame(io, roomId, difficulty);
 		games.set(roomId, game);
 
 		joinRoom(socket, roomId);
@@ -45,7 +60,10 @@ io.on('connection', socket => {
 			socket.emit('lobby_joined', { success: true, roomId });
 			console.log(`Client ${socket.id} joined lobby ${roomId}`);
 		} else {
-			socket.emit('lobby_joined', { success: false, error: 'Lobby introuvable' });
+			socket.emit('lobby_joined', {
+				success: false,
+				error: 'Lobby introuvable',
+			});
 		}
 	});
 
@@ -85,22 +103,49 @@ io.on('connection', socket => {
 		if (game) game.reset();
 	});
 
-	socket.on('join', (data: { username: string; avatar: string; canvasWidth: number; canvasHeight: number }) => {
+	socket.on(
+		'join',
+		(data: {
+			username: string;
+			avatar: string;
+			canvasWidth: number;
+			canvasHeight: number;
+			difficulty: Difficulty;
+		}) => {
+			const game = getGame(socket.id);
+			if (game) {
+				game.addPlayer(
+					socket.id,
+					data.username,
+					data.avatar,
+					data.canvasWidth,
+					data.canvasHeight
+				);
+			} else {
+				const roomId = `SOLO_${socket.id}`;
+				const newGame = new ServerGame(io, roomId, data.difficulty);
+				games.set(roomId, newGame);
+				joinRoom(socket, roomId);
+				newGame.addPlayer(
+					socket.id,
+					data.username,
+					data.avatar,
+					data.canvasWidth,
+					data.canvasHeight
+				);
+			}
+		}
+	);
+
+	socket.on('move', (data: Direction[] | { x: number; y: number }) => {
 		const game = getGame(socket.id);
 		if (game) {
-			game.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
-		} else {
-			const roomId = `SOLO_${socket.id}`;
-			const newGame = new ServerGame(io, roomId);
-			games.set(roomId, newGame);
-			joinRoom(socket, roomId);
-			newGame.addPlayer(socket.id, data.username, data.avatar, data.canvasWidth, data.canvasHeight);
+			if (Array.isArray(data)) {
+				game.handlePlayerMove(socket.id, data);
+			} else {
+				game.handlePlayerMoveVector(socket.id, data.x, data.y);
+			}
 		}
-	});
-
-	socket.on('move', (directions: Direction[]) => {
-		const game = getGame(socket.id);
-		if (game) game.handlePlayerMove(socket.id, directions);
 	});
 
 	socket.on('jump', () => {

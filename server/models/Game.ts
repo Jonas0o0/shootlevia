@@ -7,6 +7,8 @@ import ServerBonus from './Bonus.ts';
 import { BonusType } from '../../common/BonusType.ts';
 import { checkCollision, getCenter, getOverlap } from '../../common/HitBox.ts';
 import { Server } from 'socket.io';
+import type { Difficulty } from '../../common/Difficulty.ts';
+import { leaderboardService } from '../services/LeaderboardService.ts';
 
 export class ServerGame {
 	private players: Map<string, ServerPlayer> = new Map();
@@ -17,15 +19,20 @@ export class ServerGame {
 	private enemyCount: number = 0;
 	private countDrone: number = 0;
 	private countPneu: number = 0;
+	private difficulty: Difficulty;
 
-	private spawnEnemyService: SpawnEnemyService = new SpawnEnemyService();
+	private spawnEnemyService: SpawnEnemyService;
 	private intervalId: NodeJS.Timeout;
 	private io: Server;
 	private roomId: string;
 
-	constructor(io: Server, roomId: string) {
+	constructor(io: Server, roomId: string, difficulty: Difficulty) {
 		this.io = io;
 		this.roomId = roomId;
+		this.difficulty = difficulty;
+		this.spawnEnemyService = new SpawnEnemyService(
+			this.difficulty.difficultyCurve
+		);
 		// Boucle de jeu (60fps)
 		this.intervalId = setInterval(() => this.update(), 1000 / 60);
 	}
@@ -44,13 +51,32 @@ export class ServerGame {
 		this.enemyCount = 0;
 		this.countDrone = 0;
 		this.countPneu = 0;
-		this.spawnEnemyService = new SpawnEnemyService();
+		this.spawnEnemyService = new SpawnEnemyService(
+			this.difficulty.difficultyCurve
+		);
 	}
 
-	addPlayer(id: string, username: string, avatar: string, canvasWidth: number, canvasHeight: number): void {
+	addPlayer(
+		id: string,
+		username: string,
+		avatar: string,
+		canvasWidth: number,
+		canvasHeight: number
+	): void {
 		const x = 100; // Position de départ par défaut
 		const y = 300;
-		this.players.set(id, new ServerPlayer(id, { username, avatar }, x, y, canvasWidth, canvasHeight));
+		this.players.set(
+			id,
+			new ServerPlayer(
+				id,
+				{ username, avatar },
+				x,
+				y,
+				this.difficulty.life,
+				canvasWidth,
+				canvasHeight
+			)
+		);
 	}
 
 	removePlayer(id: string): void {
@@ -61,6 +87,13 @@ export class ServerGame {
 		const player = this.players.get(id);
 		if (player && player.isAlive()) {
 			directions.forEach(dir => player.move(dir));
+		}
+	}
+
+	handlePlayerMoveVector(id: string, vx: number, vy: number): void {
+		const player = this.players.get(id);
+		if (player && player.isAlive()) {
+			player.moveByVector(vx, vy);
 		}
 	}
 
@@ -100,7 +133,9 @@ export class ServerGame {
 		const bulletsToRemove = new Set<string>();
 		const enemiesToRemove = new Set<string>();
 
-		const allBullets = Array.from(this.players.values()).flatMap(p => p.arme.bullets);
+		const allBullets = Array.from(this.players.values()).flatMap(
+			p => p.arme.bullets
+		);
 
 		allBullets.forEach(bullet => {
 			this.enemies.forEach(enemy => {
@@ -134,7 +169,9 @@ export class ServerGame {
 
 		// Nettoyage des balles (on utilise bulletsToRemove ici pour marquer l'impact)
 		this.players.forEach(player => {
-			player.arme.bullets = player.arme.bullets.filter(b => !bulletsToRemove.has(b.id) && b.x < 2000);
+			player.arme.bullets = player.arme.bullets.filter(
+				b => !bulletsToRemove.has(b.id) && b.x < 2000
+			);
 		});
 
 		if (this.players.size > 0) {
@@ -147,7 +184,9 @@ export class ServerGame {
 		}
 
 		this.enemies.forEach(enemy => enemy.update());
-		this.enemies = this.enemies.filter(e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000);
+		this.enemies = this.enemies.filter(
+			e => !enemiesToRemove.has(e.id) && e.x > -200 && e.y < 2000
+		);
 		this.bonuses = this.bonuses.filter(b => b.x > -200);
 
 		this.io.to(this.roomId).emit('gameState', this.getState());
@@ -174,7 +213,14 @@ export class ServerGame {
 						return;
 					}
 
-					player.takeDamage();
+					const died = player.takeDamage();
+					if (died) {
+						leaderboardService.addEntry({
+							joueur: player.getAccount().username,
+							score: this.score,
+							date: Date.now(),
+						});
+					}
 
 					// pour repousser le joueur bord à bord
 					const overlap = getOverlap(player, enemy);
@@ -202,7 +248,9 @@ export class ServerGame {
 	getState(): GameState {
 		return {
 			players: Array.from(this.players.values()).map(p => p.toData()),
-			bullets: Array.from(this.players.values()).flatMap(p => p.arme.bullets.map(b => b.toData())),
+			bullets: Array.from(this.players.values()).flatMap(p =>
+				p.arme.bullets.map(b => b.toData())
+			),
 			enemies: this.enemies.map(e => e.toData()),
 			bonuses: this.bonuses.map(b => b.toData()),
 			time: this.time,

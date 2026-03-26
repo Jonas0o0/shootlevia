@@ -30,6 +30,7 @@ export class ServerPlayer implements HitBox {
 		account: Account,
 		x: number,
 		y: number,
+		life: number,
 		canvasWidth: number,
 		canvasHeight: number
 	) {
@@ -42,8 +43,12 @@ export class ServerPlayer implements HitBox {
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		this.bonus = [];
-		this.life = new LifebarService();
 		this.arme = new Arme(5, 10, 10);
+		this.life = new LifebarService(life);
+	}
+
+	public getAccount(): Account {
+		return this.account;
 	}
 
 	public static clamp(value: number, min: number, max: number): number {
@@ -65,6 +70,18 @@ export class ServerPlayer implements HitBox {
 				this.y += this.velocity;
 				break;
 		}
+
+		this.x = ServerPlayer.clamp(this.x, 0, this.canvasWidth - this.width);
+		this.y = ServerPlayer.clamp(
+			this.y,
+			this.canvasHeight * 0.2 - 45,
+			this.canvasHeight - this.height
+		);
+	}
+
+	moveByVector(vx: number, vy: number): void {
+		this.x += vx;
+		this.y += vy;
 
 		this.x = ServerPlayer.clamp(this.x, 0, this.canvasWidth - this.width);
 		this.y = ServerPlayer.clamp(
@@ -116,8 +133,8 @@ export class ServerPlayer implements HitBox {
 		}
 	}
 
-	takeDamage(): void {
-		if (!this.life.isAlive()) return;
+	takeDamage(): boolean {
+		if (!this.life.isAlive()) return false;
 
 		const previousBonusCount = this.bonus.length;
 
@@ -132,12 +149,13 @@ export class ServerPlayer implements HitBox {
 			if (this.bonus.length < previousBonusCount) {
 				this.invincibilityTimer = this.INVINCIBILITY_DURATION;
 			}
-			return;
+			return false;
 		}
 
 		this.life.removeLife(1);
 
 		this.invincibilityTimer = this.INVINCIBILITY_DURATION;
+		return !this.life.isAlive();
 	}
 
 	addBonus(bonus: BonusType): void {
@@ -184,7 +202,7 @@ export class ServerPlayer implements HitBox {
 			jumpTimer: this.jumpTimer,
 			jumpCooldown: this.jumpCooldown,
 			bonus: this.bonus,
-			life: { life: this.life.life } as any,
+			life: { life: this.life.life, maxLife: this.life.getMaxLife() } as any,
 			isInvincible: this.invincibilityTimer > 0,
 		};
 	}
