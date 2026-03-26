@@ -148,6 +148,7 @@ export class ServerGame {
 
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
+							const config = EnemyConfigs[enemy.type as EnemyType];
 							this.score += config.scoreValue;
 							this.enemyCount++;
 							this.countDrone++;
