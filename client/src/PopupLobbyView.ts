@@ -4,6 +4,7 @@ import Router from './Router.ts';
 import { Difficulty } from '../../common/Difficulty.ts';
 
 export default class PopupLobbyView extends View {
+	popUpName: HTMLElement;
 	createBtn: HTMLButtonElement;
 	joinBtn: HTMLButtonElement;
 	codeInput: HTMLInputElement;
@@ -22,6 +23,7 @@ export default class PopupLobbyView extends View {
 		super(element);
 		this.socket = socket;
 
+		this.popUpName = element.querySelector('#lobbypopup h2')!;
 		this.createBtn = element.querySelector('#createLobbyBtn')!;
 		this.joinBtn = element.querySelector('#joinLobbyBtn')!;
 		this.codeInput = element.querySelector('#lobbyCodeInput')!;
@@ -108,7 +110,7 @@ export default class PopupLobbyView extends View {
 		this.menuDiv.style.display = 'none';
 		this.roomDiv.style.display = 'block';
 		this.codeDisplay.textContent = code;
-		this.codeDisplay.parentElement!.style.display = 'block';
+		this.codeDisplay.parentElement!.style.display = this.solo ? 'none' : 'block';
 
 		if (isHost) {
 			this.startGameBtn.style.display = 'inline-block';
@@ -131,20 +133,16 @@ export default class PopupLobbyView extends View {
 	show(solo: boolean = false) {
 		super.show();
 		this.solo = solo;
-		if (!solo) {
+		if (solo) {
+			this.popUpName.innerHTML = 'Partie Solo';
+			this.socket.emit('create_lobby', this.getDifficulty());
+		} else {
+			this.popUpName.innerHTML = 'Partie Multijoueur';
 			this.menuDiv.style.display = 'block';
 			this.roomDiv.style.display = 'none';
 			this.element.classList.add('active');
 			this.codeDisplay.parentElement!.style.display = 'block';
 			this.playersList.style.display = 'block';
-		} else {
-			this.menuDiv.style.display = 'none';
-			this.roomDiv.style.display = 'block';
-			this.codeDisplay.parentElement!.style.display = 'none';
-			this.startGameBtn.style.display = 'inline-block';
-			this.difficulty.style.display = 'block';
-			this.waitingMessage.style.display = 'none';
-			this.playersList.style.display = 'none';
 		}
 	}
 
