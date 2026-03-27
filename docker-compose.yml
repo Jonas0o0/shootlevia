@@ -1,0 +1,11 @@
+services:
+  shootlevia:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+    environment:
+      - PORT=8080
+    volumes:
+      - ./server/ressources:/app/server/ressources
