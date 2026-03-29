@@ -69,20 +69,32 @@ export class SpawnEnemyService {
 		return configs[configs.length - 1].type;
 	}
 
+	public onBossDefeated(): void {
+		this.bossSpawned = false;
+	}
+
 	public update(
 		time: number,
 		hasPlayers: boolean,
 		enemies: ServerEnemy[]
 	): void {
 		if (hasPlayers) {
-			if (time >= this.BOSS_SPAWN_TIME) {
-				if (!this.bossSpawned) {
-					enemies.push(this.generateBoss());
-					this.bossSpawned = true;
-				}
+			// On verifie s'il y a un boss en vie
+			const isBossAlive = enemies.some(e => e.type === 'BUS_RELAY');
+
+			// Logique de spawn du boss
+			if (time > 0 && time % this.BOSS_SPAWN_TIME === 0 && !isBossAlive && !this.bossSpawned) {
+				enemies.push(this.generateBoss());
+				this.bossSpawned = true;
+				return; // On ne spawn rien d'autre sur cette frame
+			}
+
+			// Si le boss est là, on arrête le spawn d'ennemis normaux
+			if (isBossAlive) {
 				return;
 			}
 
+			// Sinon on spawn les ennemis normaux
 			this.enemySpawnCooldown--;
 			if (this.enemySpawnCooldown <= 0) {
 				enemies.push(this.generateEnemy(time));

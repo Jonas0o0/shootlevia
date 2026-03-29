@@ -49,8 +49,11 @@ export class ServerEnemy implements HitBox {
 	}
 
 	private resetShootCooldown(): void {
-		// Intervalle irrégulier entre 1s et 3s (60 à 180 frames)
-		this.shootCooldown = 180 + Math.random() * 300;
+		if (this.type === 'BUS_RELAY') {
+			this.shootCooldown = 90 + Math.random() * 60;
+		} else {
+			this.shootCooldown = 180 + Math.random() * 300;
+		}
 	}
 
 	update(): void {
@@ -58,8 +61,10 @@ export class ServerEnemy implements HitBox {
 		this.y += this.vy;
 
 		if (this.type === 'BUS_RELAY') {
-			const minY = 50;
-			const maxY = 800 - this.height;
+
+			const minY = 1080 * 0.1;
+			const maxY = 1080 - this.height;
+			
 			if (this.y <= minY) {
 				this.y = minY;
 				this.vy = Math.abs(this.vy);
@@ -77,28 +82,52 @@ export class ServerEnemy implements HitBox {
 		}
 	}
 
-	shoot(targetX?: number, targetY?: number): ServerBullet | null {
-		if (this.type !== 'DRONE') return null;
+	shoot(targetX?: number, targetY?: number): ServerBullet | ServerBullet[] | null {
+		if (this.type !== 'DRONE' && this.type !== 'BUS_RELAY') return null;
+		
 		if (this.lastShotTime <= 0) {
 			this.resetShootCooldown();
 			this.lastShotTime = this.shootCooldown;
 
 			let angle = Math.PI; // Par défaut vers la gauche
 			if (targetX !== undefined && targetY !== undefined) {
-				angle = Math.atan2(targetY - this.y, targetX - this.x);
+				angle = Math.atan2(targetY - (this.y + this.height / 2), targetX - (this.x + this.width / 2));
 			}
 
-			return new ServerBullet(
-				this.id,
-				this.x,
-				this.y + this.height / 2,
-				7, // Vitesse augmentée (était 5)
-				angle,
-				10,
-				'enemy',
-				20, // Taille augmentée (était 15)
-				20  // Taille augmentée (était 15)
-			);
+			if (this.type === 'BUS_RELAY') {
+				const pattern: ServerBullet[] = [];
+				const numBullets = 5;
+				const spread = Math.PI / 3;
+				const startAngle = angle - spread / 2;
+
+				for (let i = 0; i < numBullets; i++) {
+					const currentAngle = startAngle + (spread / (numBullets - 1)) * i;
+					pattern.push(new ServerBullet(
+						this.id,
+						this.x,
+						this.y + this.height / 2,
+						6,
+						currentAngle,
+						15,
+						'enemy',
+						30,
+						30
+					));
+				}
+				return pattern;
+			} else {
+				return new ServerBullet(
+					this.id,
+					this.x,
+					this.y + this.height / 2,
+					7,
+					angle,
+					10,
+					'enemy',
+					20,
+					20
+				);
+			}
 		}
 		return null;
 	}
