@@ -34,8 +34,15 @@ export class ServerEnemy implements HitBox {
 		this.y = y;
 		this.vx = vx;
 		this.vy = vy;
-		this.width = 50;
-		this.height = 50;
+
+		if (this.type === 'BUS_RELAY') {
+			this.width = 560;
+			this.height = 176;
+		} else {
+			this.width = 50;
+			this.height = 50;
+		}
+
 		this.health = new LifebarService(health);
 		this.resetShootCooldown();
 		this.lastShotTime = Math.floor(Math.random() * this.shootCooldown);
@@ -49,6 +56,19 @@ export class ServerEnemy implements HitBox {
 	update(): void {
 		this.x += this.vx;
 		this.y += this.vy;
+
+		if (this.type === 'BUS_RELAY') {
+			const minY = 50;
+			const maxY = 800 - this.height;
+			if (this.y <= minY) {
+				this.y = minY;
+				this.vy = Math.abs(this.vy);
+			} else if (this.y >= maxY) {
+				this.y = maxY;
+				this.vy = -Math.abs(this.vy);
+			}
+		}
+
 		if (this.damageTimer > 0) {
 			this.damageTimer--;
 		}

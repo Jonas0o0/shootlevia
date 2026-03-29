@@ -10,6 +10,8 @@ export class SpawnEnemyService {
 	private minRespawnRate: number = 30; // Permet jusqu'à 2 ennemis par seconde
 	private difficultyCurve: number = 0.1;
 	private enemySpawnCooldown: number = 0;
+	private bossSpawned: boolean = false;
+	private readonly BOSS_SPAWN_TIME = 1800; // 30 secondes à 60 FPS
 
 	// Coefficients de progression
 	private readonly MAX_SPEED_MULTIPLIER: number = 3.0;
@@ -73,6 +75,14 @@ export class SpawnEnemyService {
 		enemies: ServerEnemy[]
 	): void {
 		if (hasPlayers) {
+			if (time >= this.BOSS_SPAWN_TIME) {
+				if (!this.bossSpawned) {
+					enemies.push(this.generateBoss());
+					this.bossSpawned = true;
+				}
+				return;
+			}
+
 			this.enemySpawnCooldown--;
 			if (this.enemySpawnCooldown <= 0) {
 				enemies.push(this.generateEnemy(time));
@@ -85,6 +95,20 @@ export class SpawnEnemyService {
 
 	public reset(): void {
 		this.enemySpawnCooldown = 0;
+		this.bossSpawned = false;
+	}
+
+	private generateBoss(): ServerEnemy {
+		const id = Math.random().toString(36).substring(7);
+		const type: EnemyType = 'BUS_RELAY';
+		const config = EnemyConfigs[type];
+		
+		const x = 1400;
+		const y = 300;
+		const vx = 0;
+		const vy = 2;
+
+		return new ServerEnemy(id, type, x, y, vx, vy, config.baseHealth);
 	}
 
 	private generateEnemy(time: number): ServerEnemy {
