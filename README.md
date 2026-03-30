@@ -115,3 +115,7 @@ Solution : Mise en place d'un système de proximité. Lorsqu'un joueur actif se 
 ## Analyse des accomplissements
 
 La réussite majeure de ce projet réside dans la robustesse de l'infrastructure multijoueur. Les tests en conditions réelles ont permis de valider la stabilité du système lors de sessions impliquant jusqu'à 12 joueurs simultanés, confirmant ainsi la viabilité de l'architecture choisie. La capacité à orchestrer des sessions privées via des identifiants uniques, tout en assurant une synchronisation temps réel de multiples entités, constitue une base solide pour des développements ultérieurs. L'adaptation dynamique du moteur de rendu aux différentes résolutions d'écran assure une expérience utilisateur cohérente sans distorsion des collisions logiques.
+
+## Ce dont nous sommes le plus fier
+
+- Nous sommes content que les joueurs en multijoueur puis réanimer leur alliée.
