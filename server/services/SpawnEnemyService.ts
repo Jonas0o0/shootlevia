@@ -11,7 +11,8 @@ export class SpawnEnemyService {
 	private difficultyCurve: number = 0.1;
 	private enemySpawnCooldown: number = 0;
 	private bossSpawned: boolean = false;
-	private readonly BOSS_SPAWN_TIME = 1800; // 30 secondes à 60 FPS
+	private readonly BOSS_SPAWN_TIME = 9000; // 2 minutes et 30 secondes à 60 FPS
+	private timeSinceLastBoss: number = 0;
 
 	// Coefficients de progression
 	private readonly MAX_SPEED_MULTIPLIER: number = 3.0;
@@ -79,22 +80,21 @@ export class SpawnEnemyService {
 		enemies: ServerEnemy[]
 	): void {
 		if (hasPlayers) {
-			// On verifie s'il y a un boss en vie
 			const isBossAlive = enemies.some(e => e.type === 'BUS_RELAY');
 
-			// Logique de spawn du boss
-			if (time > 0 && time % this.BOSS_SPAWN_TIME === 0 && !isBossAlive && !this.bossSpawned) {
-				enemies.push(this.generateBoss());
-				this.bossSpawned = true;
-				return; // On ne spawn rien d'autre sur cette frame
-			}
-
-			// Si le boss est là, on arrête le spawn d'ennemis normaux
 			if (isBossAlive) {
 				return;
 			}
 
-			// Sinon on spawn les ennemis normaux
+			this.timeSinceLastBoss++;
+
+			if (this.timeSinceLastBoss >= this.BOSS_SPAWN_TIME && !this.bossSpawned) {
+				enemies.push(this.generateBoss(time));
+				this.bossSpawned = true;
+				this.timeSinceLastBoss = 0;
+				return;
+			}
+
 			this.enemySpawnCooldown--;
 			if (this.enemySpawnCooldown <= 0) {
 				enemies.push(this.generateEnemy(time));
@@ -108,9 +108,10 @@ export class SpawnEnemyService {
 	public reset(): void {
 		this.enemySpawnCooldown = 0;
 		this.bossSpawned = false;
+		this.timeSinceLastBoss = 0;
 	}
 
-	private generateBoss(): ServerEnemy {
+	private generateBoss(time: number): ServerEnemy {
 		const id = Math.random().toString(36).substring(7);
 		const type: EnemyType = 'BUS_RELAY';
 		const config = EnemyConfigs[type];
@@ -120,7 +121,9 @@ export class SpawnEnemyService {
 		const vx = 0;
 		const vy = 2;
 
-		return new ServerEnemy(id, type, x, y, vx, vy, config.baseHealth);
+		const health = this.calculateHealth(time, type);
+
+		return new ServerEnemy(id, type, x, y, vx, vy, health);
 	}
 
 	private generateEnemy(time: number): ServerEnemy {
