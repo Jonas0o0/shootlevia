@@ -16,7 +16,7 @@ export const EnemyConfigs: Record<EnemyType, EnemyConfig> = {
 	},
 	DRONE: {
 		type: 'DRONE',
-		baseHealth: 30,
+		baseHealth: 20,
 		spawnProbability: 0.7,
 		scoreValue: 20,
 	},
