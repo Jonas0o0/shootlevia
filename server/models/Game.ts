@@ -132,8 +132,8 @@ export class ServerGame {
 		// Logique de réanimation
 		if (this.players.size > 1) {
 			const playersArray = Array.from(this.players.values());
-			const alivePlayers = playersArray.filter(p => p.isAlive() && !p.isGhost);
-			const ghostPlayers = playersArray.filter(p => !p.isAlive() && p.isGhost);
+			const alivePlayers = playersArray.filter(p => !p.isGhost);
+			const ghostPlayers = playersArray.filter(p => p.isGhost);
 
 			if (alivePlayers.length > 0) {
 				ghostPlayers.forEach(ghost => {
