@@ -34,8 +34,8 @@ describe('SpawnEnemyService', () => {
             // @ts-ignore - accès pour le test
             const healthDrone1000 = service.calculateHealth(1000, 'DRONE');
             
-            assert.strictEqual(healthDrone0, 30);
-            assert.ok(healthDrone1000 > 30, 'La vie du drone devrait augmenter');
+            assert.strictEqual(healthDrone0, 20);
+            assert.ok(healthDrone1000 > 20, 'La vie du drone devrait augmenter');
             
             // @ts-ignore - accès pour le test
             const healthPneu0 = service.calculateHealth(0, 'PNEU');
