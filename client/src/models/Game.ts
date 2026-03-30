@@ -2,6 +2,7 @@ import type { Socket } from 'socket.io-client';
 import Player from './Player.ts';
 import Bullet from './Bullet.ts';
 import Enemy from './Enemy.ts';
+import Boss from './Boss.ts';
 import type { GameState } from '../../../common/types.ts';
 import type { GameStats } from '../types.ts';
 import GameMap from './GameMap.ts';
@@ -14,7 +15,7 @@ export default class Game {
 	private socket: Socket;
 	private players: Map<string, Player> = new Map();
 	private bullets: Map<string, Bullet> = new Map();
-	private enemies: Map<string, Enemy> = new Map();
+	private enemies: Map<string, Enemy | Boss> = new Map();
 	private bonuses: Map<string, Bonus> = new Map();
 	private readonly joueur: Player;
 	private time: number;
@@ -232,7 +233,11 @@ export default class Game {
 			state.enemies.forEach(enemyData => {
 				let e = this.enemies.get(enemyData.id);
 				if (!e) {
-					e = new Enemy(enemyData);
+					if (enemyData.type === 'BUS_RELAY') {
+						e = new Boss(enemyData);
+					} else {
+						e = new Enemy(enemyData);
+					}
 					this.enemies.set(e.id, e);
 				}
 				e.updateFromData(enemyData);

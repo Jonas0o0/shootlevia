@@ -190,7 +190,7 @@ export class ServerGame {
 				if (checkCollision(bullet, enemy)) {
 					const player = this.players.get(bullet.ownerId);
 					if (enemy.type === 'DRONE') {
-						enemy.takeDamage(16);
+						enemy.takeDamage(bullet.degat);
 						bulletsToRemove.add(bullet.id);
 
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
@@ -204,7 +204,7 @@ export class ServerGame {
 							this.io.to(this.roomId).emit('playSound', 'drone_destroyed');
 						}
 					} else if (enemy.type === 'PNEU') {
-						enemy.takeDamage(11);
+						enemy.takeDamage(bullet.degat);
 						bulletsToRemove.add(bullet.id);
 						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
 							enemiesToRemove.add(enemy.id);
@@ -214,6 +214,25 @@ export class ServerGame {
 							if (player) player.score += 10;
 							if (Math.random() < 0.2) this.dropRandomBonus(enemy.x, enemy.y);
 							this.io.to(this.roomId).emit('playSound', 'pneu_detruit');
+						}
+					} else if (enemy.type === 'BUS_RELAY') {
+						enemy.takeDamage(bullet.degat); // Même base de dégat qu'un drone ou autre arme
+						bulletsToRemove.add(bullet.id);
+						if (!enemy.isAlive() && !enemiesToRemove.has(enemy.id)) {
+							enemiesToRemove.add(enemy.id);
+							const config = EnemyConfigs[enemy.type as EnemyType];
+							this.score += config.scoreValue;
+							this.enemyCount++;
+							// this.countDrone++; // A ignorer ou faire un count spécial boss
+							if (player) player.score += config.scoreValue;
+							// on drop plusieurs bonus à la mort du boss
+							for (let i = 0; i < 5; i++) {
+								this.dropRandomBonus(enemy.x + i * 50, enemy.y + i * 20);
+							}
+							this.io.to(this.roomId).emit('playSound', 'drone_destroyed'); // Son temporaire boss tué
+							
+							// Avertit le service de spawn que le boss est mort pour relancer les adversaires
+							this.spawnEnemyService.onBossDefeated();
 						}
 					}
 				}
@@ -276,15 +295,19 @@ export class ServerGame {
 				}
 			}
 
-			const bullet = nearestPlayer
+const resultBullets = nearestPlayer
 				? enemy.shoot(
 						nearestPlayer.x + nearestPlayer.width / 2,
 						nearestPlayer.y + nearestPlayer.height / 2
-					)
+				  )
 				: enemy.shoot();
 
-			if (bullet) {
-				this.enemyBullets.push(bullet);
+			if (resultBullets) {
+				if (Array.isArray(resultBullets)) {
+					this.enemyBullets.push(...resultBullets);
+				} else {
+					this.enemyBullets.push(resultBullets);
+				}
 			}
 		});
 

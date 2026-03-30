@@ -1,4 +1,5 @@
-export type PlaySpriteSheet = 'PLAYER' | 'DRONE' | 'PNEU' | 'PASS_PASS' | 'POWER_UP';
+
+export type PlaySpriteSheet = 'PLAYER' | 'DRONE' | 'PNEU' | 'PASS_PASS' | 'POWER_UP' | 'BUS_RELAY';
 
 export const PlaySpriteSheet = {
 	PLAYER: 'PLAYER' as PlaySpriteSheet,
@@ -6,6 +7,7 @@ export const PlaySpriteSheet = {
 	PNEU: 'PNEU' as PlaySpriteSheet,
 	PASS_PASS: 'PASS_PASS' as PlaySpriteSheet,
 	POWER_UP: 'POWER_UP' as PlaySpriteSheet,
+	BUS_RELAY: 'BUS_RELAY' as PlaySpriteSheet,
 };
 
 export type SpriteSheetConfig = {
@@ -58,6 +60,15 @@ export const SpriteSheetConfigs: Record<PlaySpriteSheet, SpriteSheetConfig> = {
 		rows: 1,
 		spriteWidth: 28,
 		spriteHeight: 28,
+		columnsFrameMax: 1,
+		isStatic: true,
+	},
+	BUS_RELAY: {
+		path: '/assets/BusRelay.png',
+		columns: 1,
+		rows: 1,
+		spriteWidth: 560,
+		spriteHeight: 176,
 		columnsFrameMax: 1,
 		isStatic: true,
 	},

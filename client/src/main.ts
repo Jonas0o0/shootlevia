@@ -29,6 +29,7 @@ async function init() {
 		SpriteSheetConfigs.PNEU.path,
 		SpriteSheetConfigs.PASS_PASS.path,
 		SpriteSheetConfigs.POWER_UP.path,
+		SpriteSheetConfigs.BUS_RELAY.path,
 		// Ajoutez d'autres images si nécessaire
 	];
 
