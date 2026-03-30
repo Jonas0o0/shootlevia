@@ -139,15 +139,7 @@ export class ServerGame {
 				ghostPlayers.forEach(ghost => {
 					let beingRevived = false;
 					alivePlayers.forEach(alive => {
-						const ghostCenter = { x: ghost.x + ghost.width / 2, y: ghost.y + ghost.height / 2 };
-						const aliveCenter = { x: alive.x + alive.width / 2, y: alive.y + alive.height / 2 };
-						const dx = ghostCenter.x - aliveCenter.x;
-						const dy = ghostCenter.y - aliveCenter.y;
-						const distance = Math.sqrt(dx * dx + dy * dy);
-
-						if (distance < 150) {
-							beingRevived = true;
-						}
+						beingRevived = checkCollision(ghost, alive);
 					});
 
 					if (beingRevived) {
