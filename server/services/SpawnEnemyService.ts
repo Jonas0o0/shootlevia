@@ -114,7 +114,6 @@ export class SpawnEnemyService {
 	private generateBoss(time: number): ServerEnemy {
 		const id = Math.random().toString(36).substring(7);
 		const type: EnemyType = 'BUS_RELAY';
-		const config = EnemyConfigs[type];
 		
 		const x = 1400;
 		const y = 300;
