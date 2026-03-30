@@ -119,3 +119,4 @@ La réussite majeure de ce projet réside dans la robustesse de l'infrastructure
 ## Ce dont nous sommes le plus fier
 
 - Nous sommes content que les joueurs en multijoueur puis réanimer leur alliée.
+- Le combat avec le boss (Bus)
