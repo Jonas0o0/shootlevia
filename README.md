@@ -125,5 +125,5 @@ La réussite majeure de ce projet réside dans la robustesse de l'infrastructure
 
 ## Ce dont nous sommes le plus fier
 
-- Nous sommes content que les joueurs en multijoueur puisse réanimer leurs alliées.
+- Nous sommes content que les joueurs en multijoueur puissent réanimer leurs alliées.
 - Le combat avec le boss (Bus Relais)
