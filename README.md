@@ -5,15 +5,18 @@ Shootlevia est une application de jeu de type shoot-'em-up multijoueur synchrone
 ## Installation et Lancement
 
 ### Prérequis
+
 - Node.js (Version 18 ou supérieure)
 - npm (Gestionnaire de paquets)
 
 ### Procédure d'installation
+
 ```bash
 npm install
 ```
 
 ### Exécution de l'application
+
 Le projet nécessite l'exécution simultanée des composants serveur et client.
 
 ```bash
@@ -25,6 +28,7 @@ npm run client:start
 ```
 
 ### Validation technique
+
 ```bash
 npm run test
 ```
@@ -45,7 +49,7 @@ sequenceDiagram
     participant C as Client (Navigateur)
     participant S as Serveur (Node.js/Socket.io)
     participant G as Instance Jeu (ServerGame)
-    
+
     Note over C, S: Phase d'Initialisation & Lobby
     C ->> S: emit "join_lobby" (roomId)
     S -->> C: send "lobby_joined"
@@ -53,7 +57,7 @@ sequenceDiagram
     S ->> G: new ServerGame(io, roomId, difficulty)
     G ->> G: setInterval(update, 16.6ms)
     S -->> C: emit "match_started"
-    
+
     Note over C, G: Boucle de Jeu Temps Réel (60 FPS)
 
     rect rgb(240, 240, 240)
@@ -63,7 +67,7 @@ sequenceDiagram
         C ->> S: emit "jump"
         S ->> G: handlePlayerJump(id)
         G -->> C: emit "playSound" ("jump")
-        
+
         Note right of G: Traitement Serveur (Boucle update)
         G ->> G: Mise à jour positions (IA, Balles, Joueurs)
         G ->> G: Détection des collisions (HitBox.ts)
@@ -80,7 +84,7 @@ sequenceDiagram
     Note over C: Rendu graphique (Client)
     C ->> C: updateFromData(gameState)
     C ->> C: draw()
-    
+
     Note over C, G: Fin de Partie / Déconnexion
     alt Élimination du joueur
         G ->> G: leaderboardService.addEntry(score)
@@ -94,14 +98,17 @@ sequenceDiagram
 ## Défis techniques et Solutions implémentées
 
 ### 1. Synchronisation de l'état global à 60 Hz
+
 La problématique majeure résidait dans le maintien de la cohérence entre l'autorité du serveur et le rendu fluide côté client.
 Solution : Implémentation d'une boucle de mise à jour cadencée à 16,6ms sur le serveur. Le client transmet des vecteurs de vitesse plutôt que des positions absolues, permettant au serveur de valider la physique et de redistribuer l'état global sans saccades.
 
 ### 2. Algorithmes de déplacement et Inertie
+
 L'intégration de deux modes de contrôle (clavier ZQSD et suivi de souris) exigeait une réponse physique uniforme.
 Solution : Découplage de la capture d'input et de l'application de la force. Une logique d'accélération et de friction a été centralisée pour garantir que l'inertie reste constante, quel que soit le périphérique d'entrée.
 
 ### 3. Mécanique de réanimation multijoueur
+
 La gestion des états Vivant et Spectateur devait permettre une transition dynamique sans interrompre la session.
 Solution : Mise en place d'un système de proximité. Lorsqu'un joueur actif se situe dans le rayon d'un joueur éliminé, une jauge de progression est incrémentée sur le serveur jusqu'à la réanimation complète du sujet.
 
@@ -118,5 +125,5 @@ La réussite majeure de ce projet réside dans la robustesse de l'infrastructure
 
 ## Ce dont nous sommes le plus fier
 
-- Nous sommes content que les joueurs en multijoueur puis réanimer leur alliée.
-- Le combat avec le boss (Bus)
+- Nous sommes content que les joueurs en multijoueur puisse réanimer leurs alliées.
+- Le combat avec le boss (Bus Relais)
